@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Zheng T, Zhang G, Han L, et al. Building Fusion: Semantic-aware Structural Building-scale 3D Reconstruction [J]. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2020 清华-伯克利深圳学院，清华大学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[泛]Building Fusion：语义感知结构化建筑规模的三维重建">
+<meta property="og:url" content="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="Zheng T, Zhang G, Han L, et al. Building Fusion: Semantic-aware Structural Building-scale 3D Reconstruction [J]. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2020 清华-伯克利深圳学院，清华大学">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/1618760751878.png">
+<meta property="og:image" content="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/1618761353123.png">
+<meta property="article:published_time" content="2021-04-18T15:43:50.000Z">
+<meta property="article:modified_time" content="2021-04-18T17:15:27.589Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Semantic&#x2F;Deep SLAM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/1618760751878.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>[泛]Building Fusion：语义感知结构化建筑规模的三维重建 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [泛]Building Fusion：语义感知结构化建筑规模的三维重建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-18 23:43:50" itemprop="dateCreated datePublished" datetime="2021-04-18T23:43:50+08:00">2021-04-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-19 01:15:27" itemprop="dateModified" datetime="2021-04-19T01:15:27+08:00">2021-04-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">论文泛读</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Zheng T, Zhang G, Han L, et al. <a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9286413/"><strong>Building Fusion: Semantic-aware Structural Building-scale 3D Reconstruction</strong></a> [J]. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2020</p>
+<p>清华-伯克利深圳学院，清华大学</p>
+</blockquote>
+<h5 id="针对什么问题"><a href="#针对什么问题" class="headerlink" title="针对什么问题"></a>针对什么问题</h5><ol>
+<li><p>如何实现<strong>在线</strong>的<strong>建筑规模</strong>的<strong>协同</strong>三维重建，为室内场景提供详细的几何、语义和结构化信息</p>
+</li>
+<li><p>如何解决场景中相似房间导致的回环检测出错</p>
+</li>
+</ol>
+<h5 id="采用什么方法"><a href="#采用什么方法" class="headerlink" title="采用什么方法"></a>采用什么方法</h5><p>提出了一个中心化架构的语义感知结构化建筑规模的三维重建系统Building Fusion：</p>
+<ol>
+<li><p>采用分层场景结构实现全局连续的在线重建</p>
+<ul>
+<li><p>协同进行密集重建，每个agent的重建都采用基于<strong>关键帧</strong>的重建方法(组合时间连续帧)</p>
+</li>
+<li><p>采用<strong>子图策略</strong>组合空间连续帧，该方法提高了位姿图优化和深度融合的效率</p>
+</li>
+</ul>
+</li>
+<li><p>采用[8]提出的<strong>三维语义-实例分割网络</strong>实现在线语义和实例预测，用来检测房间</p>
+</li>
+<li><p>提出的房间规模的语义感知结构化回环检测方法 (LCD) 实现了对不同agent间匹配关系的寻找，从而形成全局连续的地图</p>
+<ul>
+<li><p>输入实例分割标签，预测实例级embedding，该网络对物体形状信息进行编码</p>
+</li>
+<li><p>基于第一步求出的实例形状embedding计算当前房间和数据库中所有房间的相似度</p>
+</li>
+<li><p>采用图匹配方法和ICP进行几何验证，检查这些房间是否能很好地对齐，并剔除误判。该方法受[45]所提出的基于物体的图匹配方法的启发，并将其扩展到大规模场景</p>
+</li>
+</ul>
+</li>
+</ol>
+<h5 id="达到什么效果"><a href="#达到什么效果" class="headerlink" title="达到什么效果"></a>达到什么效果</h5><ol>
+<li><p>和基于实例分割的其他方法比Recall@N（语义标签直方图和PointNet[23]）</p>
+<p><img src="/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/1618760751878.png" alt="Recall@N comparisons"></p>
+<ul>
+<li>PointNet泛化能力差，无法生成好的形状embedding</li>
+<li>Semantic Label Histogram在Recall@N上表现较好，但不能区分来自相同种类的不同物体</li>
+<li>本文提出的方法成功将相似几何外形的物体进行分类</li>
+</ul>
+</li>
+<li><p>和不用实例分割的方法相比（PointNetVLAD和FPFH）</p>
+</li>
+<li><p>和二维回环检测相比（BoBW）</p>
+<p><img src="/%E8%AE%BA%E6%96%87%E6%B3%9B%E8%AF%BB/[%E6%B3%9B]Building-Fusion%EF%BC%9A%E8%AF%AD%E4%B9%89%E6%84%9F%E7%9F%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%BB%BA%E7%AD%91%E8%A7%84%E6%A8%A1%E7%9A%84%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/1618761353123.png" alt="Table1"></p>
+<ul>
+<li>BoBW表现不好的可能原因：1)BoBW所用数据集太大了，从而降低了命中率  2) BoBW不擅长从新的位姿进行定位（not good at relocalizing from novel poses）</li>
+</ul>
+</li>
+<li><p>建筑规模重建（和Golodetz[4]相比，后者不能得到理想的结果）</p>
+</li>
+<li><p>消融实验表明：</p>
+<ul>
+<li>Room-level LCD：通过房间级的几何与语义信息进行对齐，不再受二维相似图像影响</li>
+<li>Submap-based reconstruction：大大降低了系统处理所需的时间和内存</li>
+<li>Submap reintegration：实现无缝重建，重建结果更加平滑</li>
+</ul>
+</li>
+</ol>
+<h5 id="存在什么不足"><a href="#存在什么不足" class="headerlink" title="存在什么不足"></a>存在什么不足</h5><ol>
+<li>几何重建方面<ul>
+<li>视觉跟踪器(visual tracker)导致的漂移误差(drift error)，缺乏足够视觉特征时会跟丢(tracking loss)   &lt;=  增加惯性传感器提高跟踪准确率和鲁棒性</li>
+<li>对齐房间的时候ICP无法稳定生成最佳结果  &lt;=  用学习的三维特征代替[60]</li>
+<li>重建结果可能会因为扫描密度不够而不完整  &lt;=  使用数据驱动的方法[61], [62]</li>
+</ul>
+</li>
+<li>对场景的语义和结构化理解方面<ul>
+<li>在训练集中未出现的物体/不完整重建的物体，分割结果较差  &lt;=  根据场景微调模型或采用更好的数据增强方法或采用当前更好的实例/语义分割方法</li>
+<li>当前只建模了房间，未来可以增加其他结构类型</li>
+<li>当前只考虑了静态场景，还没有考虑动态场景</li>
+</ul>
+</li>
+</ol>
+<p>[4] S. Golodetz, T. Cavallari, N. A. Lord, V. A. Prisacariu, D. W. Murray, and P. H. Torr, “Collaborative large-scale dense 3d reconstruction with online inter-agent pose optimisation,” IEEE transactions on visualization and computer graphics, vol. 24, no. 11, pp. 2895–2905, 2018.</p>
+<ul>
+<li>对比文献，建筑规模重建</li>
+</ul>
+<p>[8] L. Han, T. Zheng, L. Xu, and L. Fang, “Occuseg: Occupancy-aware 3d instance segmentation,” arXiv preprint arXiv:2003.06537, 2020.</p>
+<ul>
+<li>参考工作，实现房间检测的三维语义-实例分割网络</li>
+</ul>
+<p>[23] C. R. Qi, H. Su, K. Mo, and L. J. Guibas, “Pointnet: Deep learning on point sets for 3d classification and segmentation,” in Proceedings of the IEEE conference on computer vision and pattern recognition, 2017, pp. 652–660.</p>
+<ul>
+<li>对比文献，PointNet，基于实例分割，泛化能力差</li>
+</ul>
+<p>[45] R. Finman, L. Paull, and J. J. Leonard, “Toward object-based place recognition in dense rgb-d maps,” in ICRA Workshop Visual</p>
+<ul>
+<li>参考工作，基于物体的图匹配方法，本文将其拓展到大规模场景</li>
+</ul>
+<p>[53] A. Dai, A. X. Chang, M. Savva, M. Halber, T. Funkhouser, and M. Nießner, “Scannet: Richly-annotated 3d reconstructions of indoor scenes,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2017, pp. 5828–5839.</p>
+<ul>
+<li>RGBD视频数据集，包括了在707个不同地点的1513段扫描、重建的三维模型和三维语义/实例分割GT标签，广泛应用于三维语义和实例分割</li>
+</ul>
+<p>[60] C. Choy, J. Park, and V. Koltun, “Fully convolutional geometric features,” in ICCV, 2019.</p>
+<ul>
+<li>未来工作参考，基于学习的三维特征</li>
+</ul>
+<p>[61] A. Dai, D. Ritchie, M. Bokeloh, S. Reed, J. Sturm, and M. Nießner, “Scancomplete: Large-scale scene completion and semantic segmentation for 3d scans,” in Proc. Computer Vision and Pattern Recognition (CVPR), IEEE, 2018.</p>
+<ul>
+<li>未来工作参考，数据驱动</li>
+</ul>
+<p>[62] A. Dai, C. Diller, and M. Nießner, “Sg-nn: Sparse generative neural networks for self-supervised scene completion of rgb-d scans,” in Proc. Computer Vision and Pattern Recognition (CVPR), IEEE, 2020.</p>
+<ul>
+<li>未来工作参考，数据驱动</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Semantic-Deep-SLAM/" rel="tag"># Semantic/Deep SLAM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/uncategorized/Reinforcement-Learning-Including-Q-learning/" rel="prev" title="Reinforcement Learning (Including Q-learning)">
+      <i class="fa fa-chevron-left"></i> Reinforcement Learning (Including Q-learning)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Eigen/Eigen%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/" rel="next" title="Eigen安装及使用">
+      Eigen安装及使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%92%88%E5%AF%B9%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">针对什么问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%87%87%E7%94%A8%E4%BB%80%E4%B9%88%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">采用什么方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BE%BE%E5%88%B0%E4%BB%80%E4%B9%88%E6%95%88%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">达到什么效果</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E4%BB%80%E4%B9%88%E4%B8%8D%E8%B6%B3"><span class="nav-number">4.</span> <span class="nav-text">存在什么不足</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

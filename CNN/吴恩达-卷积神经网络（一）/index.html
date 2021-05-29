@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="卷积神经网络（一）：CNN基本概念引子：边界检测在认识卷积神经网络CNN之前，我们先来看一个最简单的例子——边界检测(edge detection)。假设现在有一张6$\times$6的图片：  我们都知道，对于一张灰度图，像素值越大，颜色越亮，因此中间两个颜色的分界线就是我们要检测的边界。那么问题来了，怎么检测它呢？我们可以设计这样一个3$\times$3滤波器(filter，或者称为kerne">
+<meta property="og:type" content="article">
+<meta property="og:title" content="吴恩达-卷积神经网络（一）">
+<meta property="og:url" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="卷积神经网络（一）：CNN基本概念引子：边界检测在认识卷积神经网络CNN之前，我们先来看一个最简单的例子——边界检测(edge detection)。假设现在有一张6$\times$6的图片：  我们都知道，对于一张灰度图，像素值越大，颜色越亮，因此中间两个颜色的分界线就是我们要检测的边界。那么问题来了，怎么检测它呢？我们可以设计这样一个3$\times$3滤波器(filter，或者称为kerne">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/01.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/02.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/03.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/08.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/09.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/10.PNG">
+<meta property="og:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/11.PNG">
+<meta property="article:published_time" content="2019-10-30T13:26:46.000Z">
+<meta property="article:modified_time" content="2021-03-23T08:19:44.654Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="CNN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/01.PNG">
+
+<link rel="canonical" href="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>吴恩达-卷积神经网络（一） | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          吴恩达-卷积神经网络（一）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-30 21:26:46" itemprop="dateCreated datePublished" datetime="2019-10-30T21:26:46+08:00">2019-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-23 16:19:44" itemprop="dateModified" datetime="2021-03-23T16:19:44+08:00">2021-03-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CNN/" itemprop="url" rel="index"><span itemprop="name">CNN</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="卷积神经网络（一）：CNN基本概念"><a href="#卷积神经网络（一）：CNN基本概念" class="headerlink" title="卷积神经网络（一）：CNN基本概念"></a>卷积神经网络（一）：CNN基本概念</h3><h4 id="引子：边界检测"><a href="#引子：边界检测" class="headerlink" title="引子：边界检测"></a>引子：边界检测</h4><p>在认识卷积神经网络CNN之前，我们先来看一个最简单的例子——边界检测(edge detection)。假设现在有一张6$\times$6的图片：</p>
+<p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/01.PNG" width="20%" height="20%"></p>
+<p>我们都知道，对于一张灰度图，像素值越大，颜色越亮，因此中间两个颜色的分界线就是我们要检测的边界。那么问题来了，怎么检测它呢？我们可以设计这样一个3$\times$3滤波器(filter，或者称为kernel，卷积核)：</p>
+<p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/02.PNG" width="10%" height="10%"></p>
+<p>我们拿这个filter去和原来的图片作卷积，也就是当filter覆盖一块相同大小的区域后，将该区域内的元素与自己对应相乘，然后求和，按步长滑动覆盖整个图像，步长的概念后文会解释，下图的例子中步长为1，将得到一个4$\times$4的结果矩阵：</p>
+<p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/03.PNG" width="60%" height="60%"></p>
+<p>可以发现右边的图中间颜色浅，两边颜色深，说明原图片中间的边界被检测出来了。</p>
+<p>上面这个例子说明了，我们可以通过设计特定的<code>filter</code>，让它去和图片作卷积，来识别出图片中的某些特征，例如边界。</p>
+<p>上面这个filter用来检测垂直边界，同样的，我们也可以设计出一个检测水平边界的filter，把刚才的filter旋转90$^\circ$即可。对于其他特征，理论上总是可以通过精密的计算检验人工设计出合适的filter，然后CNN(Convolutional Neural Network，卷积神经网络)，就可以通过这一个个不同的filter，不断地提取特征，从局部到整体，从而实现图像识别等工作。</p>
+<p>那么问题又来了，对于刚才的图片只是简单的边缘检测，人工设计滤波器可以轻易实现，但是要知道，现实的图片中可能包含了成千上万中特征，想要一一设计出对应的filter，完全不现实。这就到神经网络发挥作用的时候了，这些filter，根本不需要我们去设计，只需要将每个filter中的各个数字看作一个参数，让机器通过大量的数据自己去学习它们就可以了，甚至还可以实现比人工计算更加合适的滤波器。</p>
+<p>以上就是CNN的基本原理。</p>
+<h4 id="CNN的基本概念"><a href="#CNN的基本概念" class="headerlink" title="CNN的基本概念"></a>CNN的基本概念</h4><h5 id="Padding"><a href="#Padding" class="headerlink" title="Padding"></a>Padding</h5><p>为了构建卷积神经网络，<code>Padding</code>是一个基本的卷积操作。从上面的例子中我们发现，一个6$\times$6的图像经过3$\times$3的filter卷积之后变小了(4$\times$4)，更普通地说，一个$n\times n$的图像，用一个$f\times f$的滤波器做卷积，得到的图像大小将变为$(n-f+1)\times (n-f+1)$，这样就会产生两个问题：</p>
+<ul>
+<li>每做一次卷积图像就会缩小一次，这样没几次卷积图像就没了，尤其对于深度神经网络而言，是不希望发生的；</li>
+<li>相较图像中心的点而言，边缘像素点在卷积中计算的次数很少，容易丢失边缘信息。</li>
+</ul>
+<p>针对这两个问题的解决方法是，在每次做卷积之前，填充整个图像使得卷积后的图像大小和原始图像大小相同，同时，原图的边缘也能参与更多次的计算。通常，填充的像素值都为0。</p>
+<p>参数<code>p</code>用来指定在原图周围填充的像素圈数，例如在上面的例子中，我们指定<code>p=1</code>，那么原来6$\times$6的图像的周围将多出一圈像素值为0的像素，从而变成一个8$\times$8的图像，在经过3$\times$3的filter后，得到的结果将是一个6$\times$6的图像，和原图一样大，没有缩小。</p>
+<p>Padding常用的有两种方式：</p>
+<ul>
+<li><strong>Valid</strong>: <code>p=0</code>，即不经过任何像素填充；</li>
+<li><strong>Same</strong>: 让卷积之后的图像大小不变的Padding方式</li>
+</ul>
+<p>当我们使用<strong>Same</strong>方式时，如何计算参数<code>p</code>的具体值呢？假设我们现在有一个$n\times n$的图像，和一个$f\times f$的滤波器，在原图周围填充<code>p</code>圈像素后得到的图像大小为$(n+2p)\times (n+2p)$，那么卷积后得到的图像大小为$(n+2p-f+1)\times (n+2p-f+1)$，要使它和原图大小相等，则必须$n=n+2p-f+1$，从而得到$p=\frac{f-1}{2}$。</p>
+<p>习惯上，在计算机视觉中，$f$通常是奇数，很少见到一个偶数的滤波器。</p>
+<h5 id="Stride"><a href="#Stride" class="headerlink" title="Stride"></a>Stride</h5><p><code>Stride</code>(步长)是构建卷积神经网络的另一个基本操作，它决定了卷积核每次移动过几行/列像素，以下面7$\times$7图像卷积3$\times$3filter为例，可以清楚地了解<code>Stride</code>的作用：</p>
+<p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/08.PNG" width="60%" height="60%"></p>
+<p>卷积得到的图像大小由下面这个公式给出：</p>
+<script type="math/tex; mode=display">
+\lfloor \frac{n+2p-f}{s}+1 \rfloor \times \lfloor \frac{n+2p-f}{s}+1 \rfloor</script><p>当无法整除时向下取整，它的实际意义是，只有当filter完全在被卷积图像中时才能进行卷积操作。</p>
+<h5 id="Pooling"><a href="#Pooling" class="headerlink" title="Pooling"></a>Pooling</h5><p><code>Pooling</code>操作是为了提取一定区域内的主要特征，并减少参数的数量，防止模型过拟合，例如下面的<code>Max Pooling</code>，它采用了一个2$\times$2的窗口，步长为2，其作用是取每个2$\times$2的窗口中的最大值，构成最终的输出。</p>
+<p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/09.PNG" width="60%" height="60%"></p>
+<h5 id="多通道-channels-图像卷积"><a href="#多通道-channels-图像卷积" class="headerlink" title="多通道(channels)图像卷积"></a>多通道(channels)图像卷积</h5><p>我们在日常生活中所接触的图像通常是RGB图像，即除了长宽外，它还有RGB三个通道(channel)，因此输入卷积神经网络的数据也不再是简单的长$\times$宽，而应该是长$\times$宽$\times$通道。那么相对应的，我们的filter也要从二维变化成三维，沿用上面的例子，filter的维度就要变成(3,3,3)，其最后一维必须和输入的<code>channel</code>维度一致。</p>
+<p>这时候的卷积运算，是三个channel的所有元素对应相乘后求和，换言之，之前是九个乘积的和，而现在则是27个乘积的和，因此输出图像的维度并不会发生变化，还是和二维时的一样。</p>
+<p>但一般情况下，我们会使用多个filter来检测多个不同的特征，每个filter的输出对应最终输出图像的一层，例如上面的例子中，我们采用了4个不同的滤波器，假设分别是垂直边缘滤波器，水平边缘滤波器，45$^{\circ}$边缘滤波器，75$^{\circ}$边缘滤波器，那么输出图像维度将会是(4,4,4)，最后一维取决于使用的滤波器个数，每一层图像对应了一个不同的特征。</p>
+<h5 id="单层卷积神经网络"><a href="#单层卷积神经网络" class="headerlink" title="单层卷积神经网络"></a>单层卷积神经网络</h5><p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/10.PNG" width="60%" height="60%"></p>
+<p>对卷积得到的输出图像加上偏置并由激活函数激活后，我们最终得到了第一层的输出，亦即第二层的输入：</p>
+<script type="math/tex; mode=display">
+A^{[1]}=ReLU(W^{[1]}*A^{[0]}+B^{[1]})</script><h4 id="CNN的组成结构"><a href="#CNN的组成结构" class="headerlink" title="CNN的组成结构"></a>CNN的组成结构</h4><p>CNN包含了三种层</p>
+<h5 id="卷积层-Convolutional-layer-—-CONV"><a href="#卷积层-Convolutional-layer-—-CONV" class="headerlink" title="卷积层(Convolutional layer — CONV)"></a>卷积层(Convolutional layer — CONV)</h5><p>上面介绍的所有内容都是卷积层相关的，它由滤波器filter和激活函数构成，设计卷积层时涉及的超参数包括：filter的数量、大小、步长、是否填充、填充大小、偏差，以及激活函数的选择。</p>
+<h5 id="池化层-Pooling-layer-—-POOL"><a href="#池化层-Pooling-layer-—-POOL" class="headerlink" title="池化层(Pooling layer — POOL)"></a>池化层(Pooling layer — POOL)</h5><p>除了卷积层，卷积网络也经常使用池化层来缩小模型的大小，提高计算速度，同时提高所提取的特征的鲁棒性。</p>
+<p>最常用的算法是<code>Max Pooling</code>，这在上文也提到过。最大化操作的功能是，只要在任何窗口内提取到某个特征，它都会保留在最大池化的输出里，换言之，如果在过滤器中提取到了某个特征，那么保留其最大值；如果没有提取到这个特征，那么这块区域中不存在这个特征，其中的最大值也还是很小。</p>
+<p>另外还有一种不太常用的池化方法——平均池化(<code>Average Pooling</code>)，顾名思义，它不取最大值而是计算平均值。</p>
+<p>池化的超参数包括窗口大小$f$，步长$s$，以及池化方式。常用参数值为$f=2,s=2$，其效果相当于高度和宽度各减少一半，也有使用$f=3,s=2$的情况。池化层没有需要学习的超参数。</p>
+<h5 id="全连接层-Fully-Connected-layer-—FC"><a href="#全连接层-Fully-Connected-layer-—FC" class="headerlink" title="全连接层(Fully Connected layer —FC)"></a>全连接层(Fully Connected layer —FC)</h5><p>这就是我们之前学的神经网络中的最普通的层，就是一排神经元。因为这一层是每一个单元都和前一层的每一个单元相连接，所以称之为“全连接”。这里要指定的超参数无非就是神经元的数量，以及激活函数。</p>
+<h5 id="一个CNN的典型架构"><a href="#一个CNN的典型架构" class="headerlink" title="一个CNN的典型架构"></a>一个CNN的典型架构</h5><p><img src="/CNN/%E5%90%B4%E6%81%A9%E8%BE%BE-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89/11.PNG" width="60%" height="60%"></p>
+<p>如上图，对一个输入的(32,32,3)的手写数字图像，经过第一次卷积(f=5,s=1,p=0,n=6,ReLU)，得到(28,28,6)的CONV1，再经由最大池化层(f=2,s=2)得到(14,14,6)的POOL1，通常我们将CONV1和POOL1合称为Layer1。然后再过一次(f=5,s=1,p=0,n=16,ReLU)的卷积，得到(10,10,16)的CONV2，经过最大池化层得到(5,5,16)的POOL2，将POOL2展开(扁平化)即得到一个长为400的向量，后面的操作就与一般神经网络无异了(经过两个全连接层后变成长为84的向量，作为Softmax的输入)。</p>
+<p>CONV(relu)-POOL-CONV(relu)-POOL-FC-FC-FC-Softmax</p>
+<p>以上就是一个典型的CNN架构，在这个过程中我们可以发现，随着网络的深入，图像的长宽在不断减小，而通道数(深度)在不断增加。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CNN/" rel="tag"># CNN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E9%9A%8F%E8%AE%B0/2019-10-29%E9%9A%8F%E8%AE%B0/" rel="prev" title="2019-10-29随记">
+      <i class="fa fa-chevron-left"></i> 2019-10-29随记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Machine-Learning/Introduction-for-Machine-Learning/" rel="next" title="Introduction for Machine Learning">
+      Introduction for Machine Learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9ACNN%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">卷积神经网络（一）：CNN基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%95%E5%AD%90%EF%BC%9A%E8%BE%B9%E7%95%8C%E6%A3%80%E6%B5%8B"><span class="nav-number">1.1.</span> <span class="nav-text">引子：边界检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CNN%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.</span> <span class="nav-text">CNN的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Padding"><span class="nav-number">1.2.1.</span> <span class="nav-text">Padding</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Stride"><span class="nav-number">1.2.2.</span> <span class="nav-text">Stride</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Pooling"><span class="nav-number">1.2.3.</span> <span class="nav-text">Pooling</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%A4%9A%E9%80%9A%E9%81%93-channels-%E5%9B%BE%E5%83%8F%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.2.4.</span> <span class="nav-text">多通道(channels)图像卷积</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8D%95%E5%B1%82%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">1.2.5.</span> <span class="nav-text">单层卷积神经网络</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CNN%E7%9A%84%E7%BB%84%E6%88%90%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.</span> <span class="nav-text">CNN的组成结构</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82-Convolutional-layer-%E2%80%94-CONV"><span class="nav-number">1.3.1.</span> <span class="nav-text">卷积层(Convolutional layer — CONV)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B1%A0%E5%8C%96%E5%B1%82-Pooling-layer-%E2%80%94-POOL"><span class="nav-number">1.3.2.</span> <span class="nav-text">池化层(Pooling layer — POOL)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82-Fully-Connected-layer-%E2%80%94FC"><span class="nav-number">1.3.3.</span> <span class="nav-text">全连接层(Fully Connected layer —FC)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%80%E4%B8%AACNN%E7%9A%84%E5%85%B8%E5%9E%8B%E6%9E%B6%E6%9E%84"><span class="nav-number">1.3.4.</span> <span class="nav-text">一个CNN的典型架构</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

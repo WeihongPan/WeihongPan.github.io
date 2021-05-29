@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本章介绍矩阵初始化的一些高级方法，包括逗号初始化和一些特殊矩阵（单位矩阵、零矩阵）初始化 逗号初始化 系数初始化顺序：从左上角开始，按从左到右，从上到下的顺序排列  必须预先规定好矩阵&#x2F;向量&#x2F;数组的大小，否则会报错  初始化列表的元素除了数值外，也可以是向量或矩阵，常用来连接几个向量或矩阵，同样必须预先规定好大小：   1234567891011121314int main()&amp;#123;	Row">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高级初始化">
+<meta property="og:url" content="https://weihongpan.github.io/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="本章介绍矩阵初始化的一些高级方法，包括逗号初始化和一些特殊矩阵（单位矩阵、零矩阵）初始化 逗号初始化 系数初始化顺序：从左上角开始，按从左到右，从上到下的顺序排列  必须预先规定好矩阵&#x2F;向量&#x2F;数组的大小，否则会报错  初始化列表的元素除了数值外，也可以是向量或矩阵，常用来连接几个向量或矩阵，同样必须预先规定好大小：   1234567891011121314int main()&amp;#123;	Row">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-22T03:03:50.000Z">
+<meta property="article:modified_time" content="2021-04-23T07:37:24.562Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Eigen">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://weihongpan.github.io/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>高级初始化 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          高级初始化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 11:03:50" itemprop="dateCreated datePublished" datetime="2021-04-22T11:03:50+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 15:37:24" itemprop="dateModified" datetime="2021-04-23T15:37:24+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本章介绍矩阵初始化的一些高级方法，包括逗号初始化和一些特殊矩阵（单位矩阵、零矩阵）初始化</p>
+<h3 id="逗号初始化"><a href="#逗号初始化" class="headerlink" title="逗号初始化"></a>逗号初始化</h3><ul>
+<li><p>系数初始化顺序：从左上角开始，按从左到右，从上到下的顺序排列</p>
+</li>
+<li><p>必须预先规定好矩阵/向量/数组的大小，否则会报错</p>
+</li>
+<li><p>初始化列表的元素除了数值外，也可以是向量或矩阵，常用来连接几个向量或矩阵，同样必须预先规定好大小：</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">RowVectorXd <span class="title">vec1</span><span class="params">(<span class="number">3</span>)</span></span>;</span><br><span class="line">	vec1 &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;vec1 = &quot;</span> &lt;&lt; vec1 &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">	<span class="function">RowVectorXd <span class="title">vec2</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br><span class="line">	vec2 &lt;&lt; <span class="number">1</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;vec2 = &quot;</span> &lt;&lt; vec2 &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">	<span class="function">RowVectorXd <span class="title">joined</span><span class="params">(<span class="number">7</span>)</span></span>;</span><br><span class="line">	joined &lt;&lt; vec1, vec2;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;joined = &quot;</span> &lt;&lt; joined &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vec1 = 1 2 3</span><br><span class="line">vec2 =  1  4  9 16</span><br><span class="line">joined =  1  2  3  1  4  9 16</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以用同样的方法按块结构初始化矩阵：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">MatrixXf <span class="title">matA</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line">	matA &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>;</span><br><span class="line">	<span class="function">MatrixXf <span class="title">matB</span><span class="params">(<span class="number">4</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line">	matB &lt;&lt; matA, matA/<span class="number">10</span>, matA/<span class="number">10</span>, matA;</span><br><span class="line">	cout &lt;&lt; matB &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  <span class="number">1</span>   <span class="number">2</span> <span class="number">0.1</span> <span class="number">0.2</span></span><br><span class="line">  <span class="number">3</span>   <span class="number">4</span> <span class="number">0.3</span> <span class="number">0.4</span></span><br><span class="line"><span class="number">0.1</span> <span class="number">0.2</span>   <span class="number">1</span>   <span class="number">2</span></span><br><span class="line"><span class="number">0.3</span> <span class="number">0.4</span>   <span class="number">3</span>   <span class="number">4</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>逗号初始化也可以用来为块表达式赋值：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Matrix3f m;</span><br><span class="line">	m.<span class="built_in">row</span>(<span class="number">0</span>) &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">	m.<span class="built_in">block</span>(<span class="number">1</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">2</span>) &lt;&lt; <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">8</span>;</span><br><span class="line">	m.<span class="built_in">col</span>(<span class="number">2</span>).<span class="built_in">tail</span>(<span class="number">2</span>) &lt;&lt; <span class="number">6</span>, <span class="number">9</span>;                   </span><br><span class="line">	cout &lt;&lt; m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 2 3</span><br><span class="line">4 5 6</span><br><span class="line">7 8 9</span><br></pre></td></tr></table></figure>
+<h3 id="特殊矩阵与数组"><a href="#特殊矩阵与数组" class="headerlink" title="特殊矩阵与数组"></a>特殊矩阵与数组</h3><p>参考手册 <a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__QuickRefPage.html#title3">Quick Reference Guide - Predefined Matrices</a> </p>
+<h4 id="Zero"><a href="#Zero" class="headerlink" title="Zero()"></a>Zero()</h4><p>初始化所有系数为0，共有三种形式：</p>
+<ul>
+<li><code>Zero()</code> : 不接收任何变量，仅用于固定大小的对象；</li>
+<li><code>Zero(size)</code> : 接收一个变量，仅用于一维动态大小的对象；</li>
+<li><code>Zero(rows,cols)</code> : 接收两个变量，仅用于二维动态大小的对象。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A fixed-size array:\n&quot;</span>;</span><br><span class="line">	Array33f a1 = Array33f::<span class="built_in">Zero</span>();</span><br><span class="line">	cout &lt;&lt; a1 &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A one-dimensional dynamic-size array:\n&quot;</span>;</span><br><span class="line">	ArrayXf a2 = ArrayXf::<span class="built_in">Zero</span>(<span class="number">3</span>);</span><br><span class="line">	cout &lt;&lt; a2 &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A two-dimensional dynamic-size array:\n&quot;</span>;</span><br><span class="line">	ArrayXXf a3 = ArrayXXf::<span class="built_in">Zero</span>(<span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">	cout &lt;&lt; a3 &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">A fixed-size array:</span><br><span class="line">0 0 0</span><br><span class="line">0 0 0</span><br><span class="line">0 0 0</span><br><span class="line"></span><br><span class="line">A one-dimensional dynamic-size array:</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">A two-dimensional dynamic-size array:</span><br><span class="line">0 0 0 0</span><br><span class="line">0 0 0 0</span><br><span class="line">0 0 0 0</span><br></pre></td></tr></table></figure>
+<h4 id="Ones"><a href="#Ones" class="headerlink" title="Ones()"></a>Ones()</h4><p>初始化所有系数为1，三种形式与 <code>Zero()</code> 相同</p>
+<h4 id="Random"><a href="#Random" class="headerlink" title="Random()"></a>Random()</h4><p>初始化所有系数为随机数，三种形式与 <code>Zero()</code> 相同</p>
+<h4 id="Constant-value"><a href="#Constant-value" class="headerlink" title="Constant(value)"></a>Constant(value)</h4><p>初始化所有系数为value，同样三种形式：</p>
+<ul>
+<li><code>Constant(value)</code></li>
+<li><code>Constant(size,value)</code></li>
+<li><code>Constant(rows,cols,value)</code> </li>
+</ul>
+<h4 id="Identity"><a href="#Identity" class="headerlink" title="Identity()"></a>Identity()</h4><p>返回单位矩阵，仅用于 Matrix 类，包括 <code>Identity()</code> 和 <code>Identity(rows,cols)</code> </p>
+<h4 id="LinSpaced-size-low-high"><a href="#LinSpaced-size-low-high" class="headerlink" title="LinSpaced(size, low, high)"></a>LinSpaced(size, low, high)</h4><p>仅用于向量或一维数组，返回一个指定大小的向量，其系数在参数 <code>low</code> 和 <code>high</code> 之间等距分布</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">ArrayXXf <span class="title">table</span><span class="params">(<span class="number">10</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">0</span>) = ArrayXf::<span class="built_in">LinSpaced</span>(<span class="number">10</span>, <span class="number">0</span>, <span class="number">90</span>);</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">1</span>) = M_PI / <span class="number">180</span> * table.<span class="built_in">col</span>(<span class="number">0</span>);</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">2</span>) = table.<span class="built_in">col</span>(<span class="number">1</span>).<span class="built_in">sin</span>();</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">3</span>) = table.<span class="built_in">col</span>(<span class="number">1</span>).<span class="built_in">cos</span>();</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;  Degrees   Radians      Sine    Cosine\n&quot;</span>;</span><br><span class="line">	cout &lt;&lt; table &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Degrees   Radians      Sine    Cosine</span><br><span class="line">      0         0         0         1</span><br><span class="line">     10     0.175     0.174     0.985</span><br><span class="line">     20     0.349     0.342      0.94</span><br><span class="line">     30     0.524       0.5     0.866</span><br><span class="line">     40     0.698     0.643     0.766</span><br><span class="line">     50     0.873     0.766     0.643</span><br><span class="line">     60      1.05     0.866       0.5</span><br><span class="line">     70      1.22      0.94     0.342</span><br><span class="line">     80       1.4     0.985     0.174</span><br><span class="line">     90      1.57         1 -4.37e-08</span><br></pre></td></tr></table></figure>
+<p>从这些例子可以看出，上述方法都会返回一个矩阵或数组再赋值给变量（或表达式），方便起见，Eigen还定义了一些函数来方便地执行这些操作，例如 <code>setZero()</code>  <code>MatrixBase::setIdentity()</code>  <code>DenseBase::setLinSpaced()</code> 等。下面这个例程展示了如何使用静态方法、逗号初始化和 <code>setXxx()</code> 函数来初始化矩阵：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> size = <span class="number">6</span>;</span><br><span class="line"><span class="function">MatrixXd <span class="title">mat1</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat1.<span class="built_in">topLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)     = MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">topRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)    = MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">bottomLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)  = MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">bottomRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>) = MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">std::cout &lt;&lt; mat1 &lt;&lt; std::endl &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line"><span class="function">MatrixXd <span class="title">mat2</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat2.<span class="built_in">topLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setZero</span>();</span><br><span class="line">mat2.<span class="built_in">topRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setIdentity</span>();</span><br><span class="line">mat2.<span class="built_in">bottomLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setIdentity</span>();</span><br><span class="line">mat2.<span class="built_in">bottomRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setZero</span>();</span><br><span class="line">std::cout &lt;&lt; mat2 &lt;&lt; std::endl &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line"><span class="function">MatrixXd <span class="title">mat3</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat3 &lt;&lt; MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>), MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>),</span><br><span class="line">        MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>), MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">std::cout &lt;&lt; mat3 &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br><span class="line"></span><br><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br><span class="line"></span><br><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br></pre></td></tr></table></figure>
+<p>除此之外，Eigen还定义了一些用于生成基向量的方法：</p>
+<ul>
+<li><code>Vector3f::UnitX()</code> : (1, 0, 0)</li>
+<li><code>Vector3f::UnitY()</code> : (0, 1, 0)</li>
+<li><code>Vector3f::UnitZ()</code> : (0, 0, 1)</li>
+<li><code>VectorXf::Unit(size,i)</code> : <ul>
+<li>例如 ：<code>VectorXf::Unit(4,1)</code> == <code>Vector4f(0,1,0,0)</code> == <code>Vector4f::UnitY()</code> </li>
+</ul>
+</li>
+</ul>
+<h3 id="用作临时对象"><a href="#用作临时对象" class="headerlink" title="用作临时对象"></a>用作临时对象</h3><p>无论是逗号初始化程序还是上面介绍的几种类内静态方法，都可以用作表达式中的临时对象。</p>
+<p>逗号初始化程序用作临时对象时，需要调用 <code>finished()</code> 方法获取实际的矩阵对象。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	MatrixXd m = MatrixXd::<span class="built_in">Random</span>(<span class="number">3</span>,<span class="number">3</span>);</span><br><span class="line">    m = (m + MatrixXd::<span class="built_in">Constant</span>(<span class="number">3</span>,<span class="number">3</span>,<span class="number">1.2</span>)) * <span class="number">50</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m =&quot;</span> &lt;&lt; endl &lt;&lt; m &lt;&lt; endl;</span><br><span class="line">    <span class="function">VectorXd <span class="title">v</span><span class="params">(<span class="number">3</span>)</span></span>;</span><br><span class="line">    v &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m * v =&quot;</span> &lt;&lt; endl &lt;&lt; m * v &lt;&lt; endl;</span><br><span class="line">    MatrixXf mat = MatrixXf::<span class="built_in">Random</span>(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;mat =\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">	mat = (<span class="built_in">MatrixXf</span>(<span class="number">2</span>,<span class="number">2</span>) &lt;&lt; <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>).<span class="built_in">finished</span>() * mat;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;mat =\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">m =</span><br><span class="line">  10 55.9 14.7</span><br><span class="line">23.2 63.3 77.9</span><br><span class="line">85.6 31.9 77.9</span><br><span class="line">m * v =</span><br><span class="line">166</span><br><span class="line">383</span><br><span class="line">383</span><br><span class="line">mat =</span><br><span class="line">     -1   0.511  0.0655</span><br><span class="line"> -0.737 -0.0827  -0.562</span><br><span class="line">mat =</span><br><span class="line"> -0.737 -0.0827  -0.562</span><br><span class="line">     -1   0.511  0.0655</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Eigen/" rel="tag"># Eigen</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/%E5%9D%97%E6%93%8D%E4%BD%9C/" rel="prev" title="块操作">
+      <i class="fa fa-chevron-left"></i> 块操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/" rel="next" title="归约、迭代器和广播机制">
+      归约、迭代器和广播机制 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%97%E5%8F%B7%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">逗号初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E7%9F%A9%E9%98%B5%E4%B8%8E%E6%95%B0%E7%BB%84"><span class="nav-number">2.</span> <span class="nav-text">特殊矩阵与数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Zero"><span class="nav-number">2.1.</span> <span class="nav-text">Zero()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ones"><span class="nav-number">2.2.</span> <span class="nav-text">Ones()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Random"><span class="nav-number">2.3.</span> <span class="nav-text">Random()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Constant-value"><span class="nav-number">2.4.</span> <span class="nav-text">Constant(value)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Identity"><span class="nav-number">2.5.</span> <span class="nav-text">Identity()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LinSpaced-size-low-high"><span class="nav-number">2.6.</span> <span class="nav-text">LinSpaced(size, low, high)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%BD%9C%E4%B8%B4%E6%97%B6%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.</span> <span class="nav-text">用作临时对象</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

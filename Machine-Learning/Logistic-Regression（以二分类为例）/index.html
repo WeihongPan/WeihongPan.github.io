@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Logistic Regression（以二分类为例）2021&#x2F;03&#x2F;23 Step 1：Function Set上节得到：  P(C_1|\boldsymbol x)&#x3D;\sigma(z)&#x3D;\sigma(\boldsymbol{w}\cdot\boldsymbol x+b)\\ \sigma(z)&#x3D;\frac{1}{1+\exp(-z)}所以我们的函数集即为  f_{\boldsymbol {w}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Logistic Regression（以二分类为例）">
+<meta property="og:url" content="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="Logistic Regression（以二分类为例）2021&#x2F;03&#x2F;23 Step 1：Function Set上节得到：  P(C_1|\boldsymbol x)&#x3D;\sigma(z)&#x3D;\sigma(\boldsymbol{w}\cdot\boldsymbol x+b)\\ \sigma(z)&#x3D;\frac{1}{1+\exp(-z)}所以我们的函数集即为  f_{\boldsymbol {w}">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/1616553063518.png">
+<meta property="article:published_time" content="2021-03-24T02:02:20.000Z">
+<meta property="article:modified_time" content="2021-03-24T12:45:43.279Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Machine Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/1616553063518.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Logistic Regression（以二分类为例） | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Logistic Regression（以二分类为例）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-24 10:02:20 / 修改时间：20:45:43" itemprop="dateCreated datePublished" datetime="2021-03-24T10:02:20+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Logistic-Regression（以二分类为例）"><a href="#Logistic-Regression（以二分类为例）" class="headerlink" title="Logistic Regression（以二分类为例）"></a>Logistic Regression（以二分类为例）</h3><p>2021/03/23</p>
+<h4 id="Step-1：Function-Set"><a href="#Step-1：Function-Set" class="headerlink" title="Step 1：Function Set"></a>Step 1：Function Set</h4><p>上节得到：</p>
+<script type="math/tex; mode=display">
+P(C_1|\boldsymbol x)=\sigma(z)=\sigma(\boldsymbol{w}\cdot\boldsymbol x+b)\\
+\sigma(z)=\frac{1}{1+\exp(-z)}</script><p>所以我们的函数集即为</p>
+<script type="math/tex; mode=display">
+f_{\boldsymbol {w},b}(\boldsymbol x) = P_{\boldsymbol {w},b}(C_1|\boldsymbol x)=\sigma\bigg(\sum_iw_ix_i+b\bigg)</script><p>此为<strong>Logistic Regression</strong> ，它与Linear Regression只相差一个 <script type="math/tex">\sigma</script> 函数；Logistic Regression的输出值在0-1之间，而Linear Regression的输出值可以是任何数</p>
+<h4 id="Step-2：Goodness-of-Function"><a href="#Step-2：Goodness-of-Function" class="headerlink" title="Step 2：Goodness of Function"></a>Step 2：Goodness of Function</h4><p>依然是最大似然估计的思想，来估计我们需要的 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> </p>
+<p>给定已知数据集的分类，上述函数 <script type="math/tex">f</script> 表示当前数据属于 <script type="math/tex">C_1</script> 的概率，$1-f$ 则表示属于 <script type="math/tex">C_2</script> 的概率（以二分类为例）那么以当前的 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> 生成该数据集的概率为：</p>
+<script type="math/tex; mode=display">
+L(\boldsymbol w,b)=f(\boldsymbol x^1)f(\boldsymbol x^2)\big(1-f(\boldsymbol x^3)\big)...f(\boldsymbol x^N)</script><p>要找 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> 去最大化这个概率（最大似然估计标准解法，取负对数求导）</p>
+<p>但是上面的式子形式非常的不统一，不方便后面的表述，因此对它做一下符号化，即：</p>
+<script type="math/tex; mode=display">
+x^i\rightarrow \hat{y}^i=\left\{\begin{matrix}
+1\quad x\in C_1 \\
+0\quad x\in C_2
+\end{matrix}
+\right.</script><p>那么上面的式子可以被改写为</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+-\ln L(\boldsymbol w,b)=&-\ln f(\boldsymbol x^1)-\ln f(\boldsymbol x^2)-\ln \big(1-f(\boldsymbol x^3)\big)...\\
+=&\sum_n-\Big[\hat{y}^n\ln(f(\boldsymbol x^n))+(1-\hat{y}^n)\ln(1-f(\boldsymbol x^n))\Big]
+\end{align*}</script><p>其实，大括号里的项就是两个伯努利分布的<strong>交叉熵</strong>（cross entropy)</p>
+<p>假设有两个分布 p 和 q，那么他们的交叉熵定义为：<script type="math/tex">H(p,q)=-\sum_xp(x)ln(q(x))</script> ，表示的含义是这两个分布有多接近，即用来衡量两个分布的相似性。如果两个分布完全一样，结果就会是 0。</p>
+<p>Logistic Regression: 使用交叉熵判断模型的好坏 - 先验是正态</p>
+<p>Linear Regression: 使用误差平方(square error)判断模型好坏 - 先验是二项</p>
+<h4 id="Step-3：Find-the-best-function"><a href="#Step-3：Find-the-best-function" class="headerlink" title="Step 3：Find the best function"></a>Step 3：Find the best function</h4><p>数学推导！！！</p>
+<script type="math/tex; mode=display">
+\frac{\partial\Big(-\ln L(\boldsymbol w,b)\Big)}{\partial w_i}=\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>括号内的项表示差距越大，更新越多</p>
+<p>但神奇的是</p>
+<p>Logistic Regression 的更新方式：</p>
+<script type="math/tex; mode=display">
+w_i\leftarrow w_i-\eta\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>Linear Regression 的更新方式：</p>
+<script type="math/tex; mode=display">
+w_i\leftarrow w_i-\eta\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>其实是一模一样的，唯一不一样的是 <script type="math/tex">\hat{y}^n</script> 和 <script type="math/tex">f</script> 的取值不同</p>
+<h4 id="为什么Logistic-Regression的损失函数不用Square-Error"><a href="#为什么Logistic-Regression的损失函数不用Square-Error" class="headerlink" title="为什么Logistic Regression的损失函数不用Square Error"></a>为什么Logistic Regression的损失函数不用Square Error</h4><p>因为 <script type="math/tex">f</script> 的取值限制在了0-1之间，当估计值和目标距离很远的时候，Square Error的微分值依然很小，非常平坦，更新得很慢</p>
+<p>但Cross Entropy在距离目标较远的地方微分值很大，更新得很快</p>
+<h4 id="Discriminative-判别模型-v-s-Generative-生成模型"><a href="#Discriminative-判别模型-v-s-Generative-生成模型" class="headerlink" title="Discriminative(判别模型) v.s. Generative(生成模型)"></a>Discriminative(判别模型) v.s. Generative(生成模型)</h4><p>Discriminative: Logistic Regression =&gt; 直接找 $\boldsymbol{w}$ 和 $b$ </p>
+<p>Generative: 概率模型 =&gt; 找 $\boldsymbol{\mu}^1,\boldsymbol{\mu}^2,\boldsymbol{\Sigma}^{-1}$  =&gt; 计算 $\boldsymbol{w}$ 和 $b$ （<strong>假设</strong>了数据分布，这里是高斯分布）</p>
+<p>两种方法找出来的w和b会一样么？（不会）=&gt; 同样的模型，不同的方法得到了不同的方程。</p>
+<p>生成模型的优势：</p>
+<ul>
+<li><p>判别模型的准确率受训练数据量影响大，生成模型的准确率(一般来说)受训练数据量影响小。在训练数据少的情况下，通过假设数据分布提高准确率(但有时候也会适得其反)。</p>
+</li>
+<li><p>假设数据分布的做法，使生成模型对噪声数据更鲁棒</p>
+</li>
+<li><p>生成模型把参数分为 Priors probabilities 和 class-dependent probabilities，可以分别从不同的来源进行估计</p>
+<p>例如语音识别，现在一般使用神经网络实现（Discriminative），但事实上它是个Generative System，DNN只是其中的一部分。对语音识别来说，Priors probability指的是一句话被说出来的概率，这是不需要语音数据的，直接从网上爬文字数据就能计算出某句话出现的概率；class-dependent probability才同时需要语音和文字数据</p>
+</li>
+</ul>
+<h4 id="Logistic-Regression的限制"><a href="#Logistic-Regression的限制" class="headerlink" title="Logistic Regression的限制"></a>Logistic Regression的限制</h4><p>数据必须<strong>线性可分</strong>才能做。如果不能线性可分，解决方法：<strong>Feature Transformation</strong> 把原本线性不可分的特征向量转化为线性可分。但并不是所有时候都能知道如何找到一个好的Transformation方法，人找不到，那机器呢？</p>
+<h5 id="Cascading-Logistic-regression-models"><a href="#Cascading-Logistic-regression-models" class="headerlink" title="Cascading Logistic regression models"></a>Cascading Logistic regression models</h5><p><img src="/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/1616553063518.png" alt="Cascading Logistic regression models"></p>
+<p>前两个logistic regression自动完成feature transformation，最后一个logistic regression完成分类</p>
+<p>把诸多logistic regression叠加在一起，作进一步推广：</p>
+<ul>
+<li>某个logistic regression的输入可以是其他logistic regression的输出</li>
+<li>某个logistic regression的输出可以是其他logistic regression的输入</li>
+</ul>
+<p>把每个logistic regression模块叫做一个<strong>Neuron</strong>，把由logistic regression组成的整体叫做<strong>Neural Network</strong> </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Machine-Learning/Classification/" rel="prev" title="Classification">
+      <i class="fa fa-chevron-left"></i> Classification
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Machine-Learning/Multi-class-Classification%EF%BC%88%E4%BB%A5%E4%B8%89%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/" rel="next" title="Multi-class Classification（以三分类为例）">
+      Multi-class Classification（以三分类为例） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Logistic Regression（以二分类为例）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1%EF%BC%9AFunction-Set"><span class="nav-number">1.1.</span> <span class="nav-text">Step 1：Function Set</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2%EF%BC%9AGoodness-of-Function"><span class="nav-number">1.2.</span> <span class="nav-text">Step 2：Goodness of Function</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3%EF%BC%9AFind-the-best-function"><span class="nav-number">1.3.</span> <span class="nav-text">Step 3：Find the best function</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88Logistic-Regression%E7%9A%84%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E4%B8%8D%E7%94%A8Square-Error"><span class="nav-number">1.4.</span> <span class="nav-text">为什么Logistic Regression的损失函数不用Square Error</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Discriminative-%E5%88%A4%E5%88%AB%E6%A8%A1%E5%9E%8B-v-s-Generative-%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.5.</span> <span class="nav-text">Discriminative(判别模型) v.s. Generative(生成模型)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Logistic-Regression%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-number">1.6.</span> <span class="nav-text">Logistic Regression的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Cascading-Logistic-regression-models"><span class="nav-number">1.6.1.</span> <span class="nav-text">Cascading Logistic regression models</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

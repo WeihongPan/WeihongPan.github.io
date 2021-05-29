@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Chapter1 线性空间与线性映射线性空间域 $\mathbb{F}$一个域是一个运算系统，包括一个集合和在集合上定义的两种运算（加法和乘法）且两种运算都满足一定的运算规则 常用域：有理数域 $\mathbb{Q}$ ，实数域 $\mathbb{R}$ ，复数域 $\mathbb{C}$  二元加法运算+给定非空集合 $\mathbb{V}$ 和域 $\mathbb{F}$ ，若存在映射 $\s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="矩阵分析学习笔记1：线性空间与线性映射">
+<meta property="og:url" content="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="Chapter1 线性空间与线性映射线性空间域 $\mathbb{F}$一个域是一个运算系统，包括一个集合和在集合上定义的两种运算（加法和乘法）且两种运算都满足一定的运算规则 常用域：有理数域 $\mathbb{Q}$ ，实数域 $\mathbb{R}$ ，复数域 $\mathbb{C}$  二元加法运算+给定非空集合 $\mathbb{V}$ 和域 $\mathbb{F}$ ，若存在映射 $\s">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/1622124672475.png">
+<meta property="og:image" content="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/BFC87F8FC976B8B996157EB9E1405F6F.png">
+<meta property="article:published_time" content="2021-05-27T05:30:03.000Z">
+<meta property="article:modified_time" content="2021-05-29T00:45:42.915Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="矩阵分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/1622124672475.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>矩阵分析学习笔记1：线性空间与线性映射 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          矩阵分析学习笔记1：线性空间与线性映射
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-27 13:30:03" itemprop="dateCreated datePublished" datetime="2021-05-27T13:30:03+08:00">2021-05-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-29 08:45:42" itemprop="dateModified" datetime="2021-05-29T08:45:42+08:00">2021-05-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/" itemprop="url" rel="index"><span itemprop="name">矩阵分析</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Chapter1-线性空间与线性映射"><a href="#Chapter1-线性空间与线性映射" class="headerlink" title="Chapter1 线性空间与线性映射"></a>Chapter1 线性空间与线性映射</h2><h4 id="线性空间"><a href="#线性空间" class="headerlink" title="线性空间"></a>线性空间</h4><h5 id="域-mathbb-F"><a href="#域-mathbb-F" class="headerlink" title="域 $\mathbb{F}$"></a>域 $\mathbb{F}$</h5><p>一个域是一个运算系统，包括一个集合和在集合上定义的两种运算（加法和乘法）且两种运算都满足一定的运算规则</p>
+<p>常用域：有理数域 $\mathbb{Q}$ ，实数域 $\mathbb{R}$ ，复数域 $\mathbb{C}$ </p>
+<h5 id="二元加法运算"><a href="#二元加法运算" class="headerlink" title="二元加法运算+"></a>二元加法运算+</h5><p>给定非空集合 $\mathbb{V}$ 和域 $\mathbb{F}$ ，若存在映射 $\sigma:\mathbb{V}\times \mathbb{V}\rightarrow \mathbb{V},(\boldsymbol{\alpha},\boldsymbol{\beta})\mapsto\sigma(\boldsymbol{\alpha},\boldsymbol{\beta})$ ，即对集合 $\mathbb{V}$ 中的任意元素 $\boldsymbol{\alpha},\boldsymbol{\beta}$ ，在集合 $\mathbb{V}$ 中都存在唯一元素 $\boldsymbol{\gamma}$ ，使得 $\boldsymbol{\gamma}=\boldsymbol{\alpha}+\boldsymbol{\beta}\in\mathbb{V}$，则称 $\sigma$ 为集合 $\mathbb{V}$ 上的加法 。</p>
+<p>注：定义中的 $\times$ 是集合之间的乘法，称为卡氏积/笛卡尔积，指的是从两个集合中任取一个元素组成的所有有序元素对的集合：$\mathbb{S_1}\times\mathbb{S_2}=\{(a,b)|a\in\mathbb{S_1},b\in\mathbb{S_2}\}$ </p>
+<h5 id="二元数乘运算-cdot"><a href="#二元数乘运算-cdot" class="headerlink" title="二元数乘运算 $\cdot$"></a>二元数乘运算 $\cdot$</h5><p>给定非空集合 $\mathbb{V}$ 和数域 $\mathbb{F}$ ，若存在映射 $\sigma:\mathbb{V}\times \mathbb{F}\rightarrow \mathbb{V},(\boldsymbol{\alpha},k)\mapsto\sigma(\boldsymbol{\alpha},k)$ ，即对集合 $\mathbb{V}$ 中的任意元素 $\boldsymbol{\alpha}$ 和数域 $\mathbb{F}$ 中的任意元素 $k$ ，在集合 $\mathbb{V}$ 中都存在唯一元素 $\boldsymbol{\gamma}$ ，使得 $\boldsymbol{\gamma}=\boldsymbol{\alpha}\cdot k\in\mathbb{V}$，则称 $\sigma$ 为集合 $\mathbb{V}$ 上的数乘 。</p>
+<h5 id="通常的运算规则"><a href="#通常的运算规则" class="headerlink" title="通常的运算规则"></a>通常的运算规则</h5><ol>
+<li>加法的运算规则<ul>
+<li>交换律：$\boldsymbol{\alpha}+\boldsymbol{\beta}=\boldsymbol{\beta}+\boldsymbol{\alpha}$ </li>
+<li>结合律：$(\boldsymbol{\alpha}+\boldsymbol{\beta})+\boldsymbol{\gamma}=\boldsymbol{\alpha}+(\boldsymbol{\beta}+\boldsymbol{\gamma})$ </li>
+<li>有零元：$\exists \boldsymbol{e}\in\mathbb{V},s.t.\ \boldsymbol{e}+\boldsymbol{\alpha}=\boldsymbol{\alpha}\ 对\ \forall \boldsymbol{\alpha}\in\mathbb{V}\ 成立$ </li>
+<li>有逆元：$对\ \forall\boldsymbol{\alpha}\in\mathbb{V},\exists\boldsymbol{\beta}\in\mathbb{V},s.t.\ \boldsymbol{\alpha}+\boldsymbol{\beta}=\boldsymbol{e},记\ \boldsymbol{\beta}=-\boldsymbol{\alpha}$ </li>
+</ul>
+</li>
+<li>数乘的运算规则<ul>
+<li>交换律：$\boldsymbol{\alpha}\cdot k=k\cdot\boldsymbol{\alpha}$ （一般将对列向量数乘的数写在右侧，对行向量数乘的数写在左侧，这样可以和矩阵乘法作类比）</li>
+<li>结合律：$(\boldsymbol{\alpha}\cdot k)\cdot l=\boldsymbol{\alpha}\cdot (kl)$ （注：左边做了两次数乘，右边做了一次 $\mathbb{F}$ 中数的乘法和一次数乘）</li>
+<li>分配律：$(\boldsymbol{\alpha}+\boldsymbol{\beta})\cdot k=\boldsymbol{\alpha}\cdot k+\boldsymbol{\beta}\cdot k,\quad \boldsymbol{\alpha}\cdot(k_1+k_2)=\boldsymbol{\alpha}\cdot k_1 + \boldsymbol{\alpha}\cdot k_2$ （注：第二个式子左边做的是 $\mathbb{F}$ 中数的加法，右边做的是向量加法）</li>
+<li>与 $\mathbb{F}$ 中 1 的关系：$\boldsymbol{\alpha}\cdot 1=\boldsymbol{\alpha}$ </li>
+</ul>
+</li>
+</ol>
+<h5 id="线性空间-1"><a href="#线性空间-1" class="headerlink" title="线性空间"></a>线性空间</h5><p>若集合 $\mathbb{V}$ 满足上述两种运算，且这两种运算满足通常的运算规则，则称集合 $\mathbb{V}$ 关于此加法和数乘是域 $\mathbb{F}$ 上的线性空间。（一般也把这种线性空间称为向量空间，$\mathbb{V}$ 中的元素称为向量）</p>
+<p>注1：空间这个概念只是为了类比2维或3维几何空间的一个概念，更好的理解为元素的集合，线性空间中的元素统称为<strong>抽象向量</strong> </p>
+<p>注2：集合 $\mathbb{V}$ 中的元素分别为数组、函数、有向线段时，对应的线性空间称为数域空间、函数空间、几何空间</p>
+<p>注3：数域 $\mathbb{F}$ 上的<strong>标准线性空间</strong> $\mathbb{F}^n$ （数域空间）</p>
+<p>​    $\mathbb{V}:=\mathbb{F}^n=\begin{matrix}n\\ \overbrace{\mathbb{F}\times\mathbb{F}\times \cdots\times \mathbb{F} }\end{matrix}$ ，其元素称为 n元组（n-tuple） </p>
+<p>​    加法：$\begin{bmatrix}v_1\\ \vdots\\ v_n\end{bmatrix} + \begin{bmatrix}w_1\\ \vdots\\ w_n\end{bmatrix} = \begin{bmatrix}v_1+w_1\\ \vdots\\ v_n+w_n\end{bmatrix}$</p>
+<p>​    数乘：$\begin{bmatrix}v_1\\ \vdots\\ v_n\end{bmatrix}\cdot k=\begin{bmatrix}v_1\cdot k\\ \vdots\\ v_n\cdot k\end{bmatrix}$ </p>
+<p>​    容易证明，定义的加法和数乘满足上述运算规则</p>
+<p>注4：对于<strong>几何空间（有向线段的集合）</strong>，加法运算采用平行四边形或三角形法则进行计算，数乘运算表示对有向线段进行同向或反向伸缩</p>
+<h4 id="向量组的线性相关性"><a href="#向量组的线性相关性" class="headerlink" title="向量组的线性相关性"></a>向量组的线性相关性</h4><p>向量组：$\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$</p>
+<p>抽象矩阵：$[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_p]$ </p>
+<p>定义方程组：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{A}\boldsymbol{x}=[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_p]\begin{bmatrix}x_1\\x_2\\ \vdots\\ x_p \end{bmatrix}=\boldsymbol{0}</script><p>若无非零解，则向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 线性无关；若存在非零解，则向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 线性相关</p>
+<h5 id="向量组的线性表出"><a href="#向量组的线性表出" class="headerlink" title="向量组的线性表出"></a>向量组的线性表出</h5><p>定义方程组：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{A}\boldsymbol{x}=[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_p]\begin{bmatrix}x_1\\x_2\\ \vdots\\ x_p \end{bmatrix}=\boldsymbol{\beta}</script><p>若有解，则向量 $\boldsymbol{\beta}$ 可由向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 线性表出</p>
+<p>定义方程组：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{A}\boldsymbol{X}=[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_p]
+\begin{bmatrix}
+    x_{11} &x_{12}\ \ \cdots&x_{1p} \\
+    x_{21} &x_{22}\ \ \cdots&x_{2p} \\
+    \vdots &\ddots          &\vdots \\ 
+    x_{p1} &x_{p2}\ \ \cdots&x_{pp}
+\end{bmatrix}
+=[\boldsymbol{\beta}_1\ \boldsymbol{\beta}_2\ \cdots\ \boldsymbol{\beta}_p]
+=\boldsymbol{B}</script><p>若有解，则向量组 $\boldsymbol{\beta}_1,\boldsymbol{\beta}_2,\cdots,\boldsymbol{\beta}_p$ 可由向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 线性表出</p>
+<p>向量组的线性表示具有传递性</p>
+<h5 id="有限维线性空间的基（坐标系）与坐标"><a href="#有限维线性空间的基（坐标系）与坐标" class="headerlink" title="有限维线性空间的基（坐标系）与坐标"></a>有限维线性空间的基（坐标系）与坐标</h5><p>设集合 $\mathbb{V}$ 是 数域 $\mathbb{F}$ 上的线性空间，有正整数 $n$ 及 $\mathbb{V}$ 中的向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 满足以下两个条件：</p>
+<ul>
+<li><p>线性无关性：向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 线性无关</p>
+</li>
+<li><p>生成性：$\forall \boldsymbol{\alpha} \in \mathbb{V} $ ，均可由 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 线性表出</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\alpha}=[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_n]\begin{bmatrix}x_1\\x_2\\ \vdots\\ x_n \end{bmatrix}=\boldsymbol{A}\boldsymbol{x}</script></li>
+</ul>
+<p>则称向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 为 $n$ 维线性空间 $\mathbb{V}$ 的一组基，矩阵 $A=[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_n]$ 称为基矩阵，向量 $\boldsymbol{x}=[x_1\ x_2\ \cdots\ x_n]^T\in\mathbb{F}^n$ 称为抽象向量 $\boldsymbol{\alpha}$ 在基 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 下的坐标。</p>
+<p>换言之，抽象向量 = 基矩阵 $\cdot$ 坐标向量</p>
+<p>注1：基向量组的线性无关性保证线性空间中的抽象向量在该基下的坐标是唯一的，生成性保证空间中的任意向量在该基下都有坐标；</p>
+<p>注2：基（坐标系）实现了抽象线性空间到标准线性空间的一一对应（通过基实现对抽象向量的具体化）</p>
+<h5 id="标准线性空间-mathbb-F-n-的标准基与一般基"><a href="#标准线性空间-mathbb-F-n-的标准基与一般基" class="headerlink" title="标准线性空间 $\mathbb{F}^n$ 的标准基与一般基"></a>标准线性空间 $\mathbb{F}^n$ 的标准基与一般基</h5><p>标准基：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{e}_1=\begin{bmatrix}1\\0\\\vdots\\0 \end{bmatrix},
+\boldsymbol{e}_2=\begin{bmatrix}0\\1\\\vdots\\0 \end{bmatrix}
+\boldsymbol{e}_n=\begin{bmatrix}0\\0\\\vdots\\1 \end{bmatrix},
+\text{and}\ \boldsymbol{e}_i\in\mathbb{F}^n</script><p>标准基构成的基矩阵是单位矩阵 $\boldsymbol{I}_n=[\boldsymbol{e}_1\ \cdots\ \boldsymbol{e}_n]\in\mathbb{F}^{n\times n}$ </p>
+<p>一般基：向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 是一般基 $\Leftrightarrow$ 线性无关 $\Leftrightarrow r(\boldsymbol{A})=n$ ，由一般基构成的基矩阵是<strong>非奇异矩阵</strong> </p>
+<h4 id="线性子空间"><a href="#线性子空间" class="headerlink" title="线性子空间"></a>线性子空间</h4><p>设 $\mathbb{V}$ 是 $\mathbb{F}$ 上的线性空间，$\mathbb{W}\subseteq \mathbb{V}$ 是非空子集，若 $\mathbb{W}$ 中的元素也满足加法封闭性和数乘封闭性，则称 $\mathbb{W}$ 是 $\mathbb{V}$ 的一个线性子空间。</p>
+<h5 id="向量组的生成子空间和子空间的生成组"><a href="#向量组的生成子空间和子空间的生成组" class="headerlink" title="向量组的生成子空间和子空间的生成组"></a>向量组的生成子空间和子空间的生成组</h5><p>设 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 是线性空间 $\mathbb{V}$ 中的一个向量组，定义集合 $\mathbb{W}$ 如下：  </p>
+<script type="math/tex; mode=display">
+\mathbb{W}=\text{span}
+\{
+\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p
+\}
+=\{
+\boldsymbol{\alpha}_1\cdot x_1+\boldsymbol{\alpha}_2\cdot x_2+\cdots+\boldsymbol{\alpha}_p\cdot x_p|\forall x_i\in\mathbb{F}
+\}</script><p>称 $\mathbb{W}$ 为向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_p$ 的生成子空间，显然 $\mathbb{W}$ 是 $\mathbb{V}$ 的子空间。</p>
+<h5 id="矩阵的核与像"><a href="#矩阵的核与像" class="headerlink" title="矩阵的核与像"></a>矩阵的核与像</h5><p>设矩阵 $\boldsymbol{A}\in \mathbb{F}^{m\times n}$ ，定义矩阵 $\boldsymbol{A}$ 的核（kernel）与像（Image）如下：</p>
+<script type="math/tex; mode=display">
+\text{ker}\boldsymbol{A}=\{\boldsymbol{x}|\boldsymbol{A}\boldsymbol{x}=\boldsymbol{0},\boldsymbol{x}\in \mathbb{F}^n\} \subseteq \mathbb{F}^n \\
+\text{Im}\boldsymbol{A}=\{\boldsymbol{A}\boldsymbol{x}|\forall \boldsymbol{x}\in \mathbb{F}^n\} \subseteq \mathbb{F}^m</script><p>显然，矩阵 $\boldsymbol{A}$ 的核即为齐次线性方程组的<strong>解空间</strong> ，像即为由列向量组张成的<strong>子空间</strong> </p>
+<h5 id="子空间的交与和"><a href="#子空间的交与和" class="headerlink" title="子空间的交与和"></a>子空间的交与和</h5><p>设 $\mathbb{U}$ 和 $\mathbb{W}$ 是 $\mathbb{V}$ 的子空间，则</p>
+<ul>
+<li>$\mathbb{U}\cap\mathbb{W}$ 也是子空间，称为 $\mathbb{U}$ 和 $\mathbb{W}$ 的交（子空间）</li>
+<li>$\mathbb{U}+\mathbb{W}=\text{span}\{\mathbb{U},\mathbb{W}\}=\{u+w|\forall u\in\mathbb{U},w\in\mathbb{W}\}$ 也是子空间，称为 $\mathbb{U}$ 和 $\mathbb{W}$ 的和（子空间）</li>
+<li><strong>但</strong> $\mathbb{U}\cup\mathbb{W}$ 不一定是子空间！</li>
+</ul>
+<h4 id="线性映射"><a href="#线性映射" class="headerlink" title="线性映射"></a>线性映射</h4><h5 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h5><p>若 $f:A\rightarrow B$ 是一个映射，则须满足以下两个充要条件：</p>
+<ul>
+<li>存在性：$\forall a\in A,\exists b\in B$ 与之对应</li>
+<li>唯一性：$\forall a\in A$，在 $B$ 中的像 $b$ 是唯一的</li>
+</ul>
+<h5 id="线性映射，线性变换与线性同构"><a href="#线性映射，线性变换与线性同构" class="headerlink" title="线性映射，线性变换与线性同构"></a>线性映射，线性变换与线性同构</h5><p>设 $\mathbb{V_1},\mathbb{V_2}$ 是域 $\mathbb{F}$ 上的线性空间，$\sigma:\mathbb{V_1}\rightarrow\mathbb{V_2}$ 是映射，若满足以下两个条件：</p>
+<ul>
+<li>保加性：$\forall v_1,v_2\in\mathbb{V_1},\sigma(v_1+v_2)=\sigma(v_1)+\sigma(v_2)\in\mathbb{V_2}$ </li>
+<li>保乘性：$\forall v\in\mathbb{V_1},\sigma(v\cdot k)=\sigma(v)\cdot k\in\mathbb{V_2}$  </li>
+</ul>
+<p>则称 $\sigma$ 是 $\mathbb{V_1}$ 到 $\mathbb{V_2}$ 的线性映射</p>
+<p>若 $\mathbb{V_1}=\mathbb{V_2}=\mathbb{V}$ ，则称 $\sigma$ 为 $\mathbb{V}$ 上的线性变换</p>
+<p><strong>线性映射不同空间，线性变换同一空间</strong></p>
+<p>若 $\sigma$ 是可逆映射，则称其为线性同构（数学结构相同）。最典型的例子：抽象的线性空间选定基后，与标准线性空间线性同构</p>
+<h5 id="矩阵-与-标准线性空间中的线性映射-是等同的"><a href="#矩阵-与-标准线性空间中的线性映射-是等同的" class="headerlink" title="矩阵 与 标准线性空间中的线性映射 是等同的"></a>矩阵 与 标准线性空间中的线性映射 是等同的</h5><ol>
+<li><p>矩阵决定线性映射：给定 $\boldsymbol{A}\in\mathbb{F}^{m\times n}$ ，通过右乘列向量可以决定线性映射 $\sigma$ ：</p>
+<script type="math/tex; mode=display">
+\sigma:\mathbb{V_1}\rightarrow\mathbb{V_2};\ \boldsymbol{x}\mapsto\boldsymbol{y}=\boldsymbol{Ax}</script></li>
+<li><p>线性映射决定矩阵：给定线性映射 $\sigma:\mathbb{V_1}\rightarrow\mathbb{V_2}$ ，一定能用某个矩阵 $\boldsymbol{A}$ 表示出来：</p>
+<p>设 $\text{dim}(\mathbb{V_1})=n$ ，向量组 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 是空间 $\mathbb{V_1}$ 的一组基；$\text{dim}(\mathbb{V_2})=m$ ，向量组 $\boldsymbol{\beta}_1,\boldsymbol{\beta}_2,\cdots,\boldsymbol{\beta}_m$ 是空间 $\mathbb{V_2}$ 的一组基，则对 $\forall \boldsymbol{x}\in\mathbb{V_1}$ ，根据线性映射的保加性和保乘性，有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\sigma(\boldsymbol{x})&=\sigma([\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_n]\boldsymbol{x}) \notag\\ &=\sigma(\boldsymbol{\alpha}_1x_1+\boldsymbol{\alpha}_2x_2+\cdots+\boldsymbol{\alpha}_nx_n) \notag\\
+&=\sigma(\boldsymbol{\alpha}_1x_1)+\sigma(\boldsymbol{\alpha}_2x_2)+\cdots+\sigma(\boldsymbol{\alpha}_nx_n) \notag \\
+&=\sigma(\boldsymbol{\alpha}_1)x_1+\sigma(\boldsymbol{\alpha}_2)x_2+\cdots+\sigma(\boldsymbol{\alpha}_n)x_n \\
+&=[\sigma(\boldsymbol{\alpha}_1)\ \sigma(\boldsymbol{\alpha}_2)\ \cdots\ \sigma(\boldsymbol{\alpha}_n) ]\begin{bmatrix}x_1\\x_2\\ \vdots \\x_n \end{bmatrix} \notag \\
+&=[\boldsymbol{\beta}_1\ \boldsymbol{\beta}_2\ \cdots\ \boldsymbol{\beta}_m]\boldsymbol{Ax} \notag
+\end{align}</script><p>称矩阵 $\boldsymbol{A}$ 为线性映射 $\sigma$ 在入口基 $\boldsymbol{\alpha}_1,\boldsymbol{\alpha}_2,\cdots,\boldsymbol{\alpha}_n$ 与出口基 $\boldsymbol{\beta}_1,\boldsymbol{\beta}_2,\cdots,\boldsymbol{\beta}_m$ 下的矩阵表示，写作：</p>
+<script type="math/tex; mode=display">
+\sigma[\boldsymbol{\alpha}_1\ \boldsymbol{\alpha}_2\ \cdots\ \boldsymbol{\alpha}_n] =[\boldsymbol{\beta}_1\ \boldsymbol{\beta}_2\ \cdots\ \boldsymbol{\beta}_m]\boldsymbol{A}</script><p>线性映射 $\sigma$ 也可以用某个矩阵表示，即：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}线性\\映射\end{bmatrix}
+\begin{bmatrix}入\\口\\基\end{bmatrix}=
+\begin{bmatrix}出\\口\\基\end{bmatrix}
+\begin{bmatrix}矩阵\\表示\end{bmatrix}</script><p>第 $i$ 列表示基向量 $\boldsymbol{\alpha}_i$ 在基 $\boldsymbol{\beta}_1,\boldsymbol{\beta}_2,\cdots,\boldsymbol{\beta}_m$ 下的坐标；像 $\sigma(\boldsymbol{x})$ 在基 $\boldsymbol{\beta}_1,\boldsymbol{\beta}_2,\cdots,\boldsymbol{\beta}_m$ 下的坐标为：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{y}=\begin{bmatrix}y_1\\y_2\\ \vdots \\y_m \end{bmatrix}=\boldsymbol{A}\begin{bmatrix}x_1\\x_2\\ \vdots \\ \vdots \\x_n \end{bmatrix}=\boldsymbol{Ax}</script></li>
+</ol>
+<ul>
+<li><p>从线性变换看旋转矩阵</p>
+<p><img src="/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/1622124672475.png" alt="从线性变换看旋转矩阵"></p>
+</li>
+</ul>
+<h4 id="矩阵等价与矩阵相似（重点：用线性空间和线性映射的观点重新认知）"><a href="#矩阵等价与矩阵相似（重点：用线性空间和线性映射的观点重新认知）" class="headerlink" title="矩阵等价与矩阵相似（重点：用线性空间和线性映射的观点重新认知）"></a>矩阵等价与矩阵相似（重点：用线性空间和线性映射的观点重新认知）</h4><p>设矩阵 $\boldsymbol{A} ,\boldsymbol{B}\in\mathbb{F}^{m\times n}$ ，若存在可逆矩阵 $\boldsymbol{P}\in\mathbb{F}^{n\times n},\boldsymbol{Q}\in\mathbb{F}^{m\times m}$ ，使得 $\boldsymbol{AP}=\boldsymbol{QB}$ ，则称矩阵 $\boldsymbol{A},\boldsymbol{B}$ 等价；进一步，若 $m=n$ ，且 $\boldsymbol{AP}=\boldsymbol{PB}$ ，则称$\boldsymbol{A},\boldsymbol{B}$ 相似。</p>
+<p><strong>从几何角度理解矩阵等价与几何相似</strong>（进一步理解公式11）</p>
+<p>​    将 $\boldsymbol{A}$ 视为标准线性空间 $\mathbb{F}^n$ 到 $\mathbb{F}^m$ 的线性映射：$\ \boldsymbol{x}\mapsto\boldsymbol{y}=\boldsymbol{Ax}$ （具体矩阵抽象化）或视为某组未知入口基和出口基下的矩阵表示（不妨都取为标准基 $\boldsymbol{E_n},\boldsymbol{E_m}$ ）</p>
+<p>​    由 $\boldsymbol{P},\boldsymbol{Q}$ 可逆 $\Rightarrow$ 其列向量可视为 $\mathbb{F}^n$ / $\mathbb{F}^m$ 空间中的两个一般基矩阵。称 $\boldsymbol{P}=[p_1\ p_2\ \cdots\ p_n]$ 为入口基，$\boldsymbol{Q}=[q_1\ q_2\ \cdots q_m]$ 为出口基。</p>
+<p>​    由于 $\boldsymbol{AP}=\boldsymbol{QB}$ ，所以有下图成立，等式左右均表示从一般基P下的坐标到标准基下的坐标的线性映射。</p>
+<p><img src="/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%80%E8%AE%B2-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84/BFC87F8FC976B8B996157EB9E1405F6F.png" alt="img"></p>
+<p>​    因此，<strong>矩阵等价</strong>的几何意义为：线性映射 $\boldsymbol{A}$ 在入口基 $\boldsymbol{P}$ 和出口基 $\boldsymbol{Q}$ 下的矩阵表示为 $\boldsymbol{B}$ ，换言之，相当于同一<strong>线性映射</strong>在不同基下的矩阵表示。</p>
+<p>​    进一步，当 $m=n$ ，即在线性映射的两个空间是同一个空间的情况下，<strong>矩阵相似</strong>的几何意义为：同一<strong>线性变换</strong>在不同基下的矩阵表示。</p>
+<h5 id="方阵-线性变换-的不变子空间"><a href="#方阵-线性变换-的不变子空间" class="headerlink" title="方阵(线性变换)的不变子空间"></a>方阵(线性变换)的不变子空间</h5><p>设方阵 $\boldsymbol{A}\in\mathbb{F}^{n\times n}$ ，子空间 $\mathbb{W}\subseteq\mathbb{F}^n$ ，若满足 $\boldsymbol{A}(\mathbb{W})=\{\boldsymbol{Ax}|\boldsymbol{x}\in\mathbb{W}\}\subseteq\mathbb{W}$ ，即线性变换 $\boldsymbol{A}$ 作用在子空间 $\mathbb{W}$ 上的元素的像依然在子空间 $\mathbb{W}$ 中，则称 $\mathbb{W}$ 是 $\boldsymbol{A}$ 的不变子空间。典型的不变子空间包括：$\{0\},\mathbb{F}^n,\text{ker}(\boldsymbol{A}),\text{im}(\boldsymbol{A})$ </p>
+<p><strong>不变子空间等同于相似三角化</strong> </p>
+<p>对相似方阵 $\boldsymbol{A},\boldsymbol{B}\in\mathbb{F}^{n\times n}$ ，有可逆矩阵 $\boldsymbol{P}$ 使得 $\boldsymbol{AP}=\boldsymbol{PB}$  ，将矩阵 $\boldsymbol{P}$ 写作分块矩阵 $\boldsymbol{P}=[\boldsymbol{P_{1,n\times n_1}}|\boldsymbol{P_{2,n\times (n-n_1)}} ]$ ，<strong>对应地</strong>，将矩阵 $\boldsymbol{B}$ 写作分块矩阵：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{B}=\left[
+\begin{array}{c|c}
+    \boldsymbol{B}_{11,n_1\times n_1} & \boldsymbol{B}_{12,n_1\times(n-n_1)} \\
+    \hline
+    \boldsymbol{B}_{21,(n-n_1)\times n_1} & \boldsymbol{B}_{22,(n-n_1)\times(n-n_1)}
+\end{array}
+\right]</script><p>则：</p>
+<ul>
+<li>$\boldsymbol{B}_{21}=\boldsymbol{0}\Leftrightarrow\text{im}\boldsymbol{P_1}$ 是 $\boldsymbol{A}$ 的不变子空间（上三角化）</li>
+<li>$\boldsymbol{B}_{12}=\boldsymbol{0}\Leftrightarrow\text{im}\boldsymbol{P_2}$ 是 $\boldsymbol{A}$ 的不变子空间（下三角化）</li>
+</ul>
+<p>下面给出证明：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{AP_1}=[\boldsymbol{P_1}|\boldsymbol{P_2}]
+\begin{bmatrix}
+    \boldsymbol{B_{11}}\\
+    \boldsymbol{B_{21}}
+\end{bmatrix}</script><p>即：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{AP_1}=\boldsymbol{P_1B_{11}}+\boldsymbol{P_2B_{21}}</script><p>若 $\boldsymbol{B_{21}}=\boldsymbol{0}$ ，则 $\boldsymbol{AP_1}=\boldsymbol{P_1B_{11}}$ ，即 $\boldsymbol{A}\cdot\boldsymbol{p_{1j}}$ 均可由 $\boldsymbol{P_1}$ 的列向量的线性组合表出，而 $\boldsymbol{P_1}$ 的列向量的所有线性组合即为 $\text{im}\boldsymbol{P_1}\subseteq\mathbb{F}^{n_1}\subseteq\mathbb{F}^n$  ，从而 $\boldsymbol{A}$ 作用在子空间 $\text{im}\boldsymbol{P_1}$ 上的元素的像依然在子空间 $\text{im}\boldsymbol{P_1}$ 中，因此结论成立。</p>
+<p><strong>从不变子空间到相似三角化</strong></p>
+<p>给定方阵 $\boldsymbol{A}$ 和子空间 $\mathbb{W}$ ，求矩阵 $\boldsymbol{P}$ 使得相似矩阵 $\boldsymbol{B}$ 块三角化。</p>
+<p>$\Leftrightarrow$ 将 $\mathbb{W}$ 的 $n_1$ 个基向量扩充为 $\mathbb{F}^n$ 的一组基（因为 $\boldsymbol{P}$ 可逆），由这组基组成所求矩阵 $\boldsymbol{P}$ </p>
+<p><strong>从相似三角化到不变子空间</strong> </p>
+<p>给定矩阵 $\boldsymbol{P}$ ，求不变子空间 $\mathbb{W}$ 。</p>
+<p>根据不变子空间的维数 $n_1$ ，取 $\boldsymbol{P}$ 的前 $n_1$ 列向量张成即可。</p>
+<h5 id="从一维不变子空间看特征向量"><a href="#从一维不变子空间看特征向量" class="headerlink" title="从一维不变子空间看特征向量"></a>从一维不变子空间看特征向量</h5><p>特征向量满足： $\boldsymbol{A}\boldsymbol{p}=\boldsymbol{p}\lambda,\boldsymbol{A}\in\mathbb{F}^{n\times n},\boldsymbol{p}\in\mathbb{F}^n,\lambda\in\mathbb{F}$ ，显然等式右侧向量也在子空间 $\text{im}\boldsymbol{p}$ 中，所以 $\text{im}\boldsymbol{p}$ 为 $\boldsymbol{A}$ 的一维不变子空间。</p>
+<p>即，矩阵的一维不变子空间对应的向量即为特征向量，特征向量对应的特征值可以不只一个。</p>
+<h5 id="相似对角化的充要条件"><a href="#相似对角化的充要条件" class="headerlink" title="相似对角化的充要条件"></a>相似对角化的充要条件</h5><p>由上可知，$\boldsymbol{P}=[\boldsymbol{p}_1\ \cdots \ \boldsymbol{p}_n]$ ，因此：</p>
+<p>可以相似对角化 $\Leftrightarrow\forall j,\ \text{im}\boldsymbol{p}_j$ 是 $\boldsymbol{A}$ 的不变子空间 $\Leftrightarrow\forall j,\boldsymbol{p}_j$ 是 $\boldsymbol{A}$ 的特征向量 $\Leftrightarrow$ 矩阵 $\boldsymbol{A}$ 有 $n$ 个线性无关的特征向量 $\Leftrightarrow$ 矩阵 $\boldsymbol{A}$ 有一组由特征向量构成的基</p>
+<p><strong>从几何角度理解相似对角化</strong>，上述结论也是显然的：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\boldsymbol{P}^{-1}\boldsymbol{AP}=\boldsymbol{\Lambda}&\Leftrightarrow\boldsymbol{AP}=\boldsymbol{P\Lambda} \notag \\
+
+&\Leftrightarrow\boldsymbol{A}[\boldsymbol{p}_1\cdots\boldsymbol{p}_n]=[\boldsymbol{p}_1\cdots\boldsymbol{p}_n]
+\begin{bmatrix}
+\lambda_1 & \cdots & 0 \\
+\vdots    & \ddots & \vdots \\
+0          & \cdots & \lambda_n
+\end{bmatrix} \\
+
+&\Leftrightarrow\forall j,\boldsymbol{A}\boldsymbol{p}_j=\boldsymbol{p}_j\lambda_j \notag
+\end{align}</script><h5 id="从相似最简型问题到-lambda-矩阵的Jordan标准型"><a href="#从相似最简型问题到-lambda-矩阵的Jordan标准型" class="headerlink" title="从相似最简型问题到$\lambda$ 矩阵的Jordan标准型"></a>从相似最简型问题到$\lambda$ 矩阵的Jordan标准型</h5><p>并不是所有矩阵都有 $n$ 个特征向量，即并不是所有矩阵都能相似对角化，对于不能相似对角化的矩阵，我们提出 <code>Jordan(若当)标准型</code> 的概念。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/" rel="tag"># 矩阵分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E6%93%8D%E4%BD%9C/" rel="prev" title="稀疏矩阵操作">
+      <i class="fa fa-chevron-left"></i> 稀疏矩阵操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%BA%8C%E8%AE%B2-%CE%BB%E7%9F%A9%E9%98%B5%E4%B8%8EJordan%E6%A0%87%E5%87%86%E5%9E%8B/" rel="next" title="矩阵分析学习笔记2：多项式矩阵与Jordan标准型">
+      矩阵分析学习笔记2：多项式矩阵与Jordan标准型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Chapter1-%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84"><span class="nav-number">1.</span> <span class="nav-text">Chapter1 线性空间与线性映射</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4"><span class="nav-number">1.0.1.</span> <span class="nav-text">线性空间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%9F-mathbb-F"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">域 $\mathbb{F}$</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%8C%E5%85%83%E5%8A%A0%E6%B3%95%E8%BF%90%E7%AE%97"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">二元加法运算+</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%8C%E5%85%83%E6%95%B0%E4%B9%98%E8%BF%90%E7%AE%97-cdot"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">二元数乘运算 $\cdot$</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E5%B8%B8%E7%9A%84%E8%BF%90%E7%AE%97%E8%A7%84%E5%88%99"><span class="nav-number">1.0.1.4.</span> <span class="nav-text">通常的运算规则</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4-1"><span class="nav-number">1.0.1.5.</span> <span class="nav-text">线性空间</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E7%BB%84%E7%9A%84%E7%BA%BF%E6%80%A7%E7%9B%B8%E5%85%B3%E6%80%A7"><span class="nav-number">1.0.2.</span> <span class="nav-text">向量组的线性相关性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E7%BB%84%E7%9A%84%E7%BA%BF%E6%80%A7%E8%A1%A8%E5%87%BA"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">向量组的线性表出</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9C%89%E9%99%90%E7%BB%B4%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E7%9A%84%E5%9F%BA%EF%BC%88%E5%9D%90%E6%A0%87%E7%B3%BB%EF%BC%89%E4%B8%8E%E5%9D%90%E6%A0%87"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">有限维线性空间的基（坐标系）与坐标</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4-mathbb-F-n-%E7%9A%84%E6%A0%87%E5%87%86%E5%9F%BA%E4%B8%8E%E4%B8%80%E8%88%AC%E5%9F%BA"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">标准线性空间 $\mathbb{F}^n$ 的标准基与一般基</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E5%AD%90%E7%A9%BA%E9%97%B4"><span class="nav-number">1.0.3.</span> <span class="nav-text">线性子空间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E7%BB%84%E7%9A%84%E7%94%9F%E6%88%90%E5%AD%90%E7%A9%BA%E9%97%B4%E5%92%8C%E5%AD%90%E7%A9%BA%E9%97%B4%E7%9A%84%E7%94%9F%E6%88%90%E7%BB%84"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">向量组的生成子空间和子空间的生成组</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%9A%84%E6%A0%B8%E4%B8%8E%E5%83%8F"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">矩阵的核与像</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%90%E7%A9%BA%E9%97%B4%E7%9A%84%E4%BA%A4%E4%B8%8E%E5%92%8C"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">子空间的交与和</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84"><span class="nav-number">1.0.4.</span> <span class="nav-text">线性映射</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%98%A0%E5%B0%84"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">映射</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84%EF%BC%8C%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E4%B8%8E%E7%BA%BF%E6%80%A7%E5%90%8C%E6%9E%84"><span class="nav-number">1.0.4.2.</span> <span class="nav-text">线性映射，线性变换与线性同构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5-%E4%B8%8E-%E6%A0%87%E5%87%86%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84-%E6%98%AF%E7%AD%89%E5%90%8C%E7%9A%84"><span class="nav-number">1.0.4.3.</span> <span class="nav-text">矩阵 与 标准线性空间中的线性映射 是等同的</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%AD%89%E4%BB%B7%E4%B8%8E%E7%9F%A9%E9%98%B5%E7%9B%B8%E4%BC%BC%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%9A%E7%94%A8%E7%BA%BF%E6%80%A7%E7%A9%BA%E9%97%B4%E5%92%8C%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84%E7%9A%84%E8%A7%82%E7%82%B9%E9%87%8D%E6%96%B0%E8%AE%A4%E7%9F%A5%EF%BC%89"><span class="nav-number">1.0.5.</span> <span class="nav-text">矩阵等价与矩阵相似（重点：用线性空间和线性映射的观点重新认知）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E9%98%B5-%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2-%E7%9A%84%E4%B8%8D%E5%8F%98%E5%AD%90%E7%A9%BA%E9%97%B4"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">方阵(线性变换)的不变子空间</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%8E%E4%B8%80%E7%BB%B4%E4%B8%8D%E5%8F%98%E5%AD%90%E7%A9%BA%E9%97%B4%E7%9C%8B%E7%89%B9%E5%BE%81%E5%90%91%E9%87%8F"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">从一维不变子空间看特征向量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9B%B8%E4%BC%BC%E5%AF%B9%E8%A7%92%E5%8C%96%E7%9A%84%E5%85%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.0.5.3.</span> <span class="nav-text">相似对角化的充要条件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%8E%E7%9B%B8%E4%BC%BC%E6%9C%80%E7%AE%80%E5%9E%8B%E9%97%AE%E9%A2%98%E5%88%B0-lambda-%E7%9F%A9%E9%98%B5%E7%9A%84Jordan%E6%A0%87%E5%87%86%E5%9E%8B"><span class="nav-number">1.0.5.4.</span> <span class="nav-text">从相似最简型问题到$\lambda$ 矩阵的Jordan标准型</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

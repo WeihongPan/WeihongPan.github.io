@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本章介绍Eigen中的归约( Reductions )，迭代器( Visitors ) 和广播( Broadcasting )机制，以及它们是如何应用与矩阵和数组的。 归约归约指的是一类以矩阵或数组作为输入，返回一个标量值的函数。 常用归约函数.sum() .prod() .mean() .minCoeff() .maxCoeff() .trace() 范数计算 .norm() : L-2 范数（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="归约、迭代器和广播机制">
+<meta property="og:url" content="https://weihongpan.github.io/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="本章介绍Eigen中的归约( Reductions )，迭代器( Visitors ) 和广播( Broadcasting )机制，以及它们是如何应用与矩阵和数组的。 归约归约指的是一类以矩阵或数组作为输入，返回一个标量值的函数。 常用归约函数.sum() .prod() .mean() .minCoeff() .maxCoeff() .trace() 范数计算 .norm() : L-2 范数（">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-22T03:51:55.000Z">
+<meta property="article:modified_time" content="2021-04-23T07:38:02.347Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Eigen">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://weihongpan.github.io/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>归约、迭代器和广播机制 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          归约、迭代器和广播机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 11:51:55" itemprop="dateCreated datePublished" datetime="2021-04-22T11:51:55+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 15:38:02" itemprop="dateModified" datetime="2021-04-23T15:38:02+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本章介绍Eigen中的归约( <code>Reductions</code> )，迭代器( <code>Visitors</code> ) 和广播( <code>Broadcasting</code> )机制，以及它们是如何应用与矩阵和数组的。</p>
+<h3 id="归约"><a href="#归约" class="headerlink" title="归约"></a>归约</h3><p>归约指的是一类以矩阵或数组作为输入，返回一个标量值的函数。</p>
+<h4 id="常用归约函数"><a href="#常用归约函数" class="headerlink" title="常用归约函数"></a>常用归约函数</h4><p><code>.sum()</code> <code>.prod()</code> <code>.mean()</code> <code>.minCoeff()</code> <code>.maxCoeff()</code> <code>.trace()</code></p>
+<h4 id="范数计算"><a href="#范数计算" class="headerlink" title="范数计算"></a>范数计算</h4><ul>
+<li><code>.norm()</code> : L-2 范数（所有系数平方和开根号）</li>
+<li><code>.squaredNorm()</code> : L-2 范数的平方（所有系数平方和）</li>
+<li><code>.lpNorm&lt;p&gt;()</code> : P范数（所有系数绝对值的p次幂之和的p次根），当 <code>p=Infinity</code> 时表示所有系数绝对值的最大值</li>
+</ul>
+<h4 id="逻辑归约函数"><a href="#逻辑归约函数" class="headerlink" title="逻辑归约函数"></a>逻辑归约函数</h4><ul>
+<li><code>.all()</code> : Matrix 或 Array 的所有系数均为 true 时返回 true</li>
+<li><code>.any()</code> : Matrix 或 Array 存在某个系数为 true 时返回 true</li>
+<li><code>.count()</code> : 返回 Matrix 或 Array 中为 true 的系数总个数</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">ArrayXXf <span class="title">a</span><span class="params">(<span class="number">2</span>,<span class="number">2</span>)</span></span>; </span><br><span class="line">  	a &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>,<span class="number">4</span>; </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).all()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">all</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).any()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">any</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).count() = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">count</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).all()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">all</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).any()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">any</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).count() = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">count</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(a &gt; 0).all()   = 1</span><br><span class="line">(a &gt; 0).any()   = 1</span><br><span class="line">(a &gt; 0).count() = 4</span><br><span class="line"></span><br><span class="line">(a &gt; 2).all()   = 0</span><br><span class="line">(a &gt; 2).any()   = 1</span><br><span class="line">(a &gt; 2).count() = 2</span><br></pre></td></tr></table></figure>
+<h4 id="部分归约"><a href="#部分归约" class="headerlink" title="部分归约"></a>部分归约</h4><p>部分归约是可以对矩阵或数组按列或行进行操作的归约，对每个列或行应用归约运算，然后返回具有相应值的列或行向量。部分归约由函数 <code>.colwise()</code> 和 <code>rowwise()</code> 实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">Eigen::MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Column&#x27;s maximum: &quot;</span> &lt;&lt; endl</span><br><span class="line">   		 &lt;&lt; mat.<span class="built_in">colwise</span>().<span class="built_in">maxCoeff</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Row&#x27;s maximum: &quot;</span> &lt;&lt; endl</span><br><span class="line">   		 &lt;&lt; mat.<span class="built_in">rowwise</span>().<span class="built_in">maxCoeff</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Column<span class="string">&#x27;s maximum: </span></span><br><span class="line"><span class="string">3 2 7 9</span></span><br><span class="line"><span class="string">Row&#x27;</span>s maximum: </span><br><span class="line">9</span><br><span class="line">7</span><br></pre></td></tr></table></figure>
+<p>显然：<strong>列操作返回行向量，行操作返回列向量</strong> </p>
+<h4 id="将部分归约与其他操作结合"><a href="#将部分归约与其他操作结合" class="headerlink" title="将部分归约与其他操作结合"></a>将部分归约与其他操作结合</h4><p>例：寻找系数和最大的列</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  	MatrixXf::Index   maxIndex;</span><br><span class="line">  	<span class="keyword">float</span> maxNorm = mat.<span class="built_in">colwise</span>().<span class="built_in">sum</span>().<span class="built_in">maxCoeff</span>(&amp;maxIndex);</span><br><span class="line">  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Maximum sum at position &quot;</span> &lt;&lt; maxIndex &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;The corresponding vector is: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat.<span class="built_in">col</span>( maxIndex ) &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;And its sum is is: &quot;</span> &lt;&lt; maxNorm &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Maximum sum at position 2</span><br><span class="line">The corresponding vector is: </span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">And its sum is is: 13</span><br></pre></td></tr></table></figure>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>最常用的就是利用visitor机制获取矩阵/数组中最大值/最小值的位置，交给一个visitor的参数是指向存储行列位置变量的指针，变量类型为 <code>Index</code> ：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">m</span><span class="params">(<span class="number">2</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">  </span><br><span class="line">  	m &lt;&lt; <span class="number">1</span>, <span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>, <span class="number">4</span>;</span><br><span class="line"> </span><br><span class="line">  	<span class="comment">//get location of maximum</span></span><br><span class="line">  	MatrixXf::Index maxRow, maxCol;</span><br><span class="line">  	<span class="keyword">float</span> max = m.<span class="built_in">maxCoeff</span>(&amp;maxRow, &amp;maxCol);</span><br><span class="line"> </span><br><span class="line"> 	<span class="comment">//get location of minimum</span></span><br><span class="line">  	MatrixXf::Index minRow, minCol;</span><br><span class="line">  	<span class="keyword">float</span> min = m.<span class="built_in">minCoeff</span>(&amp;minRow, &amp;minCol);</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Max: &quot;</span> &lt;&lt; max &lt;&lt;  <span class="string">&quot;, at: &quot;</span> </span><br><span class="line">         &lt;&lt; maxRow &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; maxCol &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Min: &quot;</span> &lt;&lt; min &lt;&lt; <span class="string">&quot;, at: &quot;</span> </span><br><span class="line">         &lt;&lt; minRow &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; minCol &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Max: 4, at: 1,1</span><br><span class="line">Min: 1, at: 0,0</span><br></pre></td></tr></table></figure>
+<h3 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h3><p>广播机制类似于部分规约，区别在于广播构造了一个表达式，其中向量被解释成了一个矩阵，这个矩阵由向量在行/列方向上复制自身形成。</p>
+<h4 id="加减（-、-、-、-）"><a href="#加减（-、-、-、-）" class="headerlink" title="加减（+、-、+=、-=）"></a>加减（+、-、+=、-=）</h4><p><strong>只能用于Vector类型的对象！！！</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	<span class="function">Eigen::VectorXf <span class="title">v</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;   </span><br><span class="line">  	v &lt;&lt; <span class="number">0</span>,</span><br><span class="line">         <span class="number">1</span>;</span><br><span class="line">       </span><br><span class="line">  	<span class="comment">//add v to each column of m</span></span><br><span class="line">  	mat.<span class="built_in">colwise</span>() += v;</span><br><span class="line">  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Broadcasting result: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">    </span><br><span class="line">    <span class="function">Eigen::VectorXf <span class="title">w</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br><span class="line">    w &lt;&lt; <span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>;</span><br><span class="line">       </span><br><span class="line">  	<span class="comment">//add w to each row of m</span></span><br><span class="line">  	mat.<span class="built_in">rowwise</span>() += v.<span class="built_in">transpose</span>();</span><br><span class="line">	  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Broadcasting result: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Broadcasting result: </span><br><span class="line">1 2 6 9</span><br><span class="line">4 2 8 3</span><br><span class="line">Broadcasting result: </span><br><span class="line">1 3  8 12</span><br><span class="line">4 3 10  6</span><br></pre></td></tr></table></figure>
+<p>在执行 <code>mat.colwise() += v</code> 时，相当于进行了两步操作，首先将向量 <code>v</code> 在行方向上复制了4次形成了一个新的4x2的矩阵，再将这个矩阵和矩阵 <code>mat</code> 进行加法操作：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+1 & 2 & 6 & 9 \\
+3 & 1 & 7 & 2 
+\end{bmatrix} + 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+1 & 1 & 1 & 1 
+\end{bmatrix} = 
+\begin{bmatrix}
+1 & 2 & 6 & 9 \\
+4 & 2 & 8 & 3 
+\end{bmatrix}</script><p>只有向量才能进行按行列加减，不能是矩阵，否则会报编译错误；</p>
+<p>Array类同理，只能对 <code>ArrayXf</code> 执行这种操作</p>
+<h4 id="乘除（、-、-、-）"><a href="#乘除（、-、-、-）" class="headerlink" title="乘除（、/、\=、/=）"></a>乘除（<em>、/、\</em>=、/=）</h4><p>按行/按列执行系数级乘法除法运算。</p>
+<p><strong>只能用于 Array 类型的对象！！！</strong></p>
+<p>如果想让矩阵第 <code>i</code> 列乘上向量的第 <code>i</code> 个系数，应该写成 <code>mat = mat * v.asDiagonal()</code> </p>
+<h4 id="将广播与其他操作结合"><a href="#将广播与其他操作结合" class="headerlink" title="将广播与其他操作结合"></a>将广播与其他操作结合</h4><p>例：在矩阵 <code>m</code> 中找到与向量 <code>v</code> 距离最近的列向量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">m</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	<span class="function">Eigen::VectorXf <span class="title">v</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">  </span><br><span class="line"> 	 m &lt;&lt; <span class="number">1</span>, <span class="number">23</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">          <span class="number">3</span>, <span class="number">11</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">       </span><br><span class="line">  	v &lt;&lt; <span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>;</span><br><span class="line"> </span><br><span class="line">  	MatrixXf::Index index;</span><br><span class="line">  	<span class="comment">// find nearest neighbour</span></span><br><span class="line">  	(m.<span class="built_in">colwise</span>() - v).<span class="built_in">colwise</span>().<span class="built_in">squaredNorm</span>().<span class="built_in">minCoeff</span>(&amp;index);</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Nearest neighbour is column &quot;</span> &lt;&lt; index &lt;&lt; <span class="string">&quot;:&quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; m.<span class="built_in">col</span>(index) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Nearest neighbour is column 0:</span><br><span class="line">1</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Eigen/" rel="tag"># Eigen</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/" rel="prev" title="高级初始化">
+      <i class="fa fa-chevron-left"></i> 高级初始化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/" rel="next" title="如何将Labelme标注图像转为CULane数据集格式">
+      如何将Labelme标注图像转为CULane数据集格式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E7%BA%A6"><span class="nav-number">1.</span> <span class="nav-text">归约</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%BD%92%E7%BA%A6%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">常用归约函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8C%83%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-number">1.2.</span> <span class="nav-text">范数计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%BD%92%E7%BA%A6%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">逻辑归约函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%83%A8%E5%88%86%E5%BD%92%E7%BA%A6"><span class="nav-number">1.4.</span> <span class="nav-text">部分归约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86%E9%83%A8%E5%88%86%E5%BD%92%E7%BA%A6%E4%B8%8E%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%BB%93%E5%90%88"><span class="nav-number">1.5.</span> <span class="nav-text">将部分归约与其他操作结合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%BF%E6%92%AD"><span class="nav-number">3.</span> <span class="nav-text">广播</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E5%87%8F%EF%BC%88-%E3%80%81-%E3%80%81-%E3%80%81-%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">加减（+、-、+&#x3D;、-&#x3D;）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B9%98%E9%99%A4%EF%BC%88%E3%80%81-%E3%80%81-%E3%80%81-%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">乘除（、&#x2F;、\&#x3D;、&#x2F;&#x3D;）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86%E5%B9%BF%E6%92%AD%E4%B8%8E%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%BB%93%E5%90%88"><span class="nav-number">3.3.</span> <span class="nav-text">将广播与其他操作结合</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

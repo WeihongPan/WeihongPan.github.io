@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本章介绍 Matrix 和 Array 中的块操作。 块操作 .block()取一个从 (i,j) 开始的，大小为 (p,q) 的块，有两种语法：  matrix.block(i,j,p,q); &#x3D;&gt; 构造一个动态大小的块 matrix.block&lt;p,q&gt;(i,j); &#x3D;&gt; 构造一个固定大小的块  两种语法的执行结果相同，都能用在固定大小&#x2F;动态大小的矩阵&#x2F;数组上。唯一不同">
+<meta property="og:type" content="article">
+<meta property="og:title" content="块操作">
+<meta property="og:url" content="https://weihongpan.github.io/Eigen/%E5%9D%97%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="本章介绍 Matrix 和 Array 中的块操作。 块操作 .block()取一个从 (i,j) 开始的，大小为 (p,q) 的块，有两种语法：  matrix.block(i,j,p,q); &#x3D;&gt; 构造一个动态大小的块 matrix.block&lt;p,q&gt;(i,j); &#x3D;&gt; 构造一个固定大小的块  两种语法的执行结果相同，都能用在固定大小&#x2F;动态大小的矩阵&#x2F;数组上。唯一不同">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-22T02:38:08.000Z">
+<meta property="article:modified_time" content="2021-04-23T07:38:45.643Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Eigen">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://weihongpan.github.io/Eigen/%E5%9D%97%E6%93%8D%E4%BD%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>块操作 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E5%9D%97%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          块操作
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 10:38:08" itemprop="dateCreated datePublished" datetime="2021-04-22T10:38:08+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 15:38:45" itemprop="dateModified" datetime="2021-04-23T15:38:45+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本章介绍 Matrix 和 Array 中的块操作。</p>
+<h3 id="块操作-block"><a href="#块操作-block" class="headerlink" title="块操作 .block()"></a>块操作 .block()</h3><p>取一个从 <code>(i,j)</code> 开始的，大小为 <code>(p,q)</code> 的块，有两种语法：</p>
+<ul>
+<li><code>matrix.block(i,j,p,q);</code> =&gt; 构造一个动态大小的块</li>
+<li><code>matrix.block&lt;p,q&gt;(i,j);</code> =&gt; 构造一个固定大小的块</li>
+</ul>
+<p>两种语法的执行结果相同，都能用在固定大小/动态大小的矩阵/数组上。唯一不同的是当块大小已知且比较小的时候，返回固定大小的块能让代码执行得更快一点。</p>
+<p>尽管 <code>.block()</code> 方法可以用于任何块操作，但对于特殊情况，使用更具针对性的方法能提供更好的性能，下面将介绍三种特殊方法。</p>
+<h3 id="行列操作"><a href="#行列操作" class="headerlink" title="行列操作"></a>行列操作</h3><ul>
+<li>取第 <code>i</code> 行：<code>matrix.row(i)</code> </li>
+<li>取第 <code>j</code> 列：<code>matrix.col(j)</code> </li>
+</ul>
+<h3 id="与角相关的操作"><a href="#与角相关的操作" class="headerlink" title="与角相关的操作"></a>与角相关的操作</h3><p>同样也有返回动态大小/固定大小两种语法</p>
+<ul>
+<li>左上角 <code>p*q</code> ：<code>matrix.topLeftCorner(p,q);</code>     <code>matrix.topLeftCorner&lt;p,q&gt;();</code> </li>
+<li>左下角 <code>p*q</code> ：<code>matrix.bottomLeftCorner(p,q);</code>     <code>matrix.bottomLeftCorner&lt;p,q&gt;();</code></li>
+<li>右上角 <code>p*q</code> ：<code>matrix.topRightCorner(p,q);</code>     <code>matrix.topRightCorner&lt;p,q&gt;();</code> </li>
+<li>右下角 <code>p*q</code> ：<code>matrix.bottomRightCorner(p,q);</code>     <code>matrix.bottomRightCorner&lt;p,q&gt;();</code>  </li>
+<li>取前 <code>q</code> 行：<code>matrix.topRows(q);</code>     <code>matrix.topRows&lt;q&gt;();</code> </li>
+<li>取后 <code>q</code> 行：<code>matrix.bottomRows(q);</code>     <code>matrix.bottomRows&lt;q&gt;();</code> </li>
+<li>取前 <code>p</code> 列：<code>matrix.leftCols(p);</code>     <code>matrix.leftCols&lt;p&gt;();</code> </li>
+<li>取后 <code>p</code> 列：<code>matrix.rightCols(q);</code>     <code>matrix.rightCols&lt;q&gt;();</code> </li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Eigen::Matrix4f m;</span><br><span class="line">    m &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>,</span><br><span class="line">         <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>,</span><br><span class="line">         <span class="number">9</span>, <span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,</span><br><span class="line">         <span class="number">13</span>,<span class="number">14</span>,<span class="number">15</span>,<span class="number">16</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m.leftCols(2) =&quot;</span> &lt;&lt; endl </span><br><span class="line">         &lt;&lt; m.<span class="built_in">leftCols</span>(<span class="number">2</span>) &lt;&lt; endl </span><br><span class="line">         &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m.bottomRows&lt;2&gt;() =&quot;</span> &lt;&lt; endl </span><br><span class="line">         &lt;&lt; m.bottomRows&lt;<span class="number">2</span>&gt;() &lt;&lt; endl </span><br><span class="line">         &lt;&lt; endl;</span><br><span class="line">    m.<span class="built_in">topLeftCorner</span>(<span class="number">1</span>,<span class="number">3</span>) = m.<span class="built_in">bottomRightCorner</span>(<span class="number">3</span>,<span class="number">1</span>).<span class="built_in">transpose</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;After assignment, m = &quot;</span> &lt;&lt; endl &lt;&lt; m &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">m.leftCols(2) =</span><br><span class="line"> 1  2</span><br><span class="line"> 5  6</span><br><span class="line"> 9 10</span><br><span class="line">13 14</span><br><span class="line"></span><br><span class="line">m.bottomRows&lt;2&gt;() =</span><br><span class="line"> 9 10 11 12</span><br><span class="line">13 14 15 16</span><br><span class="line"></span><br><span class="line">After assignment, m = </span><br><span class="line"> 8 12 16  4</span><br><span class="line"> 5  6  7  8</span><br><span class="line"> 9 10 11 12</span><br><span class="line">13 14 15 16</span><br></pre></td></tr></table></figure>
+<h3 id="对向量和一维数组的块操作"><a href="#对向量和一维数组的块操作" class="headerlink" title="对向量和一维数组的块操作"></a>对向量和一维数组的块操作</h3><p>同样也有返回动态大小/固定大小两种语法</p>
+<ul>
+<li>包含前 <code>n</code> 个元素：<code>vector.head(n);</code>     <code>vector.head&lt;n&gt;();</code> </li>
+<li>包含后 <code>n</code> 个元素：<code>vector.tail(n);</code>     <code>vector.tail&lt;n&gt;();</code> </li>
+<li>从 <code>i</code> 开始，包含 <code>n</code> 个元素：<code>vector.segment(i,n);</code>     <code>vector.segment&lt;n&gt;(i);</code> </li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">Eigen::ArrayXf <span class="title">v</span><span class="params">(<span class="number">6</span>)</span></span>;</span><br><span class="line">    v &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;v.head(3) =&quot;</span> &lt;&lt; endl &lt;&lt; v.<span class="built_in">head</span>(<span class="number">3</span>) &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;v.tail&lt;3&gt;() = &quot;</span> &lt;&lt; endl &lt;&lt; v.tail&lt;<span class="number">3</span>&gt;() &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line">    v.<span class="built_in">segment</span>(<span class="number">1</span>,<span class="number">4</span>) *= <span class="number">2</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;after &#x27;v.segment(1,4) *= 2&#x27;, v =&quot;</span> &lt;&lt; endl &lt;&lt; v &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">	</span><br><span class="line">v.head(3) =</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line"></span><br><span class="line">v.tail&lt;3&gt;() = </span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line"></span><br><span class="line">after <span class="string">&#x27;v.segment(1,4) *= 2&#x27;</span>, v =</span><br><span class="line"> 1</span><br><span class="line"> 4</span><br><span class="line"> 6</span><br><span class="line"> 8</span><br><span class="line">10</span><br><span class="line"> 6</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Eigen/" rel="tag"># Eigen</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/Array%E7%B1%BB%E4%B8%8E%E7%B3%BB%E6%95%B0%E7%BA%A7%E6%93%8D%E4%BD%9C/" rel="prev" title="Array类与系数级操作">
+      <i class="fa fa-chevron-left"></i> Array类与系数级操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/" rel="next" title="高级初始化">
+      高级初始化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%97%E6%93%8D%E4%BD%9C-block"><span class="nav-number">1.</span> <span class="nav-text">块操作 .block()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%8C%E5%88%97%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">行列操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E8%A7%92%E7%9B%B8%E5%85%B3%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">与角相关的操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E5%90%91%E9%87%8F%E5%92%8C%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E5%9D%97%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">对向量和一维数组的块操作</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

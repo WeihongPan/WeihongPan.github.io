@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Tips for Deep Learning 设计网络架构和损失函数 &#x3D;&gt; 得到一个Neural Network 训练集上的准确率较高，继续3；否则回到1，修改网络（欠拟合[参数过少，能力不足]或者单纯的没有训练好） 测试集上的准确率较高，结束；否则回到1，减少参数数量或修改网络（过拟合）  不同的方法针对不同的问题，是训练集准确率就低？还是训练集准确率高但测试集准确率低？ ———&gt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tips for Deep Learning">
+<meta property="og:url" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="Tips for Deep Learning 设计网络架构和损失函数 &#x3D;&gt; 得到一个Neural Network 训练集上的准确率较高，继续3；否则回到1，修改网络（欠拟合[参数过少，能力不足]或者单纯的没有训练好） 测试集上的准确率较高，结束；否则回到1，减少参数数量或修改网络（过拟合）  不同的方法针对不同的问题，是训练集准确率就低？还是训练集准确率高但测试集准确率低？ ———&gt;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/1616597597261.png">
+<meta property="og:image" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/1616597770822.png">
+<meta property="og:image" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/1616600772310.png">
+<meta property="og:image" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/1616603518615.png">
+<meta property="article:published_time" content="2021-03-24T14:30:42.000Z">
+<meta property="article:modified_time" content="2021-03-24T18:12:21.344Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Machine Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/1616597597261.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Tips for Deep Learning | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Tips-for-Deep-Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Tips for Deep Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-24 22:30:42" itemprop="dateCreated datePublished" datetime="2021-03-24T22:30:42+08:00">2021-03-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-25 02:12:21" itemprop="dateModified" datetime="2021-03-25T02:12:21+08:00">2021-03-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Tips-for-Deep-Learning"><a href="#Tips-for-Deep-Learning" class="headerlink" title="Tips for Deep Learning"></a>Tips for Deep Learning</h3><ol>
+<li>设计网络架构和损失函数 =&gt; 得到一个Neural Network</li>
+<li>训练集上的准确率较高，继续3；否则回到1，修改网络（欠拟合[参数过少，能力不足]或者单纯的没有训练好）</li>
+<li>测试集上的准确率较高，结束；否则回到1，减少参数数量或修改网络（过拟合）</li>
+</ol>
+<p>不同的方法针对不同的问题，是训练集准确率就低？还是训练集准确率高但测试集准确率低？</p>
+<p>———&gt; <strong>dropout</strong>：测试集准确率低的时候使用</p>
+<h4 id="Bad-Results-on-Training-Data"><a href="#Bad-Results-on-Training-Data" class="headerlink" title="Bad Results on Training Data"></a>Bad Results on Training Data</h4><h5 id="新的激活函数（New-Activation-Function）"><a href="#新的激活函数（New-Activation-Function）" class="headerlink" title="新的激活函数（New Activation Function）"></a>新的激活函数（New Activation Function）</h5><ul>
+<li><p>80s：sigmoid函数。深度越深，表现并不会越好。</p>
+<p>失效原因：<strong>梯度消失</strong> </p>
+<p><strong>现象</strong>：靠近输入层的几层梯度较小，靠近输出层的几层梯度较大。当设定相同学习率时，前面学得很慢，后面学得很快。这会导致当前面几层还在变化的时候，后面已经收敛了，从而导致损失函数（交叉熵的和）降低得很慢，让人误以为卡在局部极小值而暂停训练。</p>
+<p><strong>原因</strong>：sigmoid函数会把输入的大变化衰减掉，深度越深，衰减越厉害，到输出的时候几乎没有影响了，所以越靠近输入层，对Cross Entropy的梯度越小</p>
+<p><img src="/Machine-Learning/Tips-for-Deep-Learning/1616597597261.png" alt="1616597597261"></p>
+<p><strong>解决</strong>：ReLU</p>
+</li>
+<li><p>Rectified Linear Unit（<strong>ReLU</strong>）</p>
+<p><img src="/Machine-Learning/Tips-for-Deep-Learning/1616597770822.png" alt="1616597770822"></p>
+<p>原因：1）计算速度快 2）生物学原因 3）相当于无穷多个sigmoid函数叠加的结果（bias不同）<strong>4）可以解决梯度消失的问题</strong> </p>
+<p>输出为0的neuron对整个网络毫无影响，可以直接拿掉；而剩下的neuron满足输出=输入，所以整个网络可以看作一个<strong>瘦长的线性网络</strong>。</p>
+<p>sigmoid函数的问题在于会把较大的输入变成较小的输出；而ReLU满足输出=输入，就不用再担心衰减的问题了。</p>
+<ul>
+<li><p>但这并不是说使用ReLU激活的网络就是线性网络了，它依然是个<strong>非线性</strong>的网络（局部线性，整体非线性）</p>
+<p>当每个神经元操作数的作用域一样的时候，是线性的。也就是说，如果只对输入作小改变，而不改变神经元操作数的作用域，这时是线性的；但当对输入作大改变，从而改变了神经元操作数的作用域，就变成非线性了。 ——李宏毅</p>
+<p>ReLU的非线性体现在对不同的样本呈现出不同的状态（不同的参数）</p>
+<p>对输入样本 $\boldsymbol{x}^1$ ，网络中所有的ReLU对它都有一个确定的状态，整个网络最终对 $\boldsymbol{x}^1$ 的映射等效于一个线性映射：$\boldsymbol{y}^1=\boldsymbol{w}^1\boldsymbol{x}^1+b^1$ </p>
+<p>而对另一个输入样本 $\boldsymbol{x}^2$ ，其特征与样本 $\boldsymbol{x}^1$ 不同，所以网络中的某些ReLU的激活状态因为输入变化可能发生变化，比如一些以前在右侧接通区域的变到左侧切断区域（或反之）。这样整个网络对 $\boldsymbol{x}^2$ 的映射等效于一个新的线性映射：$\boldsymbol{y}^2=\boldsymbol{w}^2\boldsymbol{x}^2+b_2$ </p>
+<p>两个函数都是线性的，但参数不同，也就是说某种线性映射参数所定义的一个超平面只在某个样本附近才能成立，一旦稍微远离就会导致至少一个ReLU翻转，那么网络将有可能拟合出另一个不同参数的超平面。即<strong>不同作用域上的非线性</strong> 。  ——知乎用户 · 摩尔</p>
+</li>
+<li><p>在0处不可微：实际应用上不会恰好到这个点的</p>
+</li>
+<li><p>ReLU变形</p>
+<ul>
+<li>Leaky ReLU：$a=0.01z\quad (z&lt;0)$ </li>
+<li>Parametric ReLU：$a=\alpha z\quad (z&lt;0)$ 其中，参数 $\alpha$ 可以通过gradient descent学出来</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Maxout Network </p>
+<ul>
+<li><p>一个用来学习激活函数的网络，产生的激活函数是个分段线性函数（ReLU是一种特殊的由Maxout产生的激活函数）</p>
+</li>
+<li><p>概念</p>
+<p><img src="/Machine-Learning/Tips-for-Deep-Learning/1616600772310.png" alt="1616600772310"></p>
+<p>至于几个元素一组是由人为事先决定的，从而决定了形成的激活函数由几段线性函数组成</p>
+</li>
+<li><p>怎么训练</p>
+<p>对各组中最大的元素来说，输入=输出，即梯度为1；而其他较小的元素则对网络不产生任何影响，同样可以拿掉，从而又可以将网络视为一个瘦长的线性网络。而对不同的输入样本，这种线性关系是不同的，当输入样本很多的时候，网络上的每个参数都能被训练到（这里的理解和ReLU一样）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="自适应学习率（Adaptive-Learning-Rate）"><a href="#自适应学习率（Adaptive-Learning-Rate）" class="headerlink" title="自适应学习率（Adaptive Learning Rate）"></a>自适应学习率（Adaptive Learning Rate）</h5><ul>
+<li><p>Adagrad</p>
+<script type="math/tex; mode=display">
+\boldsymbol{w}^{t+1}\leftarrow\boldsymbol{w}^t-\frac{\eta}{\sqrt{\sum_{i=1}^n(\boldsymbol{g}^i)^2}}\boldsymbol{g}^t</script><p>陡峭大学习率，平缓小学习率</p>
+<p>问题：单方向学习率不变</p>
+</li>
+<li><p>RMSProp</p>
+<script type="math/tex; mode=display">
+\boldsymbol{w}^1\leftarrow\boldsymbol{w}^0-\frac{\eta}{\sigma^0}\boldsymbol{g}^0\qquad \sigma^0=\boldsymbol{g}^0\\
+\boldsymbol{w}^2\leftarrow\boldsymbol{w}^1-\frac{\eta}{\sigma^1}\boldsymbol{g}^1\qquad \sigma^1=\sqrt{\alpha(\sigma^0)^2+(1-\alpha)(\boldsymbol{g}^1)^2}\\
+\boldsymbol{w}^3\leftarrow\boldsymbol{w}^2-\frac{\eta}{\sigma^2}\boldsymbol{g}^2\qquad \sigma^2=\sqrt{\alpha(\sigma^1)^2+(1-\alpha)(\boldsymbol{g}^2)^2}\\
+\cdots \\
+\boldsymbol{w}^{t+1}\leftarrow\boldsymbol{w}^t-\frac{\eta}{\sigma^t}\boldsymbol{g}^t\qquad \sigma^t=\sqrt{\alpha(\sigma^{t-1})^2+(1-\alpha)(\boldsymbol{g}^t)^2}</script><p>虽然同样在算梯度的均方根（Root Mean Square），但可以给新看到的梯度比较大的权重，给过去看到的梯度比较小的梯度，从而解决Adagrad同方向学习率不变的问题。</p>
+</li>
+<li><p>Momentum</p>
+<p>除了当前的梯度，还参考了当前的惯性，也就是把之前的梯度也纳入考虑，越远的梯度系数越小，参考影响越小；越近的梯度参考影响越大。这种方法在某些时候可以帮助跳出局部极小值点。</p>
+</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Position</th>
+<th style="text-align:center">Movement</th>
+<th style="text-align:center">Gradient</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">$\boldsymbol{\theta}^0$</td>
+<td style="text-align:center">$\boldsymbol{v}^0=0$</td>
+<td style="text-align:center">$\nabla L(\boldsymbol{\theta}^0)$</td>
+</tr>
+<tr>
+<td style="text-align:center">$\boldsymbol{\theta}^1=\boldsymbol{\theta}^0+\boldsymbol{v}^1$</td>
+<td style="text-align:center">$\boldsymbol{v}^1=\lambda\boldsymbol{v}^0-\eta\nabla L(\boldsymbol{\theta}^0)=-\eta\nabla L(\boldsymbol{\theta}^0)$</td>
+<td style="text-align:center">$\nabla L(\boldsymbol{\theta}^1)$</td>
+</tr>
+<tr>
+<td style="text-align:center">$\boldsymbol{\theta}^2=\boldsymbol{\theta}^1+\boldsymbol{v}^2$</td>
+<td style="text-align:center">$\boldsymbol{v}^2=\lambda\boldsymbol{v}^1-\eta\nabla L(\boldsymbol{\theta}^1)=-\lambda \eta\nabla L(\boldsymbol{\theta}^0)-\eta\nabla L(\boldsymbol{\theta}^1)$</td>
+<td style="text-align:center">$\nabla L(\boldsymbol{\theta}^2)$</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>  <img src="/Machine-Learning/Tips-for-Deep-Learning/1616603518615.png" alt="1616603518615"></p>
+<ul>
+<li>Adam = RMSprop + Momentum</li>
+</ul>
+<h4 id="Bad-Results-on-Testing-Data"><a href="#Bad-Results-on-Testing-Data" class="headerlink" title="Bad Results on Testing Data"></a>Bad Results on Testing Data</h4><h5 id="早点停"><a href="#早点停" class="headerlink" title="早点停"></a>早点停</h5><h5 id="正则化-Regularization"><a href="#正则化-Regularization" class="headerlink" title="正则化 Regularization"></a>正则化 Regularization</h5><p>重新定义一个损失函数，在原损失函数的基础上加上正则项（以2-norm为例）：</p>
+<script type="math/tex; mode=display">
+L'(\theta)=L(\theta)+\lambda\frac{1}{2}||\theta||_2\\
+||\theta||_2=\sum_{i=1}^n(w_i)^2 \\
+\frac{\partial L'}{\partial w}=\frac{\partial L}{\partial w}+\lambda w \\
+w^{t+1}\leftarrow w^t-\eta\frac{\partial L'}{\partial w}=(1-\eta\lambda)w^t-\eta\frac{\partial L}{\partial w}</script><p>正则化一般不考虑 bias 项，因为正则化的目的是让function变得平滑，而bias与function的平滑程度没有关系。</p>
+<p>$(1-\eta\lambda)$ 非常接近1，使得 $(1-\eta\lambda)w^t$ 越来越接近0，而后面的微分项保证了整体不会都变成0。</p>
+<p><code>L1和L2的区别</code>：L1的结果很稀疏，会有接近0的点，也会有离0远的点；L2的结果基本都是集中在0附近较小的点</p>
+<p><code>Weight Decay</code>：每次都让weight小一点</p>
+<p><code>目的</code>：参数不要离0太远。（和早点停的作用很像）</p>
+<h5 id="Dropout"><a href="#Dropout" class="headerlink" title="Dropout"></a>Dropout</h5><ul>
+<li><p>怎么做</p>
+<p>训练时：每次更新参数前，对神经元作采样（包括输入），神经元有p%的几率被丢掉，相连的weight也会相应地被丢掉，所以每次更新时的网络结构都是不同的，并且在训练集上的表现会变差（所以如果训练集本身训练效果就不是很好，就不能加dropout来解决）</p>
+<p>测试时：</p>
+<ol>
+<li>不做dropout</li>
+<li>如果训练时的dropout rate=p%，那么测试的时候，所有weight都要乘上 (1-p%) .</li>
+</ol>
+</li>
+<li><p>为什么有用</p>
+<p>终极Ensemble方法。一个复杂网络往往bias小，但variance很大。通过训练很多个这样的<strong>复杂网络</strong>，将数据经过所有网络后的输出平均（这与所有weight都乘上(1-p%)等效），这样variance也会得到平均，结果就会比较准。网络越接近线性网络，效果越好。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Machine-Learning/Backpropagation/" rel="prev" title="Backpropagation">
+      <i class="fa fa-chevron-left"></i> Backpropagation
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Machine-Learning/Convolutional-Neural-Network/" rel="next" title="Convolutional Neural Network">
+      Convolutional Neural Network <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tips-for-Deep-Learning"><span class="nav-number">1.</span> <span class="nav-text">Tips for Deep Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bad-Results-on-Training-Data"><span class="nav-number">1.1.</span> <span class="nav-text">Bad Results on Training Data</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B0%E7%9A%84%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%EF%BC%88New-Activation-Function%EF%BC%89"><span class="nav-number">1.1.1.</span> <span class="nav-text">新的激活函数（New Activation Function）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%87%AA%E9%80%82%E5%BA%94%E5%AD%A6%E4%B9%A0%E7%8E%87%EF%BC%88Adaptive-Learning-Rate%EF%BC%89"><span class="nav-number">1.1.2.</span> <span class="nav-text">自适应学习率（Adaptive Learning Rate）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bad-Results-on-Testing-Data"><span class="nav-number">1.2.</span> <span class="nav-text">Bad Results on Testing Data</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%97%A9%E7%82%B9%E5%81%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">早点停</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%8C%96-Regularization"><span class="nav-number">1.2.2.</span> <span class="nav-text">正则化 Regularization</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Dropout"><span class="nav-number">1.2.3.</span> <span class="nav-text">Dropout</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本章介绍如何利用不同的矩阵分解方法（LU，QR，SVD，特征分解等）求解线性系统 矩阵分解矩阵分解（decomposition&#x2F;factorization）是指将矩阵拆分为若干矩阵的乘积，包括三角分解（LU）、满秩分解、QR分解、Jordan分解和奇异值分解（SVD）等。Eigen提供了常用的三种矩阵分解：LU、QR、SVD 三角分解 LU A&#x3D;LU将原方阵（square matrix）分解成一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线性代数与稠密矩阵分解">
+<meta property="og:url" content="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="本章介绍如何利用不同的矩阵分解方法（LU，QR，SVD，特征分解等）求解线性系统 矩阵分解矩阵分解（decomposition&#x2F;factorization）是指将矩阵拆分为若干矩阵的乘积，包括三角分解（LU）、满秩分解、QR分解、Jordan分解和奇异值分解（SVD）等。Eigen提供了常用的三种矩阵分解：LU、QR、SVD 三角分解 LU A&#x3D;LU将原方阵（square matrix）分解成一个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224931096.png">
+<meta property="og:image" content="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224615007.png">
+<meta property="og:image" content="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210527002238291.png">
+<meta property="article:published_time" content="2021-05-24T13:57:47.000Z">
+<meta property="article:modified_time" content="2021-05-26T17:20:54.518Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="Eigen">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224931096.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>线性代数与稠密矩阵分解 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          线性代数与稠密矩阵分解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-24 21:57:47" itemprop="dateCreated datePublished" datetime="2021-05-24T21:57:47+08:00">2021-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-27 01:20:54" itemprop="dateModified" datetime="2021-05-27T01:20:54+08:00">2021-05-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本章介绍如何利用不同的矩阵分解方法（LU，QR，SVD，特征分解等）求解线性系统</p>
+<h4 id="矩阵分解"><a href="#矩阵分解" class="headerlink" title="矩阵分解"></a>矩阵分解</h4><p>矩阵分解（decomposition/factorization）是指将矩阵拆分为若干矩阵的乘积，包括三角分解（LU）、满秩分解、QR分解、Jordan分解和奇异值分解（SVD）等。Eigen提供了常用的三种矩阵分解：LU、QR、SVD</p>
+<h5 id="三角分解-LU"><a href="#三角分解-LU" class="headerlink" title="三角分解 LU"></a>三角分解 LU</h5><script type="math/tex; mode=display">
+A=LU</script><p>将原方阵（square matrix）分解成一个上三角矩阵和一个下三角形矩阵。主要用于简化一个大矩阵的行列式的计算、求逆矩阵、求解方程组。这种分解法所得到的上下三角形矩阵并非唯一。</p>
+<h5 id="LLT分解（Cholesky分解）"><a href="#LLT分解（Cholesky分解）" class="headerlink" title="LLT分解（Cholesky分解）"></a>LLT分解（Cholesky分解）</h5><p>若A为<strong>正定矩阵</strong>，则A有如下唯一的分解形式：</p>
+<script type="math/tex; mode=display">
+A=LL^*</script><p>其中 $L$ 为下三角矩阵，$L^<em>$ 为其共轭转置矩阵，当A为实矩阵时，$L^</em>=L^T$ </p>
+<h5 id="LDLT分解"><a href="#LDLT分解" class="headerlink" title="LDLT分解"></a>LDLT分解</h5><p>若A为一<strong>对称矩阵</strong>且其任意<strong>k阶主子阵均不为零</strong>，即半正定或半负定，则A有如下惟一的分解形式：</p>
+<script type="math/tex; mode=display">
+A=LDL^T</script><p>其中 $L$ 为下三角形单位矩阵（即主对角线元素皆为1），$D$ 为对角矩阵，$L^T$ 为 $L$ 的转置矩阵。LDLT分解法是Cholesky分解法的改进，Cholesky分解法虽然不需要选主元，但其运算过程中涉及到开方问题，而LDLT分解法则避免了这一问题，可用于求解线性方程组。</p>
+<h5 id="QR分解"><a href="#QR分解" class="headerlink" title="QR分解"></a>QR分解</h5><p>对列向量线性无关的矩阵 A ：</p>
+<script type="math/tex; mode=display">
+A=QR</script><p>其中，$Q$ 为 $m\times m$ 的酉矩阵（实数域内称为正交矩阵），$R$ 为上三角矩阵</p>
+<h5 id="奇异值分解-SVD"><a href="#奇异值分解-SVD" class="headerlink" title="奇异值分解 SVD"></a>奇异值分解 SVD</h5><p>对任意矩阵 A：</p>
+<script type="math/tex; mode=display">
+A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为正交矩阵，$V^*=V^T$）且不唯一， $\Sigma$ 为对角矩阵，对角线上的元素称为A的奇异值。用于解最小二乘和数据压缩。</p>
+<h4 id="用矩阵分解求解线性方程组"><a href="#用矩阵分解求解线性方程组" class="headerlink" title="用矩阵分解求解线性方程组"></a>用<a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__TopicLinearAlgebraDecompositions.html">矩阵分解</a>求解线性方程组</h4><p>Eigen为矩阵提供了如图所示的分解方法，调用第二列的方法后会返回一个第一列对应的类对象，再通过调用该对象的 <code>solve()</code> 方法实现对方程的求解，具体见后文代码示例。</p>
+<p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224931096.png" alt="矩阵分解函数"></p>
+<h5 id="LU-分解"><a href="#LU-分解" class="headerlink" title="LU 分解"></a>LU 分解</h5><ul>
+<li><p><strong>partialPivLu()</strong></p>
+<p>基于部分消元的LU分解（必须是可逆方阵）。$A=PLU$ ，其中 $L$ 为单位下三角矩阵，$U$ 为上三角矩阵，$P$ 为置换矩阵，即只进行行变换</p>
+</li>
+<li><p><strong>fullPivLu()</strong></p>
+<p>基于全消元的LU分解（对任意矩阵）。$A=P^{-1}LUQ^{-1}$ ，$L,U,P$ 同上，$Q$ 为置换矩阵，即同时进行行变换和列变换。速度比部分消元慢</p>
+</li>
+<li><p><strong>llt()</strong></p>
+<p>标准Cholesky分解（必须是对称正定矩阵）。$A=LL^*$</p>
+</li>
+<li><p><strong>ldlt()</strong> </p>
+<p>有主元的鲁棒Cholesky分解（必须是半正定或半负定矩阵）。$A=P^TLDL^*P$ </p>
+</li>
+</ul>
+<h5 id="QR-分解"><a href="#QR-分解" class="headerlink" title="QR 分解"></a>QR 分解</h5><ul>
+<li><p><strong>householderQr()</strong> </p>
+<p>使用 <code>Househoder</code> 变换实现 $A=QR$ 的分解，其中 $Q$ 为酉矩阵，$R$ 为上三角矩阵。无主元，快，但不稳定</p>
+</li>
+<li><p><strong>colPivHouseholderQr()</strong> </p>
+<p>基于行变换（列主元消元法）的 <code>Householder</code> 变换，$AP=QR$ 。较慢，但更精确</p>
+</li>
+<li><p><strong>fullPivHouseholderQr()</strong> </p>
+<p>同时进行行变换和列变换的 <code>Householder</code> 变换，$PAP’=QR$ 。最慢，但最稳定</p>
+</li>
+<li><p><strong>completeOrthogonalDecomposition()</strong> </p>
+<p>完全正交分解。可以看作是QR分解的推广</p>
+</li>
+</ul>
+<h5 id="SVD-分解"><a href="#SVD-分解" class="headerlink" title="SVD 分解"></a>SVD 分解</h5><ul>
+<li><p><strong>bdcSvd()</strong> </p>
+<p>最快的SVD算法（推荐使用）</p>
+</li>
+<li><p><strong>jacobiSvd()</strong> </p>
+<p>对小矩阵速度快，大矩阵慢</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html">表格</a>给出了上述所有分解方法的效率对比 </p>
+<p>代码示例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Eigen&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ctime&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MATRIX_SIZE 10</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">     <span class="comment">/* 假设矩阵A为方阵，待求解方程为 Ax=b */</span></span><br><span class="line">     <span class="comment">// 首先定义一个随机矩阵A，随机列向量b和待求解向量x</span></span><br><span class="line">     MatrixXd A;</span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; b;</span><br><span class="line">     A = MatrixXd::<span class="built_in">Random</span>(MATRIX_SIZE, MATRIX_SIZE);</span><br><span class="line">     b = MatrixXd::<span class="built_in">Random</span>(MATRIX_SIZE, <span class="number">1</span>);</span><br><span class="line">     <span class="comment">// 定义时间变量，方便比较效率</span></span><br><span class="line">     <span class="keyword">clock_t</span> <span class="keyword">start_t</span>;</span><br><span class="line">     <span class="keyword">double</span> time;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法一：直接右乘A的逆矩阵 x = A^&#123;-1&#125;*b */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_inv;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_inv = A.<span class="built_in">inverse</span>()*b;</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_inv time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_inv = &quot;</span> &lt;&lt; x_inv.<span class="built_in">transpose</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法二：普通LU分解 </span></span><br><span class="line"><span class="comment">      * Eigen 提供了四种LU分解的方法</span></span><br><span class="line"><span class="comment">      * - partialPivLu(): A = PLU -&gt; 要求A必须可逆</span></span><br><span class="line"><span class="comment">      * - fullPivLu(): A = P^&#123;-1&#125;LUQ^&#123;-1&#125;</span></span><br><span class="line"><span class="comment">      * - llt(): A = LL^T -&gt; 要求A必须对称正定</span></span><br><span class="line"><span class="comment">      * - ldlt(): A = LDL^T -&gt; 要求A必须半正定或半负定</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 2.1 partialPivLu()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_plu;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_plu = A.<span class="built_in">partialPivLu</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_plu time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_plu = &quot;</span> &lt;&lt; x_plu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 2.2 fullPivLu()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_flu;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_flu = A.<span class="built_in">fullPivLu</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_flu time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_flu = &quot;</span> &lt;&lt; x_flu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法三：LLT分解 */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_llt;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     <span class="comment">// 因为llt分解要求 A 必须为正定矩阵，所以构造新的方程：(A^T*A)*x = A^T*b 来求解x</span></span><br><span class="line">     x_llt = (A.<span class="built_in">transpose</span>()*A).<span class="built_in">llt</span>().<span class="built_in">solve</span>(A.<span class="built_in">transpose</span>()*b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_llt time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_llt = &quot;</span> &lt;&lt; x_llt.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法四：LDLT分解 */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_ldlt;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_ldlt = (A.<span class="built_in">transpose</span>()*A).<span class="built_in">llt</span>().<span class="built_in">solve</span>(A.<span class="built_in">transpose</span>()*b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_ldlt time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_ldlt = &quot;</span> &lt;&lt; x_ldlt.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法五：QR分解</span></span><br><span class="line"><span class="comment">      * Eigen 提供了四种QR分解的方法</span></span><br><span class="line"><span class="comment">      * - householderQr()</span></span><br><span class="line"><span class="comment">      * - colPivHouseholderQr()</span></span><br><span class="line"><span class="comment">      * - fullPivHouseholderQr()</span></span><br><span class="line"><span class="comment">      * - completeOrthogonalDecomposition()</span></span><br><span class="line"><span class="comment">      * 常用2和3</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 5.1 colPivHhouseholderQr()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_cqr;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_cqr = A.<span class="built_in">colPivHouseholderQr</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_cqr time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_cqr = &quot;</span> &lt;&lt; x_cqr.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 5.2 fullPivHhouseholderQr()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_fqr;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_fqr = A.<span class="built_in">fullPivHouseholderQr</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_fqr time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_fqr = &quot;</span> &lt;&lt; x_plu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法六：SVD分解</span></span><br><span class="line"><span class="comment">      * Eigen 提供了两种SVD分解方法</span></span><br><span class="line"><span class="comment">      * - bdcSvd()</span></span><br><span class="line"><span class="comment">      * - jacobiSvd()</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 6.1 bdcSvd()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_bsvd;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_bsvd = A.<span class="built_in">bdcSvd</span>(ComputeThinU|ComputeThinV).<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_bsvd time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_bsvd = &quot;</span> &lt;&lt; x_bsvd.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 6.2 jacobiSvd()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_jsvd;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_jsvd = A.<span class="built_in">jacobiSvd</span>(ComputeThinU|ComputeThinV).<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_jsvd time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_jsvd = &quot;</span> &lt;&lt; x_jsvd.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>计算结果：</p>
+<p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224615007.png" alt="计算结果"></p>
+<h4 id="计算特征值与特征向量"><a href="#计算特征值与特征向量" class="headerlink" title="计算特征值与特征向量"></a>计算特征值与特征向量</h4><p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210527002238291.png" alt="image-20210527002238291"></p>
+<p>如图，Eigen为矩阵提供了四种<strong>特征分解</strong>的方法，第二列表示适用矩阵的条件，第三四列分别表示运算速度和精度</p>
+<p>以 <code>SelfAdjointEigenSolver</code> 为例，代码如下，其中 <code>info()</code> 函数用来检查特征值/特征向量是否收敛：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2f A;</span><br><span class="line">   A &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   <span class="function">SelfAdjointEigenSolver&lt;Matrix2f&gt; <span class="title">eigensolver</span><span class="params">(A)</span></span>;</span><br><span class="line">   <span class="keyword">if</span> (eigensolver.<span class="built_in">info</span>() != Success) <span class="built_in">abort</span>();</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The eigenvalues of A are:\n&quot;</span> &lt;&lt; eigensolver.<span class="built_in">eigenvalues</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here&#x27;s a matrix whose columns are eigenvectors of A \n&quot;</span></span><br><span class="line">        &lt;&lt; <span class="string">&quot;corresponding to these eigenvalues:\n&quot;</span></span><br><span class="line">        &lt;&lt; eigensolver.<span class="built_in">eigenvectors</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运算结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line">1 2</span><br><span class="line">2 3</span><br><span class="line">The eigenvalues of A are:</span><br><span class="line">-0.236</span><br><span class="line">  4.24</span><br><span class="line">Here<span class="string">&#x27;s a matrix whose columns are eigenvectors of A </span></span><br><span class="line"><span class="string">corresponding to these eigenvalues:</span></span><br><span class="line"><span class="string">-0.851 -0.526</span></span><br><span class="line"><span class="string"> 0.526 -0.851</span></span><br></pre></td></tr></table></figure>
+<h4 id="计算逆矩阵与行列式"><a href="#计算逆矩阵与行列式" class="headerlink" title="计算逆矩阵与行列式"></a>计算逆矩阵与行列式</h4><p>尽管逆和行列式是基本的数学概念，但它们在数值线性代数中不像在纯数学中那么常用。求逆通常由 <code>solve()</code> 代替，而行列式一般并不是检测矩阵是否可逆的好方法。不过对于比较小的矩阵，逆和行列式还是比较有用的。</p>
+<p>尽管Eigen提供了上述矩阵分解的方法，我们仍然可以直接调用 <code>inverse()</code> 方法和 <code>determinant()</code> 方法。若矩阵尺寸较小（不超过4x4），那么Eigen可以避免使用LU分解，而是使用数学公式，这样更高效。</p>
+<h4 id="求解最小二乘"><a href="#求解最小二乘" class="headerlink" title="求解最小二乘"></a><a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__LeastSquares.html">求解最小二乘</a></h4><p>求解最小二乘最精确的方法是使用SVD分解。Eigen提供了两种方法（见上文），推荐使用 <code>bdcSvd()</code> ，对大规模问题友好，同时对小规模问题能自动降级到 <code>jacobiSvd()</code> 方法；</p>
+<p>另一种方法是使用 <code>Cholesky</code> 分解或 <code>QR</code> 分解，速度可能会快点，但准确率会下降；</p>
+<p>第三种方法是将方程转化为 $A^TAx=A^Tb$ 并使用 <code>ldlt()</code> 方法求解。不过，如果 A 是一个病态矩阵的话，这种方法就不会太好，因为 $A^TA$ 的条件数是 $A$ 的平方，这意味着这种方法会比其他方法损失两倍数值。</p>
+<h4 id="将求解和构造分开"><a href="#将求解和构造分开" class="headerlink" title="将求解和构造分开"></a>将求解和构造分开</h4><p>上面的例子将矩阵分解对象的构造和计算写在同一句中，当然也有方法将它们分开写，每种矩阵分解类都有一个默认的构造函数和一个 <code>compute(matrix)</code> 方法，该方法可以对不同的 <code>matrix</code> 重复调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2f A, b;</span><br><span class="line">   LLT&lt;Matrix2f&gt; llt;</span><br><span class="line">   A &lt;&lt; <span class="number">2</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">3</span>;</span><br><span class="line">   b &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the right hand side b:\n&quot;</span> &lt;&lt; b &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Computing LLT decomposition...&quot;</span> &lt;&lt; endl;</span><br><span class="line">   llt.<span class="built_in">compute</span>(A);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The solution is:\n&quot;</span> &lt;&lt; llt.<span class="built_in">solve</span>(b) &lt;&lt; endl;</span><br><span class="line">   <span class="built_in">A</span>(<span class="number">1</span>,<span class="number">1</span>)++;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The matrix A is now:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Computing LLT decomposition...&quot;</span> &lt;&lt; endl;</span><br><span class="line">   llt.<span class="built_in">compute</span>(A);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The solution is now:\n&quot;</span> &lt;&lt; llt.<span class="built_in">solve</span>(b) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line"> 2 -1</span><br><span class="line">-1  3</span><br><span class="line">Here is the right hand side b:</span><br><span class="line">1 2</span><br><span class="line">3 1</span><br><span class="line">Computing LLT decomposition...</span><br><span class="line">The solution is:</span><br><span class="line">1.2 1.4</span><br><span class="line">1.4 0.8</span><br><span class="line">The matrix A is now:</span><br><span class="line"> 2 -1</span><br><span class="line">-1  4</span><br><span class="line">Computing LLT decomposition...</span><br><span class="line">The solution is now:</span><br><span class="line">    1  1.29</span><br><span class="line">    1 0.571</span><br></pre></td></tr></table></figure>
+<p>也可以通过向构造函数中传入矩阵大小来预分配分解矩阵所需要的内存空间大小：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HouseholderQR&lt;MatrixXf&gt; <span class="title">qr</span><span class="params">(<span class="number">50</span>,<span class="number">50</span>)</span></span>;</span><br><span class="line">MatrixXf A = MatrixXf::<span class="built_in">Random</span>(<span class="number">50</span>,<span class="number">50</span>);</span><br><span class="line">qr.<span class="built_in">compute</span>(A); <span class="comment">// no dynamic memory allocation</span></span><br></pre></td></tr></table></figure>
+<h4 id="秩显式分解"><a href="#秩显式分解" class="headerlink" title="秩显式分解"></a>秩显式分解</h4><p>某些分解方法可以同时计算出矩阵的秩，这些通常也是在面对非满秩矩阵（方阵时称为奇异矩阵）时表现最好的方法。包括 <code>FullPivLU</code> 、<code>ColPivHouseholderQR</code> 、<code>FullPivHouseholderQR</code> 、<code>BDCSVD</code> 、<code>JacobiSVD</code> 、<code>SelfAdjointEigenSolver</code> 、<code>ComplexEigenSolver</code> 和 <code>EigenSolver</code> </p>
+<p>这些分解类至少提供了一个 <code>rank()</code> 方法用来求矩阵的秩。此外，还提供了一些方便的方法，例如 <code>isInvertible()</code> ；有些还提供了计算矩阵的内核(零空间)和图像(列空间)方法，例如 <code>FullPivLU</code> ：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix3f A;</span><br><span class="line">   A &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>,</span><br><span class="line">        <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>,</span><br><span class="line">        <span class="number">3</span>, <span class="number">0</span>, <span class="number">3</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   <span class="function">FullPivLU&lt;Matrix3f&gt; <span class="title">lu_decomp</span><span class="params">(A)</span></span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The rank of A is &quot;</span> &lt;&lt; lu_decomp.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is a matrix whose columns form a basis of the null-space of A:\n&quot;</span></span><br><span class="line">        &lt;&lt; lu_decomp.<span class="built_in">kernel</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is a matrix whose columns form a basis of the column-space of A:\n&quot;</span></span><br><span class="line">        &lt;&lt; lu_decomp.<span class="built_in">image</span>(A) &lt;&lt; endl; <span class="comment">// yes, have to pass the original A</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line">1 2 5</span><br><span class="line">2 1 4</span><br><span class="line">3 0 3</span><br><span class="line">The rank of A is 2</span><br><span class="line">Here is a matrix whose columns form a basis of the null-space of A:</span><br><span class="line"> 0.5</span><br><span class="line">   1</span><br><span class="line">-0.5</span><br><span class="line">Here is a matrix whose columns form a basis of the column-space of A:</span><br><span class="line">5 1</span><br><span class="line">4 2</span><br><span class="line">3 3</span><br></pre></td></tr></table></figure>
+<p>当然，任何秩计算都取决于对随机阈值的选择，因为实际上没有哪个浮点矩阵是完全秩亏的。Eigen会选择一个合理的默认阈值。我们也可以自己设定想要的正确阈值：在调用 <code>rank()</code> 或任何其他需要使用这个阈值的方法之前，调用 <code>setThreshold()</code> 来设置阈值。分解计算本身，即 <code>compute()</code> 方法，与阈值选取无关，所以在改变阈值之后，不需要重新计算矩阵分解。</p>
+<p>例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2d A;</span><br><span class="line">   A &lt;&lt; <span class="number">2</span>, <span class="number">1</span>,</span><br><span class="line">        <span class="number">2</span>, <span class="number">0.9999999999</span>;</span><br><span class="line">   <span class="function">FullPivLU&lt;Matrix2d&gt; <span class="title">lu</span><span class="params">(A)</span></span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;By default, the rank of A is found to be &quot;</span> &lt;&lt; lu.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">   lu.<span class="built_in">setThreshold</span>(<span class="number">1e-5</span>);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;With threshold 1e-5, the rank of A is found to be &quot;</span> &lt;&lt; lu.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">By default, the rank of A is found to be 2</span><br><span class="line">With threshold 1e-5, the rank of A is found to be 1</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Eigen/" rel="tag"># Eigen</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/%E6%B7%B7%E5%8F%A0%E9%97%AE%E9%A2%98-Aliasing/" rel="prev" title="混叠问题(Aliasing)">
+      <i class="fa fa-chevron-left"></i> 混叠问题(Aliasing)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Eigen/%E7%A8%80%E7%96%8F%E7%9F%A9%E9%98%B5%E6%93%8D%E4%BD%9C/" rel="next" title="稀疏矩阵操作">
+      稀疏矩阵操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E5%88%86%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">矩阵分解</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%88%86%E8%A7%A3-LU"><span class="nav-number">1.1.</span> <span class="nav-text">三角分解 LU</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LLT%E5%88%86%E8%A7%A3%EF%BC%88Cholesky%E5%88%86%E8%A7%A3%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">LLT分解（Cholesky分解）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LDLT%E5%88%86%E8%A7%A3"><span class="nav-number">1.3.</span> <span class="nav-text">LDLT分解</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#QR%E5%88%86%E8%A7%A3"><span class="nav-number">1.4.</span> <span class="nav-text">QR分解</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3-SVD"><span class="nav-number">1.5.</span> <span class="nav-text">奇异值分解 SVD</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8%E7%9F%A9%E9%98%B5%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84"><span class="nav-number">2.</span> <span class="nav-text">用矩阵分解求解线性方程组</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#LU-%E5%88%86%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">LU 分解</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#QR-%E5%88%86%E8%A7%A3"><span class="nav-number">2.2.</span> <span class="nav-text">QR 分解</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SVD-%E5%88%86%E8%A7%A3"><span class="nav-number">2.3.</span> <span class="nav-text">SVD 分解</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E7%89%B9%E5%BE%81%E5%80%BC%E4%B8%8E%E7%89%B9%E5%BE%81%E5%90%91%E9%87%8F"><span class="nav-number">3.</span> <span class="nav-text">计算特征值与特征向量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E9%80%86%E7%9F%A9%E9%98%B5%E4%B8%8E%E8%A1%8C%E5%88%97%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">计算逆矩阵与行列式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98"><span class="nav-number">5.</span> <span class="nav-text">求解最小二乘</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86%E6%B1%82%E8%A7%A3%E5%92%8C%E6%9E%84%E9%80%A0%E5%88%86%E5%BC%80"><span class="nav-number">6.</span> <span class="nav-text">将求解和构造分开</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A7%A9%E6%98%BE%E5%BC%8F%E5%88%86%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">秩显式分解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

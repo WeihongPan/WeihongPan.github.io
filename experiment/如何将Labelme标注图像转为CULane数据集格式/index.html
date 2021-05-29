@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="毕设做铁路轨道检测，发现Lane Detection的大部分开源代码都是跑的公用数据集CULane（或Tusimple），而我们自己采集的数据用labelme标注完以后不是CULane的标准格式。为了能直接用公开代码训练我们自己的数据集，需要先把labelme标注的json数据转化成CULane标准格式。 项目地址：[labelme_to_culane]  CULane数据集根据官网的介绍，CUL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何将Labelme标注图像转为CULane数据集格式">
+<meta property="og:url" content="https://weihongpan.github.io/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="毕设做铁路轨道检测，发现Lane Detection的大部分开源代码都是跑的公用数据集CULane（或Tusimple），而我们自己采集的数据用labelme标注完以后不是CULane的标准格式。为了能直接用公开代码训练我们自己的数据集，需要先把labelme标注的json数据转化成CULane标准格式。 项目地址：[labelme_to_culane]  CULane数据集根据官网的介绍，CUL">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-22T12:31:34.000Z">
+<meta property="article:modified_time" content="2021-04-23T06:49:55.687Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="experiment">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://weihongpan.github.io/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何将Labelme标注图像转为CULane数据集格式 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何将Labelme标注图像转为CULane数据集格式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 20:31:34" itemprop="dateCreated datePublished" datetime="2021-04-22T20:31:34+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 14:49:55" itemprop="dateModified" datetime="2021-04-23T14:49:55+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/experiment/" itemprop="url" rel="index"><span itemprop="name">experiment</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>毕设做铁路轨道检测，发现Lane Detection的大部分开源代码都是跑的公用数据集CULane（或Tusimple），而我们自己采集的数据用labelme标注完以后不是CULane的标准格式。为了能直接用公开代码训练我们自己的数据集，需要先把labelme标注的json数据转化成CULane标准格式。</p>
+<p>项目地址：[labelme_to_culane] </p>
+<h3 id="CULane数据集"><a href="#CULane数据集" class="headerlink" title="CULane数据集"></a>CULane数据集</h3><p>根据<a target="_blank" rel="noopener" href="https://xingangpan.github.io/projects/CULane.html">官网</a>的介绍，CULane数据集文件包括：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- driver_23_30frame</span><br><span class="line">- driver_161_90frame</span><br><span class="line">- driver_182_30frame</span><br><span class="line">- driver_37_30frame</span><br><span class="line">- driver_100_30frame</span><br><span class="line">- driver_193_90frame</span><br><span class="line">- laneseg_label_w16</span><br><span class="line">- list</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>三个训练集&amp;验证集ground truth图像与标注：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- driver_23_30frame</span><br><span class="line">- driver_161_90frame</span><br><span class="line">- driver_182_30frame</span><br></pre></td></tr></table></figure>
+<p>每个文件夹下都包含若干视频中抽帧形成的子文件夹，每个子文件夹又包含若干图像数据文件（eg. xxxx.jpg）和一个对应的标注文件（xxxx.lines.txt），以182_30文件为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- driver_182_30frame</span><br><span class="line">  - 05312327_0001.MP4</span><br><span class="line">    |- 00000.jpg</span><br><span class="line">    |- 00000.lines.txt</span><br><span class="line">    |- 00030.jpg</span><br><span class="line">    |- 00030.lines.txt</span><br><span class="line">    |- 00060.jpg</span><br><span class="line">    |- 00060.lines.txt</span><br><span class="line">    ...</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>标注文件中每一行都给出了车道线上关键点的对应（x，y）坐标，以 <code>05130.lines.txt</code> 为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">104.092 590 123.101 580 144.826 570 165.645 560 187.369 550 208.189 540 229.913 530 250.733 520 272.457 510 293.277 500 315.001 490 335.82 480 357.545 470 379.269 460 399.746 450 421.471 440 442.29 430 464.015 420 485.373 410 506.192 400 527.551 390 549.275 380 570.095 370 591.452 360 613.176 350 633.996 340 655.72 330 677.001 320 698.726 310 719.545 300 740.828 290 762.552 280 783.371 270 </span><br><span class="line">661.843 590 665.482 580 669.121 570 673.124 560 677.128 550 681.131 540 684.77 530 688.773 520 692.775 510 696.778 500 700.417 490 704.419 480 708.422 470 712.06 460 716.093 450 720.096 440 724.099 430 727.918 420 731.922 410 735.562 400 739.746 390 743.385 380 747.387 370 751.206 360 755.208 350 759.211 340 763.215 330 766.854 320 770.858 310 774.862 300 778.5 290 782.503 280 786.505 270 </span><br><span class="line">1457.13 590 1438.25 580 1418.46 570 1397.78 560 1377.09 550 1356.41 540 1335.96 530 1315.27 520 1294.59 510 1273.91 500 1253.22 490 1232.77 480 1212.09 470 1192.3 460 1171.62 450 1150.94 440 1130.47 430 1109.79 420 1089.11 410 1068.42 400 1047.74 390 1027.84 380 1007.16 370 986.473 360 965.79 350 945.106 340 924.422 330 903.617 320 883.833 310 863.149 300 842.466 290 821.782 280 801.099 270 </span><br><span class="line">1676.79 450 1632.17 440 1587.27 430 1542.37 420 1497.07 410 1452.17 400 1406.89 390 1361.98 380 1317.08 370 1272.76 360 1227.86 350 1182.96 340 1137.76 330 1092.86 320 1047.96 310 1003.06 300 957.841 290 912.94 280 868.04 270 </span><br></pre></td></tr></table></figure>
+<p>其中，关键点选取的y坐标，是固定的，称其为<strong>行锚点</strong> ，默认图像大小为288 * 800：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">culane_row_anchor = [121, 131, 141, 150, 160, 170, 180, 189, 199, 209, 219, 228, 238, 248, 258, 267, 277, 287]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>测试集ground truth图像及标注：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- driver_37_30frame</span><br><span class="line">- driver_100_30frame</span><br><span class="line">- driver_193_90frame</span><br></pre></td></tr></table></figure>
+<p>格式与训练集/验证集相同</p>
+</li>
+<li><p>训练集/验证集车道线分割label图像：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- laneseg_label_w16</span><br></pre></td></tr></table></figure>
+<p>该文件夹下为训练集/验证集中所有ground truth图像所对应的逐像素label图，即每个像素点的值表示它所在的车道线id，0表示背景。</p>
+</li>
+<li><p>训练集/验证集/测试集列表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- </span><br><span class="line">  - list</span><br><span class="line">    |- test_split</span><br><span class="line">       |- test0_normal.txt</span><br><span class="line">       |- test1_crowd.txt</span><br><span class="line">       |- test2_hlight.txt</span><br><span class="line">       |- test3_shadow.txt</span><br><span class="line">       |- test4_noline.txt</span><br><span class="line">       |- test5_arrow.txt</span><br><span class="line">       |- test6_curve.txt</span><br><span class="line">       |- test7_cross.txt</span><br><span class="line">       |- test8_night.txt</span><br><span class="line">    |- test.txt</span><br><span class="line">    |- train.txt</span><br><span class="line">    |- train_gt.txt</span><br><span class="line">    |- val.txt</span><br><span class="line">    |- val_gt.txt</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>trian.txt</code> <code>val.txt</code> <code>test.txt</code> 都是对应训练集/验证集/测试集图像的相对路径，以 <code>test.txt</code> 为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/driver_100_30frame/05251517_0433.MP4/00000.jpg</span><br><span class="line">/driver_100_30frame/05251517_0433.MP4/00030.jpg</span><br><span class="line">/driver_100_30frame/05251517_0433.MP4/00060.jpg</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>test_split</code> 文件夹下的文件是将测试集 <code>test.txt</code> 分为不同的环境后重组，本质也是图像的相对路径</p>
+</li>
+<li><p><code>train_gt.txt</code> 和 <code>val_gt.txt</code> 中每行的格式为：</p>
+<p>gt图像相对路径 逐像素label图像相对路径 四个0/1数字表示\&lt;左2>&lt;左1>&lt;右1>&lt;右2>四个车道是否存在</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/driver_23_30frame/05171102_0766.MP4/00020.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00020.png 1 1 1 0</span><br><span class="line">/driver_23_30frame/05171102_0766.MP4/00050.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00050.png 1 1 1 0</span><br><span class="line">/driver_23_30frame/05171102_0766.MP4/00080.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00080.png 1 1 1 0</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="从json标注文件到label-png"><a href="#从json标注文件到label-png" class="headerlink" title="从json标注文件到label.png"></a>从json标注文件到label.png</h3><p>labelme提供了将json文件转为label.png的方法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labelme_json_to_dataset [-h] [-o output_file] json_file.json</span><br></pre></td></tr></table></figure>
+<p>此方法实现对一个json文件的转换，将生成以下文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- output_file</span><br><span class="line">  |- json_file_json</span><br><span class="line">     |- img.png</span><br><span class="line">     |- label.png</span><br><span class="line">     |- label_names.txt</span><br><span class="line">     |- lable_viz.png</span><br></pre></td></tr></table></figure>
+<p>实现json文件批量转化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> os.path <span class="keyword">as</span> osp</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> name <span class="keyword">in</span> os.listdir(json_files_path):</span><br><span class="line">    json_data = osp.join(json_files_path, name)</span><br><span class="line">    os.system(<span class="string">&quot;labelme_json_to_dataset json_data -o &quot;</span> + output_path)</span><br></pre></td></tr></table></figure>
+<p>如果在标注的时候不是用的纯数字，labelme在进行转换的时候会首先对标注进行字符串排序，排序后的结果在 <code>label_names.txt</code> 中；<code>label.png</code> 虽然看上去是彩色图，但用 <code>PIL.Image</code> 读入后会发现，这其实是个逐像素分类的图，像素值由 <code>label_names.txt</code> 中的标注顺序生成（下标/像素从0开始，其中0表示的是背景，即 <code>label_names.txt</code> 中的第一个默认分类 <code>_background_</code> ）。存在的像素值对应 <code>*_gt.txt</code> 中的值为1，否则为0</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line">label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">label_data = ny.asarray(label).copy()</span><br><span class="line">label.save(target_path)</span><br></pre></td></tr></table></figure>
+<p>这样就得到了我们需要的 <code>xxxx_label.png</code> 文件</p>
+<h3 id="从label-png到-xxxx-lines-txt-和-gt-txt-文件"><a href="#从label-png到-xxxx-lines-txt-和-gt-txt-文件" class="headerlink" title="从label.png到 xxxx.lines.txt 和 *_gt.txt 文件"></a>从label.png到 xxxx.lines.txt 和 *_gt.txt 文件</h3><ul>
+<li>根据 <code>label.png</code> 和 <code>culane_row_anchor</code> 获取轨道线上关键点的坐标生成 <code>xxxx.lines.txt</code> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># image = Image.open(image_path)</span></span><br><span class="line">label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">w, h = label.size</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将行采样点按输入图像高度放缩</span></span><br><span class="line"><span class="keyword">if</span> h != <span class="number">288</span>:</span><br><span class="line">    scale_f = <span class="keyword">lambda</span> x : <span class="built_in">int</span>((x * <span class="number">1.0</span>/<span class="number">288</span>) * h)</span><br><span class="line">    sample_tmp = <span class="built_in">list</span>(<span class="built_in">map</span>(scale_f,culane_row_anchor)) </span><br><span class="line">    <span class="comment"># 根据提供的函数对指定序列做映射</span></span><br><span class="line"></span><br><span class="line">lines = <span class="string">&quot;&quot;</span> </span><br><span class="line"><span class="keyword">for</span> i,r <span class="keyword">in</span> <span class="built_in">enumerate</span>(sample_tmp):</span><br><span class="line">    label_r = np.asarray(label)[<span class="built_in">int</span>(<span class="built_in">round</span>(r))] </span><br><span class="line">    <span class="comment"># 取出label图像中行坐标为int(round(r))的一行        </span></span><br><span class="line">    <span class="keyword">for</span> lane_idx <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">        line = <span class="string">&quot;&quot;</span></span><br><span class="line">        pos = np.where(label_r == lane_idx)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(pos) == <span class="number">0</span>:            </span><br><span class="line">            <span class="keyword">continue</span>        </span><br><span class="line">        pos = np.mean(pos)        </span><br><span class="line">        line = line + <span class="built_in">str</span>(pos) + <span class="string">&quot; &quot;</span> + <span class="built_in">str</span>(r) + <span class="string">&quot; &quot;</span></span><br><span class="line">        <span class="comment"># print(line)</span></span><br><span class="line">        <span class="comment"># cv2.circle(image, (int(round(pos)), int(round(r))), 1, (0,0,255),2)       </span></span><br><span class="line">    lines = lines + line + <span class="string">&quot;\n&quot;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(lines_file_path, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(lines)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据 <code>label.png</code> 生成 <code>*_gt.txt</code> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">lines = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> label_path <span class="keyword">in</span> os.listdir(label_file_path):</span><br><span class="line">    label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">    label_data = np.asarray(label).copy()</span><br><span class="line">    np.unique(label_data)</span><br><span class="line">    line = gt_image_path + <span class="string">&#x27; &#x27;</span> + label_path</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">        <span class="keyword">if</span> i <span class="keyword">in</span> label_data:</span><br><span class="line">            line = line + <span class="string">&#x27; 1&#x27;</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            line = line + <span class="string">&#x27; 0&#x27;</span></span><br><span class="line">    lines = lines + line + <span class="string">&#x27;\n&#x27;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(gt_file_path, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(lines)</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/experiment/" rel="tag"># experiment</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/" rel="prev" title="归约、迭代器和广播机制">
+      <i class="fa fa-chevron-left"></i> 归约、迭代器和广播机制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Eigen/Map%E7%B1%BB%E5%AE%9E%E7%8E%B0%E4%B8%8EC-C++%E6%95%B0%E7%BB%84%E7%9A%84%E8%BD%AC%E6%8D%A2/" rel="next" title="Map类实现与C/C++数组的转换">
+      Map类实现与C/C++数组的转换 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#CULane%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">CULane数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8Ejson%E6%A0%87%E6%B3%A8%E6%96%87%E4%BB%B6%E5%88%B0label-png"><span class="nav-number">2.</span> <span class="nav-text">从json标注文件到label.png</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8Elabel-png%E5%88%B0-xxxx-lines-txt-%E5%92%8C-gt-txt-%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">从label.png到 xxxx.lines.txt 和 *_gt.txt 文件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

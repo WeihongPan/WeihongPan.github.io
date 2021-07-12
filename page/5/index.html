@@ -165,6 +165,290 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Gradient-Descent/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/Gradient-Descent/" class="post-title-link" itemprop="url">Gradient Descent</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-23 17:43:53 / 修改时间：23:06:53" itemprop="dateCreated datePublished" datetime="2021-03-23T17:43:53+08:00">2021-03-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Gradient-Descent"><a href="#Gradient-Descent" class="headerlink" title="Gradient Descent"></a>Gradient Descent</h3><p>gradient：Loss的等高线的法线方向</p>
+<p>​    <script type="math/tex">\left[\begin{array}{cc} \theta_1^1 \\ \theta_2^1 \end{array} \right] = \left[\begin{array}{cc} \theta_1^0 \\ \theta_2^0 \end{array} \right] - \eta \left[\begin{array}{cc} \frac{\partial L(\theta_1^0)}{\partial \theta_1} \\ \frac{\partial L(\theta_2^0)}{\partial \theta_2} \end{array} \right]</script> 记作：<script type="math/tex">\boldsymbol{\theta}^1 =\boldsymbol {\theta}^0-\eta \nabla L(\boldsymbol {\theta}^0)</script>  </p>
+<h4 id="1-小心调整学习率Learning-Rate"><a href="#1-小心调整学习率Learning-Rate" class="headerlink" title="1. 小心调整学习率Learning Rate"></a>1. 小心调整学习率Learning Rate</h4><p>可视化参数更新次数和Loss的关系，根据这个图，调整学习率</p>
+<h5 id="Adaptive-Learning-Rates-自适应学习率"><a href="#Adaptive-Learning-Rates-自适应学习率" class="headerlink" title="Adaptive Learning Rates 自适应学习率"></a>Adaptive Learning Rates 自适应学习率</h5><ol>
+<li><p>总原则：通常学习率随着参数的更新越来越小，例如：<script type="math/tex">\eta^t = \eta/\sqrt{t+1}</script> </p>
+</li>
+<li><p>为不同的参数设置不同的学习率，例如<strong>Adagrad</strong>：<script type="math/tex">w^{t+1}\leftarrow w^t-\frac{\eta^t}{\sigma^t}g^t</script> ，其中 <script type="math/tex">\sigma^t</script> 是个与参数有管的函数，表示过去所有微分值[包括本次]的均方根（RMS：root mean square 所有值的平方求和均值再开方）； <script type="math/tex">\eta ^t</script> 是个与更新次数有关的函数（同上）：</p>
+<script type="math/tex; mode=display">
+w^{t+1}\leftarrow w^t-\frac{\eta}{\sqrt{\sum_{i=0}^t(g^i)^2}}g^t</script><p>分母可以处理梯度突变的情况</p>
+<p><strong>Adam</strong> 是现在比较好的更新学习率的方法，训练时间短</p>
+</li>
+<li><p>在不同参数间比较，需要同时考虑一阶导和二阶导 <script type="math/tex">\frac{|一阶导数|}{二阶导数}</script> ，可以发现Adagrad的分母恰好是二阶导的近似 </p>
+</li>
+</ol>
+<h4 id="2-Stochastic-Gradient-Descent-随机梯度下降"><a href="#2-Stochastic-Gradient-Descent-随机梯度下降" class="headerlink" title="2. Stochastic Gradient Descent 随机梯度下降"></a>2. Stochastic Gradient Descent 随机梯度下降</h4><p>不在全部数据上求loss和，而是选取一个样本计算loss，梯度也只计算这个样本的梯度</p>
+<p>比较快</p>
+<h4 id="3-Feature-Scaling-特征归一化"><a href="#3-Feature-Scaling-特征归一化" class="headerlink" title="3. Feature Scaling 特征归一化"></a>3. Feature Scaling 特征归一化</h4><p>不归一化的话，各个方向的学习率各有不同，有的方向变化快，学习率就要小一点；有的方向变化慢，学习率就要大一点。</p>
+<p>归一化后，各个方向可以使用相同的学习率</p>
+<p>一般方法：对某一个维度<script type="math/tex">i</script>的数据，求平均值<script type="math/tex">m_i</script>和标准方差<script type="math/tex">\sigma_i</script> ，<script type="math/tex">x^r_i\leftarrow \frac{x^r_i-m_i}{\sigma_i}</script> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Error%E6%9D%A5%E6%BA%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/Error%E6%9D%A5%E6%BA%90/" class="post-title-link" itemprop="url">Error来源</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-23 17:40:58 / 修改时间：17:42:12" itemprop="dateCreated datePublished" datetime="2021-03-23T17:40:58+08:00">2021-03-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="Error来源"><a href="#Error来源" class="headerlink" title="Error来源"></a>Error来源</h4><ol>
+<li>bias - 距靶心距离（准）</li>
+<li>variance - 分散程度（稳）</li>
+</ol>
+<h5 id="Estimator"><a href="#Estimator" class="headerlink" title="Estimator"></a>Estimator</h5><ul>
+<li>均值：<script type="math/tex">m=\frac{1}{N}\sum x^i</script> （上标表示第几个变量）</li>
+<li>均值估计：<script type="math/tex">E[m]=E\big([\frac{1}{N}\sum x^i]\big)=\frac{1}{N}\sum E[x^i]=\mu</script> </li>
+<li>方差：<script type="math/tex">s^2=\frac{\sigma ^2}{N}=\frac{1}{N}\sum (x^i-m)^2</script> </li>
+<li>方差估计：<script type="math/tex">E[s^2]=E[\frac{1}{N}\sum (x^i-m)^2]=\frac{N-1}{N}\sigma^2\neq\sigma^2</script> </li>
+</ul>
+<h5 id="variance大-过拟合"><a href="#variance大-过拟合" class="headerlink" title="variance大 - 过拟合"></a>variance大 - 过拟合</h5><ol>
+<li><p><strong>简单模型</strong>受训练数据影响小，<strong>Variance小</strong>；<strong>复杂模型Variance大</strong></p>
+</li>
+<li><p>方法1：<strong>增加数据集</strong>（效率低，但并不总是practical）- 不会伤害bias</p>
+</li>
+<li>方法2：对损失函数进行<strong>正则化</strong>（Regularization），平滑曲线 - 会伤害bias</li>
+</ol>
+<h5 id="bias大-欠拟合"><a href="#bias大-欠拟合" class="headerlink" title="bias大 - 欠拟合"></a>bias大 - 欠拟合</h5><ol>
+<li>简单模型bias大，复杂模型bias小。&lt;泰勒展开&gt;，模型越复杂，function set越大</li>
+<li>说明model本身设计得就不好/过于简单，导致没有包含目标模型，此时收集更多数据是没有用的，需要<strong>重新设计model</strong></li>
+</ol>
+<p>var增大，bias减小，需要找到平衡点，使得error最小</p>
+<h5 id="Model-Selection"><a href="#Model-Selection" class="headerlink" title="Model Selection"></a>Model Selection</h5><ul>
+<li><p>Training Set：训练模型</p>
+</li>
+<li><p>Validation Set：选模型</p>
+</li>
+<li><p>N-fold Cross Validation（N折交叉验证）</p>
+<p>Training Set分成三份，分别作为(train, train, val) (train, val, train) (val, train, train)，模型分别训练三次得到三个error取平均值，选最低error的模型再在整个Training Set上训练一次，得到的结果应用于Testing Set</p>
+<p>不要根据Testing Set调整参数！</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Regression/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/Regression/" class="post-title-link" itemprop="url">Regression</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-23 15:58:53 / 修改时间：17:26:39" itemprop="dateCreated datePublished" datetime="2021-03-23T15:58:53+08:00">2021-03-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Regression"><a href="#Regression" class="headerlink" title="Regression"></a>Regression</h3><p>2021/03/22</p>
+<p>应用：股票预测系统/自动驾驶/推荐系统</p>
+<h4 id="Step1：Model-A-set-of-function"><a href="#Step1：Model-A-set-of-function" class="headerlink" title="Step1：Model = A set of function"></a>Step1：Model = A set of function</h4><p>​    Linear Model: <script type="math/tex">y=b+\sum w_ix_i</script> , <script type="math/tex">w_i</script>: weight，<script type="math/tex">b_i</script>: bias</p>
+<h4 id="Step2：Goodness-of-Function"><a href="#Step2：Goodness-of-Function" class="headerlink" title="Step2：Goodness of Function"></a>Step2：Goodness of Function</h4><p>​    Loss Function <script type="math/tex">L</script> ：input a function, output how bad it is  </p>
+<script type="math/tex; mode=display">
+L(f)=L(w,b)= \overset{10}{\underset{n=i}{\sum}}(\hat y^n-(b+w\cdot x^n_{cp}))^2</script><p>​    Regularization 正则化：     </p>
+<script type="math/tex; mode=display">
+L(f)=L(w,b)= \overset{10}{\underset{n=i}{\sum}}(\hat y^n-(b+w\cdot x^n_{cp}))^2+\lambda \sum(w_i)^2</script><p>​        其中<script type="math/tex">\lambda</script> 是<strong>手调</strong>的参数，加的一项表示<strong>希望参数 <script type="math/tex">w_i</script> 越小越好，越接近0越好</strong> </p>
+<p>​        参数值接近0的function是比较平滑的，平滑的函数比较受青睐，因为受输入噪声影响越小；但也不能太平滑。<script type="math/tex">\lambda</script> 越大，考虑平滑越多</p>
+<p>​        做Regularization不考虑bias比较好，bias只是对function上下移动，对平滑程度没有影响</p>
+<h4 id="Step3：Best-Function"><a href="#Step3：Best-Function" class="headerlink" title="Step3：Best Function"></a>Step3：Best Function</h4><script type="math/tex; mode=display">
+f^*=arg\underset{f}\min L(f)</script><script type="math/tex; mode=display">
+w^*, b^* =arg \underset{w,b}{\min}L(w,b)</script><h5 id="Gradient-Descent-梯度下降法"><a href="#Gradient-Descent-梯度下降法" class="headerlink" title="Gradient Descent 梯度下降法"></a>Gradient Descent 梯度下降法</h5><ul>
+<li><p>(随机)选取参数初始值<script type="math/tex">w^0, b^0</script></p>
+</li>
+<li><p>计算初始位置参数对损失函数的（偏）微分（切线斜率）</p>
+<ul>
+<li><p>为负：增大参数</p>
+</li>
+<li><p>为正：减小参数</p>
+</li>
+<li><p>步长（Step Size）取决于当前（偏）微分值，和一个常数项（Learning Rate）<script type="math/tex">\eta</script> </p>
+<script type="math/tex; mode=display">
+w^1\leftarrow w^0-\eta\frac{\partial L}{\partial w}|_{w=w^0,b=b^0}</script><script type="math/tex; mode=display">
+b^1\leftarrow b^0-\eta\frac{\partial L}{\partial b}|_{w=w^0,b=b^0}</script></li>
+<li><p>重复2、3的步骤，到达局部最小值，但不一定是全局最小值（线性回归没有这个问题）</p>
+</li>
+<li><p>Overfitting 过拟合：减少参量；正则化（Step2）</p>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Introduction-for-Machine-Learning/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1228,20 +1512,20 @@ A^{[1]}=ReLU(W^{[1]}*A^{[0]}+B^{[1]})</script><h4 id="CNN的组成结构"><a hre
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

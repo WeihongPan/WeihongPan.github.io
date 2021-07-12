@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Chapter 1: Linear AlgebraVector Spaces(向量空间) 线性空间 &#x2F; 域 $\mathbb{R}$ 上的向量空间  域 $\mathbb{R}$ 上的集合 $\mathbb{V}$ 对向量加法(vector summation)和数乘(scalar multiplication)封闭  \begin{align} +:\mathbb{V}\times\mathbb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Multiple View Geometry - Lecture 1">
+<meta property="og:url" content="https://weihongpan.github.io/slam/Multiple-View-Geometry-Lecture-1/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="Chapter 1: Linear AlgebraVector Spaces(向量空间) 线性空间 &#x2F; 域 $\mathbb{R}$ 上的向量空间  域 $\mathbb{R}$ 上的集合 $\mathbb{V}$ 对向量加法(vector summation)和数乘(scalar multiplication)封闭  \begin{align} +:\mathbb{V}\times\mathbb">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-06-17T04:39:02.000Z">
+<meta property="article:modified_time" content="2021-06-27T15:04:18.818Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="MVG slam">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://weihongpan.github.io/slam/Multiple-View-Geometry-Lecture-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Multiple View Geometry - Lecture 1 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/WeihongPan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/slam/Multiple-View-Geometry-Lecture-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Multiple View Geometry - Lecture 1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-17 12:39:02" itemprop="dateCreated datePublished" datetime="2021-06-17T12:39:02+08:00">2021-06-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-27 23:04:18" itemprop="dateModified" datetime="2021-06-27T23:04:18+08:00">2021-06-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/slam/" itemprop="url" rel="index"><span itemprop="name">slam</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Chapter-1-Linear-Algebra"><a href="#Chapter-1-Linear-Algebra" class="headerlink" title="Chapter 1: Linear Algebra"></a>Chapter 1: Linear Algebra</h3><h4 id="Vector-Spaces-向量空间"><a href="#Vector-Spaces-向量空间" class="headerlink" title="Vector Spaces(向量空间)"></a>Vector Spaces(向量空间)</h4><ul>
+<li>线性空间 / 域 $\mathbb{R}$ 上的向量空间</li>
+</ul>
+<p>域 $\mathbb{R}$ 上的集合 $\mathbb{V}$ 对向量加法(vector summation)和数乘(scalar multiplication)封闭</p>
+<script type="math/tex; mode=display">
+\begin{align}
++:\mathbb{V}\times\mathbb{V}\rightarrow\mathbb{V} \notag\\ 
+\cdot:\mathbb{R}\times\mathbb{V}\rightarrow\mathbb{V} \notag
+\end{align}</script><p>即：$\forall \boldsymbol{v_1},\boldsymbol{v_2}\in\mathbb{V},\forall \alpha,\beta\in\mathbb{R}, \alpha\boldsymbol{v_1}+\beta\boldsymbol{v_2}\in\mathbb{V}$ </p>
+<p>加法和数乘具体定义和满足的条件见矩阵分析第一讲</p>
+<ul>
+<li>子空间</li>
+</ul>
+<p>$\mathbb{W}\subset\mathbb{V},\boldsymbol{0}\in\mathbb{W}$，且对加法和数乘封闭，则称 $\mathbb{W}$ 为向量空间 $\mathbb{V}$ 的子空间</p>
+<ul>
+<li>线性无关</li>
+</ul>
+<p>一组向量 $\mathbb{S}=\{\boldsymbol{v_1},…,\boldsymbol{v_k}\}\subset\mathbb{V}$ 的生成子空间定义为：</p>
+<script type="math/tex; mode=display">
+\text{span}(\mathbb{S})=\{\boldsymbol{v}\in\mathbb{V}|\boldsymbol{v}=\sum^k_{i=1}\alpha_i\boldsymbol{v_i}\}</script><p>集合 $\mathbb{S}$ 线性无关的条件：</p>
+<script type="math/tex; mode=display">
+\sum^k_{i=1}\alpha_i\boldsymbol{v_i}=0\Rightarrow\alpha_i=0\ \forall i</script><p>即集合中的所有向量都不能被其他向量所表示，反之则称该集合线性相关</p>
+<ul>
+<li>线性空间的一组基(basis)</li>
+</ul>
+<p>向量组 $\mathbb{B}=\{\boldsymbol{v_1},…\boldsymbol{v_n}\}$ 线性无关且生成子空间为 $\mathbb{V}$ ，则称向量组 $\mathbb{B}$ 为线性空间 $\mathbb{V}$ 的一组基，即线性无关向量的最大集合</p>
+<p>若向量组 $\mathbb{B}$ 和 $\mathbb{B’}$ 是线性空间 $\mathbb{V}$ 的两组基，那么有以下三个结论</p>
+<ol>
+<li><p>$\mathbb{B}$ 和 $\mathbb{B’}$ 中的向量个数相等，均为 $n$ ，称为线性空间 $\mathbb{V}$ 的维度</p>
+</li>
+<li><p>$\forall \boldsymbol{v}\in\mathbb{V}$ 都可由向量组 $\mathbb{B}$ 中的基向量唯一线性表出</p>
+</li>
+<li><p>特殊地，向量组 $\mathbb{B’}$ 中的所有向量都可由 $\mathbb{B}$ 线性表出：</p>
+<script type="math/tex; mode=display">
+b'_i=\sum^n_{j=1}a_{ji}b_j</script><p>该基变换中的系数 $a_{ji}$ 组成矩阵 $\boldsymbol{A}$，$\boldsymbol{B}=[b_1,…b_n],\boldsymbol{B’}=[b_1’…,b_n’]$ ，故上式可写作：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{B'}=\boldsymbol{BA}\Leftrightarrow\boldsymbol{B}=\boldsymbol{B'A^{-1}}</script></li>
+</ol>
+<ul>
+<li><p>内积(Inner Product)</p>
+<p>在向量空间中定义内积（点积）$\langle\cdot,\cdot\rangle:\mathbb{V}\times\mathbb{V}\rightarrow\mathbb{R}$ ，满足以下三个条件：</p>
+<ol>
+<li>线性性：$\langle\boldsymbol{u},\alpha\boldsymbol{v}+\beta\boldsymbol{w}\rangle=\alpha\langle\boldsymbol{u},\boldsymbol{v}\rangle+\beta\langle\boldsymbol{u},\boldsymbol{w}\rangle$ </li>
+<li>对称性：$\langle\boldsymbol{u},\boldsymbol{v}\rangle=\langle\boldsymbol{v},\boldsymbol{u}\rangle$ </li>
+<li>正定性：$\langle\boldsymbol{v},\boldsymbol{v}\rangle\geq0$ 且 $\langle\boldsymbol{v},\boldsymbol{v}\rangle=0\Leftrightarrow\boldsymbol{v}=\boldsymbol{0}$ </li>
+</ol>
+<p>从而定义了一个<strong>范数</strong>(norm) ：</p>
+<script type="math/tex; mode=display">
+|\cdot|:\mathbb{V}\rightarrow\mathbb{R},|\boldsymbol{v}|=\sqrt{\langle\boldsymbol{v},\boldsymbol{v}\rangle}</script><p>和一个<strong>度量</strong>(metric) ：</p>
+<script type="math/tex; mode=display">
+\text{d}:\mathbb{V}\times\mathbb{V}\rightarrow\mathbb{R},\text{d}(\boldsymbol{v},\boldsymbol{w})=|\boldsymbol{v}-\boldsymbol{w}|=\sqrt{\langle\boldsymbol{v}-\boldsymbol{w},\boldsymbol{v}-\boldsymbol{w}\rangle}</script><p>分别用来计算向量长度和向量间的距离，这使得 $\mathbb{V}$ 成为一个度量空间，又因为该度量是由向量内积定义的，所以又称 $\mathbb{V}$ 为<strong>希尔伯特空间(Hilbert Space)</strong> </p>
+</li>
+<li><p><strong>标准内积</strong>与生成内积(Canonical Inner Product and Induced Inner Product)</p>
+<p>特殊地，在 $\mathbb{V}=\mathbb{R}$ 时，可以由标准基 $\boldsymbol{B}=\boldsymbol{I}_n$ (n维单位矩阵)定义标准内积：$\langle \boldsymbol{x},\boldsymbol{y}\rangle=\boldsymbol{x}^T\boldsymbol{y}=\sum^n_{i=1}x_iy_i$ ，从而定义出了标准 $L_2$ 范数（欧几里得范数）$|\boldsymbol{x}|=\sqrt{\boldsymbol{x}^T\boldsymbol{x}}=\sqrt{x_1^2+…+x_n^2}$ </p>
+<p>对于一个新给出的基底 $\boldsymbol{B}’$ ，有基变换 $\boldsymbol{A}$ 使得 $\boldsymbol{I}=\boldsymbol{B}’\boldsymbol{A}^{-1}$ ，那么标准内积用新坐标 $\boldsymbol{x}’,\boldsymbol{y}’$ 可表示为：$\langle\boldsymbol{x},\boldsymbol{y}\rangle=\boldsymbol{x}^T\boldsymbol{y}=(\boldsymbol{Ax}’)^T(\boldsymbol{Ay}’)=\boldsymbol{x}’^T\boldsymbol{A}^T\boldsymbol{A}\boldsymbol{y}’\equiv\langle\boldsymbol{x}’,\boldsymbol{y}’\rangle_{\boldsymbol{A}^T\boldsymbol{A}}$ ，后者成为变换矩阵 $\boldsymbol{A}$ 下的<strong>生成内积</strong></p>
+<p>当且仅当 $\langle\boldsymbol{v},\boldsymbol{w}\rangle=0$ 时向量正交</p>
+</li>
+<li><p>(<font color="red">新概念</font>)  矩阵的 <strong>Kronecker积</strong> 和 <strong>Stack</strong>（堆）</p>
+<p>给定两个任意大小的矩阵 $\boldsymbol{A}\in\mathbb{R}^{m\times n}$ 和 $\boldsymbol{B}\in\mathbb{R}^{k\times l}$ ，定义它们的 <font color="green">Kronecker积</font> 如下： </p>
+<script type="math/tex; mode=display">
+\boldsymbol{A}\otimes\boldsymbol{B}\equiv
+\left(
+\begin{matrix}
+a_{11}\boldsymbol{B} \  \cdots \  a_{1n}\boldsymbol{B}\\
+\vdots \quad \ddots \quad \vdots \\
+a_{m1}\boldsymbol{B} \  \cdots \  a_{mn}\boldsymbol{B}
+\end{matrix}
+\right)
+\in\mathbb{R}^{mk\times nl}.</script><p>矩阵 $\boldsymbol{A}$ 的 <font color="green">Stack</font> (堆) $\boldsymbol{A}^s$ 则定义为一个由所有n个列向量纵向堆叠而成的的列向量：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{A}^s\equiv
+\left(
+\begin{matrix}
+\boldsymbol{a_1}\\
+\vdots \\
+\boldsymbol{a_n}
+\end{matrix}
+\right)\in\mathbb{R}^{mn}.</script><p>上述定义使得代数表达式可以被重写得更加直观，例如：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{u}^T\boldsymbol{A}\boldsymbol{v}=(\boldsymbol{v}\otimes\boldsymbol{u})^T\boldsymbol{A}^s</script><p>这其实是容易证明的：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\boldsymbol{u}^T\boldsymbol{A}\boldsymbol{v}
+&=(\quad\quad)_{1\times m}\left(\begin{matrix}\quad\quad\\ \\ \end{matrix}\right)_{m\times n}\left(\begin{matrix}\\ \\\end{matrix}\right)_{n\times1} \notag\\
+&=\left(\boldsymbol{u}^T\boldsymbol{a_1}\ ...\ \boldsymbol{u}^T\boldsymbol{a_n}\right)_{1\times n}\left(\begin{matrix}\\\\\end{matrix}\right)_{n\times1} \notag \\
+&=\boldsymbol{u}^T\boldsymbol{a_1}v_1+...+\boldsymbol{u}^T\boldsymbol{a_n}v_n \notag \\
+&=\boldsymbol{u}^Tv_1\cdot\boldsymbol{a_1}+...+\boldsymbol{u}^Tv_n\cdot\boldsymbol{a_n} \notag \\
+&=\left(\boldsymbol{u}^Tv_1\ ...\ \boldsymbol{u}^Tv_n\right)\left(\begin{matrix}\boldsymbol{a_1}\\\vdots\\\boldsymbol{a_n}\end{matrix}\right) \notag \\
+&=\left(\begin{matrix}v_1\boldsymbol{u}\\\vdots\\v_n\boldsymbol{u}\end{matrix}\right)^T\left(\begin{matrix}\boldsymbol{a_1}\\\vdots\\\boldsymbol{a_n}\end{matrix}\right) \notag \\
+&=(\boldsymbol{v}\otimes\boldsymbol{u})^T\boldsymbol{A}^s \notag
+
+\end{align}</script></li>
+</ul>
+<h4 id="Linear-Transformations-and-Matrices-线性变换和矩阵"><a href="#Linear-Transformations-and-Matrices-线性变换和矩阵" class="headerlink" title="Linear Transformations and Matrices(线性变换和矩阵)"></a>Linear Transformations and Matrices(线性变换和矩阵)</h4><p>线性代数研究的是两个线性空间之间的线性变换，由于这些线性变换都可以用矩阵表示，所以线性代数相当于在研究矩阵的特性。</p>
+<p>两个线性空间 $\mathbb{V}$ 和 $\mathbb{W}$ 之间的 <font color="green"><strong>线性变换(Linear Transformation)</strong></font> 是一个映射 $\boldsymbol{L}: \mathbb{V}\rightarrow\mathbb{W}$ ，它满足以下两个条件：</p>
+<ol>
+<li>$\boldsymbol{L}(\boldsymbol{x}+\boldsymbol{y})=\boldsymbol{L}(\boldsymbol{x})+\boldsymbol{L}(\boldsymbol{y})\quad\forall\boldsymbol{x},\boldsymbol{y}\in\mathbb{V}$ </li>
+<li>$\boldsymbol{L}(\alpha\boldsymbol{x})=\alpha\boldsymbol{L}(\boldsymbol{x})\quad \forall\boldsymbol{x}\in\mathbb{V},\alpha\in\mathbb{R}$ </li>
+</ol>
+<p>由于线性性，线性变换 $\boldsymbol{L}$ 对空间 $\mathbb{V}$ 的操作可以唯一定义为对 $\mathbb{V}$ 上基向量的操作，对标准基 $\{\boldsymbol{\theta_1},…,\boldsymbol{\theta_n}\}$ 有：$\boldsymbol{L}(\boldsymbol{x})=\boldsymbol{Ax}\quad \forall\boldsymbol{x}\in\mathbb{V}$ 其中 $\boldsymbol{A}=(\boldsymbol{L}(\boldsymbol{\theta_1}),…,\boldsymbol{L}(\boldsymbol{\theta_n}))\in\mathbb{R}^{m\times n}$ </p>
+<p>所有 $m\times n$ 维实矩阵组成的集合记为 $\mathcal{M}(m,n)$ ，当 $m=n$ 时，集合 $\mathcal{M}(m,n)\equiv\mathcal{M}(n)$ 就形成了域 $\mathbb{R}$ 上的一个 <font color="green">环</font>，即满足对矩阵乘法和矩阵加法封闭</p>
+<ul>
+<li><p><font color="red"><strong>线性群</strong></font> $GL(n)$ 和 $SL(n)$</p>
+<p><font color="green"><strong>群</strong></font> 的概念：集合 $\mathbb{G}$ 与集合 $\mathbb{G}$ 上定义的一种运算：$\circ :\mathbb{G}\times\mathbb{G}\rightarrow\mathbb{G}$ 满足以下四个条件：</p>
+<ol>
+<li>封闭性：$\boldsymbol{g}_1\circ\boldsymbol{g}_2\in\mathbb{G},\quad\forall\boldsymbol{g}_1,\boldsymbol{g}_2\in\mathbb{G}$ </li>
+<li>结合律：$(\boldsymbol{g}_1\circ\boldsymbol{g}_2)\circ\boldsymbol{g}_3=\boldsymbol{g}_1\circ(\boldsymbol{g}_2\circ\boldsymbol{g}_3),\quad\forall\boldsymbol{g}_1,\boldsymbol{g}_2,\boldsymbol{g}_3\in\mathbb{G}$ </li>
+<li>幺元：$\exists\boldsymbol{e}\in\mathbb{G},\ s.t.\ \boldsymbol{e}\circ\boldsymbol{g}=\boldsymbol{g}\circ\boldsymbol{e}=\boldsymbol{g},\quad \forall\boldsymbol{g}\in\mathbb{G}$ </li>
+<li>可逆性：$\exists\boldsymbol{g}^{-1}\in\mathbb{G},\ s.t.\ \boldsymbol{g}\circ\boldsymbol{g}^{-1}=\boldsymbol{g}^{-1}\boldsymbol{g}=\boldsymbol{e},\quad\forall\boldsymbol{g}\in\mathbb{G}$</li>
+</ol>
+<p>这样的集合就称为<strong>群</strong> 。</p>
+<ul>
+<li>所有<strong>可逆</strong>（非奇异）$n\times n$ 维实矩阵和矩阵乘法就构成了一个群，这个群称为 <font color="green"><strong>general linear group</strong></font>，记作 $GL(n)$ ，该群中包含了所有行列式非零的 $n\times n$ 维<strong>方阵</strong>；</li>
+<li>进一步，$GL(n)$ 中所有<strong>行列式为1</strong>的矩阵又组成了一个群，称为 <font color="green"><strong>special linear group</strong></font> ，记作 $SL(n)$ ，根据可逆性，该群中的方阵满足：$\text{det}(\boldsymbol{A}^{-1})=\text{det}(\boldsymbol{A})^{-1}$ </li>
+</ul>
+</li>
+<li><font color="red">**群的矩阵表示**</font> 
+
+<p>一个群 $G$ 有矩阵表示（可被视为矩阵群）的条件：</p>
+<ul>
+<li>存在一个群的同构映射（群同态）$R:G\rightarrow GL(n)$ .</li>
+</ul>
+<p>该映射保留了群 $G$ 的群结构，即保留了幺元、群乘、可逆性等：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&R(e)=I_{n\times n} \notag \\
+&R(g\circ h)=R(g)R(h),\ \ \forall g,h\in G \notag \\
+&\text{if}\ \ g\circ g^{-1}=g^{-1}\circ g=e,\ \ \text{then}\ \ R(g)R(g^{-1})=I_{n\times n} \notag
+\end{align}</script><p>之所以引进群的矩阵表示，是因为这能实现从研究矩阵群的特征角度来研究更抽象的群。</p>
+<p>例如：物体旋转运动构成了一个群，如果能用矩阵表示旋转，那么研究旋转群的特征会容易很多</p>
+</li>
+<li><p>仿射群 $A(n)$ </p>
+<p>仿射变换 $L:\mathbb{R}^n\rightarrow \mathbb{R}^n$ 可以由一个矩阵 $\boldsymbol{A}\in GL(n)$ 和一个向量 $\boldsymbol{b}\in \mathbb{R}^n$ 唯一定义 ：</p>
+<script type="math/tex; mode=display">
+L(\boldsymbol{x})=\boldsymbol{Ax+b}</script><p>由这些仿射变换构成的集合称为<font color="green"> <strong>$n$ 维仿射群</strong> </font>，记作 $A(n)$ </p>
+<p>显然，上述定义的仿射变换 $L$ 不是个线性映射，除非 $\boldsymbol{b}=\boldsymbol{0}$。通过引入<font color="green"> <strong>齐次坐标</strong> </font>（将 $\boldsymbol{x}\in\mathbb{R}^n$ 表示为 $\left(\begin{matrix}\boldsymbol{x}\\1\end{matrix}\right)\in\mathbb{R}^{n+1}$ ）可以把 $L:\mathbb{R}^n\rightarrow \mathbb{R}^n$ 变成一个线性映射 $L:\mathbb{R}^{n+1}\rightarrow \mathbb{R}^{n+1}$ ：</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+\boldsymbol{x} \\ 1
+\end{matrix}
+\right)
+\mapsto
+\left(
+\begin{matrix}
+\boldsymbol{A} \quad \boldsymbol{b} \\
+\boldsymbol{0} \quad\  1
+\end{matrix}
+\right)
+\left(
+\begin{matrix}
+\boldsymbol{x} \\ 1
+\end{matrix}
+\right)</script><p>矩阵 $\left(<br>\begin{matrix}<br>\boldsymbol{A} \quad \boldsymbol{b} \\<br>\boldsymbol{0} \quad\  1<br>\end{matrix}<br>\right)\in GL(n+1)$ 称为<font color="green"> <strong>仿射矩阵</strong> </font>，所有仿射矩阵构成了 $GL(n+1)$ 的一个子群</p>
+</li>
+<li><p>正交群 $O(n)$</p>
+<p>所有 $n\times n$ 的正交矩阵构成了正交群 $O(n)=\{\boldsymbol{R}\in GL(n)|\boldsymbol{R}^T\boldsymbol{R}=\boldsymbol{I}\}$ ，显然它是群 $GL(n)$ 的子群，且 $\text{det}(\boldsymbol{R}^T\boldsymbol{R})=(\text{det}(\boldsymbol{R}))^2=\text{det}(\boldsymbol{I})=1\Rightarrow\text{det}(\boldsymbol{R})\in\{+1,-1\}$ </p>
+<p>将 $O(n)$ 满足 $\text{det}(\boldsymbol{R})=+1$ 的子群称为<font color="green"> <strong>特殊正交群</strong> </font>，记作 $SO(n)$ ，显然 $SO(n)=O(n)\cap SL(n)$ 。特别地，$SO(3)$ 即为三维旋转矩阵构成的群（行列式为-1的矩阵为镜像矩阵）</p>
+</li>
+<li><p>欧氏群 $E(n)$</p>
+<p>由正交阵 $\boldsymbol{R}\in O(n)$ 和向量 $\boldsymbol{T}\in \mathbb{R}^n$ 定义出一个欧氏变换：$L:\mathbb{R}^n\rightarrow \mathbb{R}^n;\quad \boldsymbol{x}\mapsto\boldsymbol{Rx+T}$ </p>
+<p>由这种变换组成的集合称为欧几里得群（欧氏群）$E(n)$ ，显然它是仿射群 $A(n)$ 的子群，基于齐次坐标，欧氏群的矩阵表示如下：</p>
+<script type="math/tex; mode=display">
+E(n)=\left\{ 
+\left(
+\begin{matrix}
+\boldsymbol{R} \quad\boldsymbol{T}\\
+\boldsymbol{0} \quad\ 1
+\end{matrix}
+\right)\Bigg|
+\boldsymbol{R}\in O(n),\boldsymbol{T}\in\mathbb{R}^n
+\right\}</script><p>对应地，若 $\boldsymbol{R}\in SO(n)$ ，那么此时的欧氏群称作<font color="green"> <strong>特殊欧氏群</strong> </font>，记作 $SE(n)$ 。特别地，$SE(3)$ 表示的是三维刚体运动。</p>
+<p>综上，几个群之间的关系有：</p>
+<script type="math/tex; mode=display">
+\boxed{SO(n)\subset O{n}\subset GL(n),\quad SE(n)\subset E(n)\subset A(n)\subset GL(n+1)}</script></li>
+</ul>
+<h4 id="Properties-of-Matrices-矩阵特征"><a href="#Properties-of-Matrices-矩阵特征" class="headerlink" title="Properties of Matrices(矩阵特征)"></a>Properties of Matrices(矩阵特征)</h4><h4 id="SVD-Singular-Value-Decomposition"><a href="#SVD-Singular-Value-Decomposition" class="headerlink" title="SVD(Singular Value Decomposition)"></a>SVD(Singular Value Decomposition)</h4>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MVG-slam/" rel="tag"># MVG slam</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90/%E5%93%88%E5%B7%A5%E5%A4%A7-%E4%B8%A5%E8%B4%A8%E5%BD%AC-%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90-%E7%AC%AC%E4%B8%89%E8%AE%B2-%E5%86%85%E7%A7%AF/" rel="prev" title="哈工大-严质彬-矩阵分析-第三讲-内积">
+      <i class="fa fa-chevron-left"></i> 哈工大-严质彬-矩阵分析-第三讲-内积
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" rel="next" title="Ubuntu16.04无权限断网从源码安装PCL">
+      Ubuntu16.04无权限断网从源码安装PCL <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Chapter-1-Linear-Algebra"><span class="nav-number">1.</span> <span class="nav-text">Chapter 1: Linear Algebra</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Vector-Spaces-%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4"><span class="nav-number">1.1.</span> <span class="nav-text">Vector Spaces(向量空间)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linear-Transformations-and-Matrices-%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%92%8C%E7%9F%A9%E9%98%B5"><span class="nav-number">1.2.</span> <span class="nav-text">Linear Transformations and Matrices(线性变换和矩阵)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Properties-of-Matrices-%E7%9F%A9%E9%98%B5%E7%89%B9%E5%BE%81"><span class="nav-number">1.3.</span> <span class="nav-text">Properties of Matrices(矩阵特征)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SVD-Singular-Value-Decomposition"><span class="nav-number">1.4.</span> <span class="nav-text">SVD(Singular Value Decomposition)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

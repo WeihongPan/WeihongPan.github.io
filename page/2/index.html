@@ -165,6 +165,401 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/experiment/%E5%A6%82%E4%BD%95%E5%B0%86Labelme%E6%A0%87%E6%B3%A8%E5%9B%BE%E5%83%8F%E8%BD%AC%E4%B8%BACULane%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F/" class="post-title-link" itemprop="url">如何将Labelme标注图像转为CULane数据集格式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 20:31:34" itemprop="dateCreated datePublished" datetime="2021-04-22T20:31:34+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 14:49:55" itemprop="dateModified" datetime="2021-04-23T14:49:55+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/experiment/" itemprop="url" rel="index"><span itemprop="name">experiment</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>毕设做铁路轨道检测，发现Lane Detection的大部分开源代码都是跑的公用数据集CULane（或Tusimple），而我们自己采集的数据用labelme标注完以后不是CULane的标准格式。为了能直接用公开代码训练我们自己的数据集，需要先把labelme标注的json数据转化成CULane标准格式。</p>
+<p>项目地址：[labelme_to_culane] </p>
+<h3 id="CULane数据集"><a href="#CULane数据集" class="headerlink" title="CULane数据集"></a>CULane数据集</h3><p>根据<a target="_blank" rel="noopener" href="https://xingangpan.github.io/projects/CULane.html">官网</a>的介绍，CULane数据集文件包括：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- driver_23_30frame</span><br><span class="line">- driver_161_90frame</span><br><span class="line">- driver_182_30frame</span><br><span class="line">- driver_37_30frame</span><br><span class="line">- driver_100_30frame</span><br><span class="line">- driver_193_90frame</span><br><span class="line">- laneseg_label_w16</span><br><span class="line">- list</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>三个训练集&amp;验证集ground truth图像与标注：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- driver_23_30frame</span><br><span class="line">- driver_161_90frame</span><br><span class="line">- driver_182_30frame</span><br></pre></td></tr></table></figure>
+<p>每个文件夹下都包含若干视频中抽帧形成的子文件夹，每个子文件夹又包含若干图像数据文件（eg. xxxx.jpg）和一个对应的标注文件（xxxx.lines.txt），以182_30文件为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- driver_182_30frame</span><br><span class="line">  - 05312327_0001.MP4</span><br><span class="line">    |- 00000.jpg</span><br><span class="line">    |- 00000.lines.txt</span><br><span class="line">    |- 00030.jpg</span><br><span class="line">    |- 00030.lines.txt</span><br><span class="line">    |- 00060.jpg</span><br><span class="line">    |- 00060.lines.txt</span><br><span class="line">    ...</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>标注文件中每一行都给出了车道线上关键点的对应（x，y）坐标，以 <code>05130.lines.txt</code> 为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">104.092 590 123.101 580 144.826 570 165.645 560 187.369 550 208.189 540 229.913 530 250.733 520 272.457 510 293.277 500 315.001 490 335.82 480 357.545 470 379.269 460 399.746 450 421.471 440 442.29 430 464.015 420 485.373 410 506.192 400 527.551 390 549.275 380 570.095 370 591.452 360 613.176 350 633.996 340 655.72 330 677.001 320 698.726 310 719.545 300 740.828 290 762.552 280 783.371 270 </span><br><span class="line">661.843 590 665.482 580 669.121 570 673.124 560 677.128 550 681.131 540 684.77 530 688.773 520 692.775 510 696.778 500 700.417 490 704.419 480 708.422 470 712.06 460 716.093 450 720.096 440 724.099 430 727.918 420 731.922 410 735.562 400 739.746 390 743.385 380 747.387 370 751.206 360 755.208 350 759.211 340 763.215 330 766.854 320 770.858 310 774.862 300 778.5 290 782.503 280 786.505 270 </span><br><span class="line">1457.13 590 1438.25 580 1418.46 570 1397.78 560 1377.09 550 1356.41 540 1335.96 530 1315.27 520 1294.59 510 1273.91 500 1253.22 490 1232.77 480 1212.09 470 1192.3 460 1171.62 450 1150.94 440 1130.47 430 1109.79 420 1089.11 410 1068.42 400 1047.74 390 1027.84 380 1007.16 370 986.473 360 965.79 350 945.106 340 924.422 330 903.617 320 883.833 310 863.149 300 842.466 290 821.782 280 801.099 270 </span><br><span class="line">1676.79 450 1632.17 440 1587.27 430 1542.37 420 1497.07 410 1452.17 400 1406.89 390 1361.98 380 1317.08 370 1272.76 360 1227.86 350 1182.96 340 1137.76 330 1092.86 320 1047.96 310 1003.06 300 957.841 290 912.94 280 868.04 270 </span><br></pre></td></tr></table></figure>
+<p>其中，关键点选取的y坐标，是固定的，称其为<strong>行锚点</strong> ，默认图像大小为288 * 800：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">culane_row_anchor = [121, 131, 141, 150, 160, 170, 180, 189, 199, 209, 219, 228, 238, 248, 258, 267, 277, 287]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>测试集ground truth图像及标注：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- driver_37_30frame</span><br><span class="line">- driver_100_30frame</span><br><span class="line">- driver_193_90frame</span><br></pre></td></tr></table></figure>
+<p>格式与训练集/验证集相同</p>
+</li>
+<li><p>训练集/验证集车道线分割label图像：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- laneseg_label_w16</span><br></pre></td></tr></table></figure>
+<p>该文件夹下为训练集/验证集中所有ground truth图像所对应的逐像素label图，即每个像素点的值表示它所在的车道线id，0表示背景。</p>
+</li>
+<li><p>训练集/验证集/测试集列表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- </span><br><span class="line">  - list</span><br><span class="line">    |- test_split</span><br><span class="line">       |- test0_normal.txt</span><br><span class="line">       |- test1_crowd.txt</span><br><span class="line">       |- test2_hlight.txt</span><br><span class="line">       |- test3_shadow.txt</span><br><span class="line">       |- test4_noline.txt</span><br><span class="line">       |- test5_arrow.txt</span><br><span class="line">       |- test6_curve.txt</span><br><span class="line">       |- test7_cross.txt</span><br><span class="line">       |- test8_night.txt</span><br><span class="line">    |- test.txt</span><br><span class="line">    |- train.txt</span><br><span class="line">    |- train_gt.txt</span><br><span class="line">    |- val.txt</span><br><span class="line">    |- val_gt.txt</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>trian.txt</code> <code>val.txt</code> <code>test.txt</code> 都是对应训练集/验证集/测试集图像的相对路径，以 <code>test.txt</code> 为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/driver_100_30frame/05251517_0433.MP4/00000.jpg</span><br><span class="line">/driver_100_30frame/05251517_0433.MP4/00030.jpg</span><br><span class="line">/driver_100_30frame/05251517_0433.MP4/00060.jpg</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>test_split</code> 文件夹下的文件是将测试集 <code>test.txt</code> 分为不同的环境后重组，本质也是图像的相对路径</p>
+</li>
+<li><p><code>train_gt.txt</code> 和 <code>val_gt.txt</code> 中每行的格式为：</p>
+<p>gt图像相对路径 逐像素label图像相对路径 四个0/1数字表示\&lt;左2>&lt;左1>&lt;右1>&lt;右2>四个车道是否存在</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/driver_23_30frame/05171102_0766.MP4/00020.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00020.png 1 1 1 0</span><br><span class="line">/driver_23_30frame/05171102_0766.MP4/00050.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00050.png 1 1 1 0</span><br><span class="line">/driver_23_30frame/05171102_0766.MP4/00080.jpg /laneseg_label_w16/driver_23_30frame/05171102_0766.MP4/00080.png 1 1 1 0</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="从json标注文件到label-png"><a href="#从json标注文件到label-png" class="headerlink" title="从json标注文件到label.png"></a>从json标注文件到label.png</h3><p>labelme提供了将json文件转为label.png的方法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labelme_json_to_dataset [-h] [-o output_file] json_file.json</span><br></pre></td></tr></table></figure>
+<p>此方法实现对一个json文件的转换，将生成以下文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- output_file</span><br><span class="line">  |- json_file_json</span><br><span class="line">     |- img.png</span><br><span class="line">     |- label.png</span><br><span class="line">     |- label_names.txt</span><br><span class="line">     |- lable_viz.png</span><br></pre></td></tr></table></figure>
+<p>实现json文件批量转化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> os.path <span class="keyword">as</span> osp</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> name <span class="keyword">in</span> os.listdir(json_files_path):</span><br><span class="line">    json_data = osp.join(json_files_path, name)</span><br><span class="line">    os.system(<span class="string">&quot;labelme_json_to_dataset json_data -o &quot;</span> + output_path)</span><br></pre></td></tr></table></figure>
+<p>如果在标注的时候不是用的纯数字，labelme在进行转换的时候会首先对标注进行字符串排序，排序后的结果在 <code>label_names.txt</code> 中；<code>label.png</code> 虽然看上去是彩色图，但用 <code>PIL.Image</code> 读入后会发现，这其实是个逐像素分类的图，像素值由 <code>label_names.txt</code> 中的标注顺序生成（下标/像素从0开始，其中0表示的是背景，即 <code>label_names.txt</code> 中的第一个默认分类 <code>_background_</code> ）。存在的像素值对应 <code>*_gt.txt</code> 中的值为1，否则为0</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line">label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">label_data = ny.asarray(label).copy()</span><br><span class="line">label.save(target_path)</span><br></pre></td></tr></table></figure>
+<p>这样就得到了我们需要的 <code>xxxx_label.png</code> 文件</p>
+<h3 id="从label-png到-xxxx-lines-txt-和-gt-txt-文件"><a href="#从label-png到-xxxx-lines-txt-和-gt-txt-文件" class="headerlink" title="从label.png到 xxxx.lines.txt 和 *_gt.txt 文件"></a>从label.png到 xxxx.lines.txt 和 *_gt.txt 文件</h3><ul>
+<li>根据 <code>label.png</code> 和 <code>culane_row_anchor</code> 获取轨道线上关键点的坐标生成 <code>xxxx.lines.txt</code> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># image = Image.open(image_path)</span></span><br><span class="line">label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">w, h = label.size</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将行采样点按输入图像高度放缩</span></span><br><span class="line"><span class="keyword">if</span> h != <span class="number">288</span>:</span><br><span class="line">    scale_f = <span class="keyword">lambda</span> x : <span class="built_in">int</span>((x * <span class="number">1.0</span>/<span class="number">288</span>) * h)</span><br><span class="line">    sample_tmp = <span class="built_in">list</span>(<span class="built_in">map</span>(scale_f,culane_row_anchor)) </span><br><span class="line">    <span class="comment"># 根据提供的函数对指定序列做映射</span></span><br><span class="line"></span><br><span class="line">lines = <span class="string">&quot;&quot;</span> </span><br><span class="line"><span class="keyword">for</span> i,r <span class="keyword">in</span> <span class="built_in">enumerate</span>(sample_tmp):</span><br><span class="line">    label_r = np.asarray(label)[<span class="built_in">int</span>(<span class="built_in">round</span>(r))] </span><br><span class="line">    <span class="comment"># 取出label图像中行坐标为int(round(r))的一行        </span></span><br><span class="line">    <span class="keyword">for</span> lane_idx <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">        line = <span class="string">&quot;&quot;</span></span><br><span class="line">        pos = np.where(label_r == lane_idx)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(pos) == <span class="number">0</span>:            </span><br><span class="line">            <span class="keyword">continue</span>        </span><br><span class="line">        pos = np.mean(pos)        </span><br><span class="line">        line = line + <span class="built_in">str</span>(pos) + <span class="string">&quot; &quot;</span> + <span class="built_in">str</span>(r) + <span class="string">&quot; &quot;</span></span><br><span class="line">        <span class="comment"># print(line)</span></span><br><span class="line">        <span class="comment"># cv2.circle(image, (int(round(pos)), int(round(r))), 1, (0,0,255),2)       </span></span><br><span class="line">    lines = lines + line + <span class="string">&quot;\n&quot;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(lines_file_path, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(lines)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据 <code>label.png</code> 生成 <code>*_gt.txt</code> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">lines = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> label_path <span class="keyword">in</span> os.listdir(label_file_path):</span><br><span class="line">    label = Image.<span class="built_in">open</span>(label_path)</span><br><span class="line">    label_data = np.asarray(label).copy()</span><br><span class="line">    np.unique(label_data)</span><br><span class="line">    line = gt_image_path + <span class="string">&#x27; &#x27;</span> + label_path</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">        <span class="keyword">if</span> i <span class="keyword">in</span> label_data:</span><br><span class="line">            line = line + <span class="string">&#x27; 1&#x27;</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            line = line + <span class="string">&#x27; 0&#x27;</span></span><br><span class="line">    lines = lines + line + <span class="string">&#x27;\n&#x27;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(gt_file_path, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(lines)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Eigen/%E5%BD%92%E7%BA%A6%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E5%B9%BF%E6%92%AD%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">归约、迭代器和广播机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 11:51:55" itemprop="dateCreated datePublished" datetime="2021-04-22T11:51:55+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 15:38:02" itemprop="dateModified" datetime="2021-04-23T15:38:02+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本章介绍Eigen中的归约( <code>Reductions</code> )，迭代器( <code>Visitors</code> ) 和广播( <code>Broadcasting</code> )机制，以及它们是如何应用与矩阵和数组的。</p>
+<h3 id="归约"><a href="#归约" class="headerlink" title="归约"></a>归约</h3><p>归约指的是一类以矩阵或数组作为输入，返回一个标量值的函数。</p>
+<h4 id="常用归约函数"><a href="#常用归约函数" class="headerlink" title="常用归约函数"></a>常用归约函数</h4><p><code>.sum()</code> <code>.prod()</code> <code>.mean()</code> <code>.minCoeff()</code> <code>.maxCoeff()</code> <code>.trace()</code></p>
+<h4 id="范数计算"><a href="#范数计算" class="headerlink" title="范数计算"></a>范数计算</h4><ul>
+<li><code>.norm()</code> : L-2 范数（所有系数平方和开根号）</li>
+<li><code>.squaredNorm()</code> : L-2 范数的平方（所有系数平方和）</li>
+<li><code>.lpNorm&lt;p&gt;()</code> : P范数（所有系数绝对值的p次幂之和的p次根），当 <code>p=Infinity</code> 时表示所有系数绝对值的最大值</li>
+</ul>
+<h4 id="逻辑归约函数"><a href="#逻辑归约函数" class="headerlink" title="逻辑归约函数"></a>逻辑归约函数</h4><ul>
+<li><code>.all()</code> : Matrix 或 Array 的所有系数均为 true 时返回 true</li>
+<li><code>.any()</code> : Matrix 或 Array 存在某个系数为 true 时返回 true</li>
+<li><code>.count()</code> : 返回 Matrix 或 Array 中为 true 的系数总个数</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">ArrayXXf <span class="title">a</span><span class="params">(<span class="number">2</span>,<span class="number">2</span>)</span></span>; </span><br><span class="line">  	a &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>,<span class="number">4</span>; </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).all()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">all</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).any()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">any</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 0).count() = &quot;</span> &lt;&lt; (a &gt; <span class="number">0</span>).<span class="built_in">count</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).all()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">all</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).any()   = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">any</span>() &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;(a &gt; 2).count() = &quot;</span> &lt;&lt; (a &gt; <span class="number">2</span>).<span class="built_in">count</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(a &gt; 0).all()   = 1</span><br><span class="line">(a &gt; 0).any()   = 1</span><br><span class="line">(a &gt; 0).count() = 4</span><br><span class="line"></span><br><span class="line">(a &gt; 2).all()   = 0</span><br><span class="line">(a &gt; 2).any()   = 1</span><br><span class="line">(a &gt; 2).count() = 2</span><br></pre></td></tr></table></figure>
+<h4 id="部分归约"><a href="#部分归约" class="headerlink" title="部分归约"></a>部分归约</h4><p>部分归约是可以对矩阵或数组按列或行进行操作的归约，对每个列或行应用归约运算，然后返回具有相应值的列或行向量。部分归约由函数 <code>.colwise()</code> 和 <code>rowwise()</code> 实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">Eigen::MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Column&#x27;s maximum: &quot;</span> &lt;&lt; endl</span><br><span class="line">   		 &lt;&lt; mat.<span class="built_in">colwise</span>().<span class="built_in">maxCoeff</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Row&#x27;s maximum: &quot;</span> &lt;&lt; endl</span><br><span class="line">   		 &lt;&lt; mat.<span class="built_in">rowwise</span>().<span class="built_in">maxCoeff</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Column<span class="string">&#x27;s maximum: </span></span><br><span class="line"><span class="string">3 2 7 9</span></span><br><span class="line"><span class="string">Row&#x27;</span>s maximum: </span><br><span class="line">9</span><br><span class="line">7</span><br></pre></td></tr></table></figure>
+<p>显然：<strong>列操作返回行向量，行操作返回列向量</strong> </p>
+<h4 id="将部分归约与其他操作结合"><a href="#将部分归约与其他操作结合" class="headerlink" title="将部分归约与其他操作结合"></a>将部分归约与其他操作结合</h4><p>例：寻找系数和最大的列</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  	MatrixXf::Index   maxIndex;</span><br><span class="line">  	<span class="keyword">float</span> maxNorm = mat.<span class="built_in">colwise</span>().<span class="built_in">sum</span>().<span class="built_in">maxCoeff</span>(&amp;maxIndex);</span><br><span class="line">  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Maximum sum at position &quot;</span> &lt;&lt; maxIndex &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;The corresponding vector is: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat.<span class="built_in">col</span>( maxIndex ) &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;And its sum is is: &quot;</span> &lt;&lt; maxNorm &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Maximum sum at position 2</span><br><span class="line">The corresponding vector is: </span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">And its sum is is: 13</span><br></pre></td></tr></table></figure>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>最常用的就是利用visitor机制获取矩阵/数组中最大值/最小值的位置，交给一个visitor的参数是指向存储行列位置变量的指针，变量类型为 <code>Index</code> ：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">m</span><span class="params">(<span class="number">2</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">  </span><br><span class="line">  	m &lt;&lt; <span class="number">1</span>, <span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>, <span class="number">4</span>;</span><br><span class="line"> </span><br><span class="line">  	<span class="comment">//get location of maximum</span></span><br><span class="line">  	MatrixXf::Index maxRow, maxCol;</span><br><span class="line">  	<span class="keyword">float</span> max = m.<span class="built_in">maxCoeff</span>(&amp;maxRow, &amp;maxCol);</span><br><span class="line"> </span><br><span class="line"> 	<span class="comment">//get location of minimum</span></span><br><span class="line">  	MatrixXf::Index minRow, minCol;</span><br><span class="line">  	<span class="keyword">float</span> min = m.<span class="built_in">minCoeff</span>(&amp;minRow, &amp;minCol);</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Max: &quot;</span> &lt;&lt; max &lt;&lt;  <span class="string">&quot;, at: &quot;</span> </span><br><span class="line">         &lt;&lt; maxRow &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; maxCol &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Min: &quot;</span> &lt;&lt; min &lt;&lt; <span class="string">&quot;, at: &quot;</span> </span><br><span class="line">         &lt;&lt; minRow &lt;&lt; <span class="string">&quot;,&quot;</span> &lt;&lt; minCol &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Max: 4, at: 1,1</span><br><span class="line">Min: 1, at: 0,0</span><br></pre></td></tr></table></figure>
+<h3 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h3><p>广播机制类似于部分规约，区别在于广播构造了一个表达式，其中向量被解释成了一个矩阵，这个矩阵由向量在行/列方向上复制自身形成。</p>
+<h4 id="加减（-、-、-、-）"><a href="#加减（-、-、-、-）" class="headerlink" title="加减（+、-、+=、-=）"></a>加减（+、-、+=、-=）</h4><p><strong>只能用于Vector类型的对象！！！</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	<span class="function">Eigen::VectorXf <span class="title">v</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">  	mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">           <span class="number">3</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>;   </span><br><span class="line">  	v &lt;&lt; <span class="number">0</span>,</span><br><span class="line">         <span class="number">1</span>;</span><br><span class="line">       </span><br><span class="line">  	<span class="comment">//add v to each column of m</span></span><br><span class="line">  	mat.<span class="built_in">colwise</span>() += v;</span><br><span class="line">  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Broadcasting result: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">    </span><br><span class="line">    <span class="function">Eigen::VectorXf <span class="title">w</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br><span class="line">    w &lt;&lt; <span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>;</span><br><span class="line">       </span><br><span class="line">  	<span class="comment">//add w to each row of m</span></span><br><span class="line">  	mat.<span class="built_in">rowwise</span>() += v.<span class="built_in">transpose</span>();</span><br><span class="line">	  </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Broadcasting result: &quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Broadcasting result: </span><br><span class="line">1 2 6 9</span><br><span class="line">4 2 8 3</span><br><span class="line">Broadcasting result: </span><br><span class="line">1 3  8 12</span><br><span class="line">4 3 10  6</span><br></pre></td></tr></table></figure>
+<p>在执行 <code>mat.colwise() += v</code> 时，相当于进行了两步操作，首先将向量 <code>v</code> 在行方向上复制了4次形成了一个新的4x2的矩阵，再将这个矩阵和矩阵 <code>mat</code> 进行加法操作：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+1 & 2 & 6 & 9 \\
+3 & 1 & 7 & 2 
+\end{bmatrix} + 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+1 & 1 & 1 & 1 
+\end{bmatrix} = 
+\begin{bmatrix}
+1 & 2 & 6 & 9 \\
+4 & 2 & 8 & 3 
+\end{bmatrix}</script><p>只有向量才能进行按行列加减，不能是矩阵，否则会报编译错误；</p>
+<p>Array类同理，只能对 <code>ArrayXf</code> 执行这种操作</p>
+<h4 id="乘除（、-、-、-）"><a href="#乘除（、-、-、-）" class="headerlink" title="乘除（、/、\=、/=）"></a>乘除（<em>、/、\</em>=、/=）</h4><p>按行/按列执行系数级乘法除法运算。</p>
+<p><strong>只能用于 Array 类型的对象！！！</strong></p>
+<p>如果想让矩阵第 <code>i</code> 列乘上向量的第 <code>i</code> 个系数，应该写成 <code>mat = mat * v.asDiagonal()</code> </p>
+<h4 id="将广播与其他操作结合"><a href="#将广播与其他操作结合" class="headerlink" title="将广播与其他操作结合"></a>将广播与其他操作结合</h4><p>例：在矩阵 <code>m</code> 中找到与向量 <code>v</code> 距离最近的列向量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="function">Eigen::MatrixXf <span class="title">m</span><span class="params">(<span class="number">2</span>,<span class="number">4</span>)</span></span>;</span><br><span class="line">  	<span class="function">Eigen::VectorXf <span class="title">v</span><span class="params">(<span class="number">2</span>)</span></span>;</span><br><span class="line">  </span><br><span class="line"> 	 m &lt;&lt; <span class="number">1</span>, <span class="number">23</span>, <span class="number">6</span>, <span class="number">9</span>,</span><br><span class="line">          <span class="number">3</span>, <span class="number">11</span>, <span class="number">7</span>, <span class="number">2</span>;</span><br><span class="line">       </span><br><span class="line">  	v &lt;&lt; <span class="number">2</span>,</span><br><span class="line">         <span class="number">3</span>;</span><br><span class="line"> </span><br><span class="line">  	MatrixXf::Index index;</span><br><span class="line">  	<span class="comment">// find nearest neighbour</span></span><br><span class="line">  	(m.<span class="built_in">colwise</span>() - v).<span class="built_in">colwise</span>().<span class="built_in">squaredNorm</span>().<span class="built_in">minCoeff</span>(&amp;index);</span><br><span class="line"> </span><br><span class="line">  	cout &lt;&lt; <span class="string">&quot;Nearest neighbour is column &quot;</span> &lt;&lt; index &lt;&lt; <span class="string">&quot;:&quot;</span> &lt;&lt; endl;</span><br><span class="line">  	cout &lt;&lt; m.<span class="built_in">col</span>(index) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Nearest neighbour is column 0:</span><br><span class="line">1</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Eigen/%E9%AB%98%E7%BA%A7%E5%88%9D%E5%A7%8B%E5%8C%96/" class="post-title-link" itemprop="url">高级初始化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-22 11:03:50" itemprop="dateCreated datePublished" datetime="2021-04-22T11:03:50+08:00">2021-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 15:37:24" itemprop="dateModified" datetime="2021-04-23T15:37:24+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本章介绍矩阵初始化的一些高级方法，包括逗号初始化和一些特殊矩阵（单位矩阵、零矩阵）初始化</p>
+<h3 id="逗号初始化"><a href="#逗号初始化" class="headerlink" title="逗号初始化"></a>逗号初始化</h3><ul>
+<li><p>系数初始化顺序：从左上角开始，按从左到右，从上到下的顺序排列</p>
+</li>
+<li><p>必须预先规定好矩阵/向量/数组的大小，否则会报错</p>
+</li>
+<li><p>初始化列表的元素除了数值外，也可以是向量或矩阵，常用来连接几个向量或矩阵，同样必须预先规定好大小：</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">RowVectorXd <span class="title">vec1</span><span class="params">(<span class="number">3</span>)</span></span>;</span><br><span class="line">	vec1 &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;vec1 = &quot;</span> &lt;&lt; vec1 &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">	<span class="function">RowVectorXd <span class="title">vec2</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br><span class="line">	vec2 &lt;&lt; <span class="number">1</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;vec2 = &quot;</span> &lt;&lt; vec2 &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">	<span class="function">RowVectorXd <span class="title">joined</span><span class="params">(<span class="number">7</span>)</span></span>;</span><br><span class="line">	joined &lt;&lt; vec1, vec2;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;joined = &quot;</span> &lt;&lt; joined &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vec1 = 1 2 3</span><br><span class="line">vec2 =  1  4  9 16</span><br><span class="line">joined =  1  2  3  1  4  9 16</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以用同样的方法按块结构初始化矩阵：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">MatrixXf <span class="title">matA</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line">	matA &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>;</span><br><span class="line">	<span class="function">MatrixXf <span class="title">matB</span><span class="params">(<span class="number">4</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line">	matB &lt;&lt; matA, matA/<span class="number">10</span>, matA/<span class="number">10</span>, matA;</span><br><span class="line">	cout &lt;&lt; matB &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  <span class="number">1</span>   <span class="number">2</span> <span class="number">0.1</span> <span class="number">0.2</span></span><br><span class="line">  <span class="number">3</span>   <span class="number">4</span> <span class="number">0.3</span> <span class="number">0.4</span></span><br><span class="line"><span class="number">0.1</span> <span class="number">0.2</span>   <span class="number">1</span>   <span class="number">2</span></span><br><span class="line"><span class="number">0.3</span> <span class="number">0.4</span>   <span class="number">3</span>   <span class="number">4</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>逗号初始化也可以用来为块表达式赋值：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Matrix3f m;</span><br><span class="line">	m.<span class="built_in">row</span>(<span class="number">0</span>) &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">	m.<span class="built_in">block</span>(<span class="number">1</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">2</span>) &lt;&lt; <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">8</span>;</span><br><span class="line">	m.<span class="built_in">col</span>(<span class="number">2</span>).<span class="built_in">tail</span>(<span class="number">2</span>) &lt;&lt; <span class="number">6</span>, <span class="number">9</span>;                   </span><br><span class="line">	cout &lt;&lt; m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 2 3</span><br><span class="line">4 5 6</span><br><span class="line">7 8 9</span><br></pre></td></tr></table></figure>
+<h3 id="特殊矩阵与数组"><a href="#特殊矩阵与数组" class="headerlink" title="特殊矩阵与数组"></a>特殊矩阵与数组</h3><p>参考手册 <a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__QuickRefPage.html#title3">Quick Reference Guide - Predefined Matrices</a> </p>
+<h4 id="Zero"><a href="#Zero" class="headerlink" title="Zero()"></a>Zero()</h4><p>初始化所有系数为0，共有三种形式：</p>
+<ul>
+<li><code>Zero()</code> : 不接收任何变量，仅用于固定大小的对象；</li>
+<li><code>Zero(size)</code> : 接收一个变量，仅用于一维动态大小的对象；</li>
+<li><code>Zero(rows,cols)</code> : 接收两个变量，仅用于二维动态大小的对象。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A fixed-size array:\n&quot;</span>;</span><br><span class="line">	Array33f a1 = Array33f::<span class="built_in">Zero</span>();</span><br><span class="line">	cout &lt;&lt; a1 &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A one-dimensional dynamic-size array:\n&quot;</span>;</span><br><span class="line">	ArrayXf a2 = ArrayXf::<span class="built_in">Zero</span>(<span class="number">3</span>);</span><br><span class="line">	cout &lt;&lt; a2 &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;A two-dimensional dynamic-size array:\n&quot;</span>;</span><br><span class="line">	ArrayXXf a3 = ArrayXXf::<span class="built_in">Zero</span>(<span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">	cout &lt;&lt; a3 &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">A fixed-size array:</span><br><span class="line">0 0 0</span><br><span class="line">0 0 0</span><br><span class="line">0 0 0</span><br><span class="line"></span><br><span class="line">A one-dimensional dynamic-size array:</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">A two-dimensional dynamic-size array:</span><br><span class="line">0 0 0 0</span><br><span class="line">0 0 0 0</span><br><span class="line">0 0 0 0</span><br></pre></td></tr></table></figure>
+<h4 id="Ones"><a href="#Ones" class="headerlink" title="Ones()"></a>Ones()</h4><p>初始化所有系数为1，三种形式与 <code>Zero()</code> 相同</p>
+<h4 id="Random"><a href="#Random" class="headerlink" title="Random()"></a>Random()</h4><p>初始化所有系数为随机数，三种形式与 <code>Zero()</code> 相同</p>
+<h4 id="Constant-value"><a href="#Constant-value" class="headerlink" title="Constant(value)"></a>Constant(value)</h4><p>初始化所有系数为value，同样三种形式：</p>
+<ul>
+<li><code>Constant(value)</code></li>
+<li><code>Constant(size,value)</code></li>
+<li><code>Constant(rows,cols,value)</code> </li>
+</ul>
+<h4 id="Identity"><a href="#Identity" class="headerlink" title="Identity()"></a>Identity()</h4><p>返回单位矩阵，仅用于 Matrix 类，包括 <code>Identity()</code> 和 <code>Identity(rows,cols)</code> </p>
+<h4 id="LinSpaced-size-low-high"><a href="#LinSpaced-size-low-high" class="headerlink" title="LinSpaced(size, low, high)"></a>LinSpaced(size, low, high)</h4><p>仅用于向量或一维数组，返回一个指定大小的向量，其系数在参数 <code>low</code> 和 <code>high</code> 之间等距分布</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">ArrayXXf <span class="title">table</span><span class="params">(<span class="number">10</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">0</span>) = ArrayXf::<span class="built_in">LinSpaced</span>(<span class="number">10</span>, <span class="number">0</span>, <span class="number">90</span>);</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">1</span>) = M_PI / <span class="number">180</span> * table.<span class="built_in">col</span>(<span class="number">0</span>);</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">2</span>) = table.<span class="built_in">col</span>(<span class="number">1</span>).<span class="built_in">sin</span>();</span><br><span class="line">	table.<span class="built_in">col</span>(<span class="number">3</span>) = table.<span class="built_in">col</span>(<span class="number">1</span>).<span class="built_in">cos</span>();</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;  Degrees   Radians      Sine    Cosine\n&quot;</span>;</span><br><span class="line">	cout &lt;&lt; table &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Degrees   Radians      Sine    Cosine</span><br><span class="line">      0         0         0         1</span><br><span class="line">     10     0.175     0.174     0.985</span><br><span class="line">     20     0.349     0.342      0.94</span><br><span class="line">     30     0.524       0.5     0.866</span><br><span class="line">     40     0.698     0.643     0.766</span><br><span class="line">     50     0.873     0.766     0.643</span><br><span class="line">     60      1.05     0.866       0.5</span><br><span class="line">     70      1.22      0.94     0.342</span><br><span class="line">     80       1.4     0.985     0.174</span><br><span class="line">     90      1.57         1 -4.37e-08</span><br></pre></td></tr></table></figure>
+<p>从这些例子可以看出，上述方法都会返回一个矩阵或数组再赋值给变量（或表达式），方便起见，Eigen还定义了一些函数来方便地执行这些操作，例如 <code>setZero()</code>  <code>MatrixBase::setIdentity()</code>  <code>DenseBase::setLinSpaced()</code> 等。下面这个例程展示了如何使用静态方法、逗号初始化和 <code>setXxx()</code> 函数来初始化矩阵：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> size = <span class="number">6</span>;</span><br><span class="line"><span class="function">MatrixXd <span class="title">mat1</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat1.<span class="built_in">topLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)     = MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">topRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)    = MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">bottomLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>)  = MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">mat1.<span class="built_in">bottomRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>) = MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">std::cout &lt;&lt; mat1 &lt;&lt; std::endl &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line"><span class="function">MatrixXd <span class="title">mat2</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat2.<span class="built_in">topLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setZero</span>();</span><br><span class="line">mat2.<span class="built_in">topRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setIdentity</span>();</span><br><span class="line">mat2.<span class="built_in">bottomLeftCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setIdentity</span>();</span><br><span class="line">mat2.<span class="built_in">bottomRightCorner</span>(size/<span class="number">2</span>, size/<span class="number">2</span>).<span class="built_in">setZero</span>();</span><br><span class="line">std::cout &lt;&lt; mat2 &lt;&lt; std::endl &lt;&lt; std::endl;</span><br><span class="line"> </span><br><span class="line"><span class="function">MatrixXd <span class="title">mat3</span><span class="params">(size, size)</span></span>;</span><br><span class="line">mat3 &lt;&lt; MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>), MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>),</span><br><span class="line">        MatrixXd::<span class="built_in">Identity</span>(size/<span class="number">2</span>, size/<span class="number">2</span>), MatrixXd::<span class="built_in">Zero</span>(size/<span class="number">2</span>, size/<span class="number">2</span>);</span><br><span class="line">std::cout &lt;&lt; mat3 &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br><span class="line"></span><br><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br><span class="line"></span><br><span class="line">0 0 0 1 0 0</span><br><span class="line">0 0 0 0 1 0</span><br><span class="line">0 0 0 0 0 1</span><br><span class="line">1 0 0 0 0 0</span><br><span class="line">0 1 0 0 0 0</span><br><span class="line">0 0 1 0 0 0</span><br></pre></td></tr></table></figure>
+<p>除此之外，Eigen还定义了一些用于生成基向量的方法：</p>
+<ul>
+<li><code>Vector3f::UnitX()</code> : (1, 0, 0)</li>
+<li><code>Vector3f::UnitY()</code> : (0, 1, 0)</li>
+<li><code>Vector3f::UnitZ()</code> : (0, 0, 1)</li>
+<li><code>VectorXf::Unit(size,i)</code> : <ul>
+<li>例如 ：<code>VectorXf::Unit(4,1)</code> == <code>Vector4f(0,1,0,0)</code> == <code>Vector4f::UnitY()</code> </li>
+</ul>
+</li>
+</ul>
+<h3 id="用作临时对象"><a href="#用作临时对象" class="headerlink" title="用作临时对象"></a>用作临时对象</h3><p>无论是逗号初始化程序还是上面介绍的几种类内静态方法，都可以用作表达式中的临时对象。</p>
+<p>逗号初始化程序用作临时对象时，需要调用 <code>finished()</code> 方法获取实际的矩阵对象。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	MatrixXd m = MatrixXd::<span class="built_in">Random</span>(<span class="number">3</span>,<span class="number">3</span>);</span><br><span class="line">    m = (m + MatrixXd::<span class="built_in">Constant</span>(<span class="number">3</span>,<span class="number">3</span>,<span class="number">1.2</span>)) * <span class="number">50</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m =&quot;</span> &lt;&lt; endl &lt;&lt; m &lt;&lt; endl;</span><br><span class="line">    <span class="function">VectorXd <span class="title">v</span><span class="params">(<span class="number">3</span>)</span></span>;</span><br><span class="line">    v &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;m * v =&quot;</span> &lt;&lt; endl &lt;&lt; m * v &lt;&lt; endl;</span><br><span class="line">    MatrixXf mat = MatrixXf::<span class="built_in">Random</span>(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;mat =\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">	mat = (<span class="built_in">MatrixXf</span>(<span class="number">2</span>,<span class="number">2</span>) &lt;&lt; <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>).<span class="built_in">finished</span>() * mat;</span><br><span class="line">	cout &lt;&lt; <span class="string">&quot;mat =\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">m =</span><br><span class="line">  10 55.9 14.7</span><br><span class="line">23.2 63.3 77.9</span><br><span class="line">85.6 31.9 77.9</span><br><span class="line">m * v =</span><br><span class="line">166</span><br><span class="line">383</span><br><span class="line">383</span><br><span class="line">mat =</span><br><span class="line">     -1   0.511  0.0655</span><br><span class="line"> -0.737 -0.0827  -0.562</span><br><span class="line">mat =</span><br><span class="line"> -0.737 -0.0827  -0.562</span><br><span class="line">     -1   0.511  0.0655</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E5%9D%97%E6%93%8D%E4%BD%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -991,177 +1386,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/uncategorized/Policy-Gradient-Supplementary-Explanation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/uncategorized/Policy-Gradient-Supplementary-Explanation/" class="post-title-link" itemprop="url">Policy Gradient (Supplementary Explanation)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-01 02:23:42" itemprop="dateCreated datePublished" datetime="2021-04-01T02:23:42+08:00">2021-04-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/uncategorized/Deep-Reinforcement-Learning/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/uncategorized/Deep-Reinforcement-Learning/" class="post-title-link" itemprop="url">Deep Reinforcement Learning</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-01 02:23:12" itemprop="dateCreated datePublished" datetime="2021-04-01T02:23:12+08:00">2021-04-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/uncategorized/Ensemble/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/uncategorized/Ensemble/" class="post-title-link" itemprop="url">Ensemble</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-01 02:22:56" itemprop="dateCreated datePublished" datetime="2021-04-01T02:22:56+08:00">2021-04-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1233,20 +1457,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

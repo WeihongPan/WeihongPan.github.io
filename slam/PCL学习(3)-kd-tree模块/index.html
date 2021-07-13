@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="kd-tree概念的基本介绍可以参考这篇博客  PCL中的kd-tree库提供了kd-tree数据结构，基于FLANN进行快速最近邻检索。最近邻检索在匹配、特征描述子计算、邻域特征提取中是非常基础的核心操作。 kd-tree模块包括了三个类和两个函数，实现了利用kd-tree数据结构对点云进行高效管理和检索，依赖于 pcl_common 模块。 kd-tree模块中的类三个类的继承关系如图： -k">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PCL学习(3):kd-tree模块">
+<meta property="og:url" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="kd-tree概念的基本介绍可以参考这篇博客  PCL中的kd-tree库提供了kd-tree数据结构，基于FLANN进行快速最近邻检索。最近邻检索在匹配、特征描述子计算、邻域特征提取中是非常基础的核心操作。 kd-tree模块包括了三个类和两个函数，实现了利用kd-tree数据结构对点云进行高效管理和检索，依赖于 pcl_common 模块。 kd-tree模块中的类三个类的继承关系如图： -k">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3">
+<meta property="article:published_time" content="2021-07-13T03:26:20.000Z">
+<meta property="article:modified_time" content="2021-07-13T08:33:36.581Z">
+<meta property="article:author" content="潘薇鸿">
+<meta property="article:tag" content="PCL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3">
+
+<link rel="canonical" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>PCL学习(3):kd-tree模块 | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/WeihongPan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PCL学习(3):kd-tree模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-07-13 11:26:20 / 修改时间：16:33:36" itemprop="dateCreated datePublished" datetime="2021-07-13T11:26:20+08:00">2021-07-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>kd-tree概念的基本介绍可以参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/silangquan/article/details/41483689">这篇博客</a> </p>
+<p>PCL中的kd-tree库提供了kd-tree数据结构，基于FLANN进行<strong>快速最近邻检索</strong>。最近邻检索在<strong>匹配</strong>、<strong>特征描述子计算</strong>、<strong>邻域特征提取</strong>中是非常基础的核心操作。</p>
+<p>kd-tree模块包括了三个类和两个函数，实现了利用kd-tree数据结构对点云进行高效管理和检索，依赖于 <code>pcl_common</code> 模块。</p>
+<h4 id="kd-tree模块中的类"><a href="#kd-tree模块中的类" class="headerlink" title="kd-tree模块中的类"></a>kd-tree模块中的类</h4><p>三个类的继承关系如图：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3" alt="1626155630734">-kd-tree模块/1626155630734.png)</p>
+<p><a target="_blank" rel="noopener" href="https://pointclouds.org/documentation/classpcl_1_1_kd_tree.html"><code>pcl::KdTree&lt;PointT&gt;</code></a> </p>
+<p>KdTree类实现了kd-tree的数据结构，关键成员函数如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">KdTree</span>(<span class="keyword">bool</span> sorted=<span class="literal">true</span>); <span class="comment">// 空的构造函数</span></span><br><span class="line"><span class="keyword">virtual</span> ~<span class="built_in">KdTree</span>(); 		  <span class="comment">// 析构函数</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="title">setInputCloud</span> <span class="params">(   </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> PointCloud::ConstPtr &amp;cloud, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> shared_ptr&lt;<span class="keyword">const</span> Indices&gt; &amp;indices=shared_ptr&lt;<span class="keyword">const</span> Indices&gt;())</span></span>;</span><br><span class="line"><span class="comment">// 设置输入点云，indices为点云在kd-tree中使用的点对应的索引，不设置则默认使用整个点云填充kd-tree</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setEpsilon</span><span class="params">(<span class="keyword">float</span> eps)</span></span>; <span class="comment">// 设置误差限</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setMinPts</span><span class="params">(<span class="keyword">int</span> min_pts)</span></span>; <span class="comment">// 设置k近邻搜索中可行结果的最小数目</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>virtual int nearestKSearch</code> </li>
+</ul>
+<p>纯虚函数，共有三种形式，具体实现在子类 <code>KdTreeFLANN</code> 中，用来进行K邻域搜索。</p>
+<p>（1）根据提供的点云和待查询点的索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointCloud &amp; 	 cloud,</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] <strong>cloud</strong>：点云数据</p>
+<p>[input] <strong>index</strong>：所查询点的索引（必须是有效的索引，该函数不会对有效性进行检查）</p>
+<p>[input] <strong>k</strong>：K邻域个数</p>
+<p>[output] <strong>k_indices</strong>：搜索完的邻域点对应的索引</p>
+<p>[output] <strong>k_sqr_distances</strong>：搜索完的每个邻域点与查询点之间的欧氏距离</p>
+<p>返回找到的邻域点个数</p>
+<p>（2）根据提供的待查询点进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointT &amp; 	 	 p_q,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] <strong>p_q</strong>：待查询点</p>
+<p>其他与上同</p>
+<p>（3）根据提供的待查询点索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>virtual int radiusSearch</code> </li>
+</ul>
+<p>纯虚函数，类似<code>nearestKSearch</code>，共有三种形式，具体实现在子类 <code>KdTreeFLANN</code> 中，用来进行r半径内的邻域搜索。</p>
+<p>（1）根据提供的点云和待查询点的索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointCloud &amp; 	 cloud,</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] radius：搜索半径</p>
+<p>[input] max_nn：设置返回的邻域点个数商店，若为0或大于返回邻域点个数，则返回全部搜索结果</p>
+<p>其他与上同，返回半径内搜索到的邻域点个数</p>
+<p>（2）根据提供的待查询点进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointT &amp; 	 	 p_q,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>（3）根据提供的待查询点索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	    </span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://pointclouds.org/documentation/classpcl_1_1_kd_tree_f_l_a_n_n.html">pcl::KdTreeFLANN<PointT, dist></PointT,></a> </p>
+<p>基本与上无差别，具体参见官方手册</p>
+<h4 id="ke-tree-模块中的全局函数"><a href="#ke-tree-模块中的全局函数" class="headerlink" title="ke-tree 模块中的全局函数"></a>ke-tree 模块中的全局函数</h4><p><code>void pcl::getApproximateIndices</code> </p>
+<p>获取参考点云中查询点云的近似索引向量（两个点云的坐标类型可以不同）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> PointT&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::getApproximateIndices</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">const</span> <span class="keyword">typename</span> pcl::PointCloud&lt;Point1T&gt;::ConstPtr &amp; cloud_in,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> <span class="keyword">typename</span> pcl::PointCloud&lt;Point2T&gt;::ConstPtr &amp; cloud_ref,</span></span></span><br><span class="line"><span class="params"><span class="function">    Indices &amp; 											indices</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span></span><br></pre></td></tr></table></figure>
+<p>[input] cloud_in：待查询点云的引用</p>
+<p>[input] cloud_ref：参考点云的引用</p>
+<p>[output] indices：返回查询结果在参考点云中的索引向量</p>
+<p><a target="_blank" rel="noopener" href="https://pcl.readthedocs.io/projects/tutorials/en/latest/kdtree_search.html#kdtree-search">代码示例</a> </p>
+<p>运行输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3" alt="1626165206589">-kd-tree模块/1626165206589.png)</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PCL/" rel="tag"># PCL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" rel="prev" title="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
+      <i class="fa fa-chevron-left"></i> PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/uncategorized/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/" rel="next" title="PCL学习(4)-octree模块">
+      PCL学习(4)-octree模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#kd-tree%E6%A8%A1%E5%9D%97%E4%B8%AD%E7%9A%84%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">kd-tree模块中的类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ke-tree-%E6%A8%A1%E5%9D%97%E4%B8%AD%E7%9A%84%E5%85%A8%E5%B1%80%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">ke-tree 模块中的全局函数</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

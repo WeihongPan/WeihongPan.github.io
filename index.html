@@ -165,7 +165,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/uncategorized/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -179,7 +179,64 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" class="post-title-link" itemprop="url">Ubuntu16.04无权限断网从源码安装PCL</a>
+            <a href="/uncategorized/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">PCL学习(4)-octree模块</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-13 16:35:55" itemprop="dateCreated datePublished" datetime="2021-07-13T16:35:55+08:00">2021-07-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">PCL学习(3):kd-tree模块</a>
         </h2>
 
         <div class="post-meta">
@@ -190,7 +247,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-07-12 00:08:00 / 修改时间：11:16:06" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+              <time title="创建时间：2021-07-13 11:26:20 / 修改时间：16:33:36" itemprop="dateCreated datePublished" datetime="2021-07-13T11:26:20+08:00">2021-07-13</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -198,7 +255,130 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/PCL/" itemprop="url" rel="index"><span itemprop="name">PCL</span></a>
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>kd-tree概念的基本介绍可以参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/silangquan/article/details/41483689">这篇博客</a> </p>
+<p>PCL中的kd-tree库提供了kd-tree数据结构，基于FLANN进行<strong>快速最近邻检索</strong>。最近邻检索在<strong>匹配</strong>、<strong>特征描述子计算</strong>、<strong>邻域特征提取</strong>中是非常基础的核心操作。</p>
+<p>kd-tree模块包括了三个类和两个函数，实现了利用kd-tree数据结构对点云进行高效管理和检索，依赖于 <code>pcl_common</code> 模块。</p>
+<h4 id="kd-tree模块中的类"><a href="#kd-tree模块中的类" class="headerlink" title="kd-tree模块中的类"></a>kd-tree模块中的类</h4><p>三个类的继承关系如图：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3" alt="1626155630734">-kd-tree模块/1626155630734.png)</p>
+<p><a target="_blank" rel="noopener" href="https://pointclouds.org/documentation/classpcl_1_1_kd_tree.html"><code>pcl::KdTree&lt;PointT&gt;</code></a> </p>
+<p>KdTree类实现了kd-tree的数据结构，关键成员函数如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">KdTree</span>(<span class="keyword">bool</span> sorted=<span class="literal">true</span>); <span class="comment">// 空的构造函数</span></span><br><span class="line"><span class="keyword">virtual</span> ~<span class="built_in">KdTree</span>(); 		  <span class="comment">// 析构函数</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="title">setInputCloud</span> <span class="params">(   </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> PointCloud::ConstPtr &amp;cloud, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> shared_ptr&lt;<span class="keyword">const</span> Indices&gt; &amp;indices=shared_ptr&lt;<span class="keyword">const</span> Indices&gt;())</span></span>;</span><br><span class="line"><span class="comment">// 设置输入点云，indices为点云在kd-tree中使用的点对应的索引，不设置则默认使用整个点云填充kd-tree</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setEpsilon</span><span class="params">(<span class="keyword">float</span> eps)</span></span>; <span class="comment">// 设置误差限</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setMinPts</span><span class="params">(<span class="keyword">int</span> min_pts)</span></span>; <span class="comment">// 设置k近邻搜索中可行结果的最小数目</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>virtual int nearestKSearch</code> </li>
+</ul>
+<p>纯虚函数，共有三种形式，具体实现在子类 <code>KdTreeFLANN</code> 中，用来进行K邻域搜索。</p>
+<p>（1）根据提供的点云和待查询点的索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointCloud &amp; 	 cloud,</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] <strong>cloud</strong>：点云数据</p>
+<p>[input] <strong>index</strong>：所查询点的索引（必须是有效的索引，该函数不会对有效性进行检查）</p>
+<p>[input] <strong>k</strong>：K邻域个数</p>
+<p>[output] <strong>k_indices</strong>：搜索完的邻域点对应的索引</p>
+<p>[output] <strong>k_sqr_distances</strong>：搜索完的每个邻域点与查询点之间的欧氏距离</p>
+<p>返回找到的邻域点个数</p>
+<p>（2）根据提供的待查询点进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointT &amp; 	 	 p_q,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] <strong>p_q</strong>：待查询点</p>
+<p>其他与上同</p>
+<p>（3）根据提供的待查询点索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">nearestKSearch</span>(	</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> 		 k,</span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances </span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>virtual int radiusSearch</code> </li>
+</ul>
+<p>纯虚函数，类似<code>nearestKSearch</code>，共有三种形式，具体实现在子类 <code>KdTreeFLANN</code> 中，用来进行r半径内的邻域搜索。</p>
+<p>（1）根据提供的点云和待查询点的索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointCloud &amp; 	 cloud,</span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>[input] radius：搜索半径</p>
+<p>[input] max_nn：设置返回的邻域点个数商店，若为0或大于返回邻域点个数，则返回全部搜索结果</p>
+<p>其他与上同，返回半径内搜索到的邻域点个数</p>
+<p>（2）根据提供的待查询点进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	</span><br><span class="line">    <span class="keyword">const</span> PointT &amp; 	 	 p_q,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>（3）根据提供的待查询点索引进行搜索</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="keyword">int</span> pcl::KdTree&lt; PointT &gt;::<span class="built_in">radiusSearch</span>(	    </span><br><span class="line">    <span class="keyword">int</span>   				 index,</span><br><span class="line">    <span class="keyword">double</span> 				 radius,    </span><br><span class="line">    Indices &amp;			 k_indices,</span><br><span class="line">    std::vector&lt;<span class="keyword">float</span>&gt; &amp; k_sqr_distances,</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>		 max_nn = <span class="number">0</span></span><br><span class="line">)<span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://pointclouds.org/documentation/classpcl_1_1_kd_tree_f_l_a_n_n.html">pcl::KdTreeFLANN<PointT, dist></PointT,></a> </p>
+<p>基本与上无差别，具体参见官方手册</p>
+<h4 id="ke-tree-模块中的全局函数"><a href="#ke-tree-模块中的全局函数" class="headerlink" title="ke-tree 模块中的全局函数"></a>ke-tree 模块中的全局函数</h4><p><code>void pcl::getApproximateIndices</code> </p>
+<p>获取参考点云中查询点云的近似索引向量（两个点云的坐标类型可以不同）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> PointT&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::getApproximateIndices</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">const</span> <span class="keyword">typename</span> pcl::PointCloud&lt;Point1T&gt;::ConstPtr &amp; cloud_in,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> <span class="keyword">typename</span> pcl::PointCloud&lt;Point2T&gt;::ConstPtr &amp; cloud_ref,</span></span></span><br><span class="line"><span class="params"><span class="function">    Indices &amp; 											indices</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span></span><br></pre></td></tr></table></figure>
+<p>[input] cloud_in：待查询点云的引用</p>
+<p>[input] cloud_ref：参考点云的引用</p>
+<p>[output] indices：返回查询结果在参考点云中的索引向量</p>
+<p><a target="_blank" rel="noopener" href="https://pcl.readthedocs.io/projects/tutorials/en/latest/kdtree_search.html#kdtree-search">代码示例</a> </p>
+<p>运行输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/PCL学习(3" alt="1626165206589">-kd-tree模块/1626165206589.png)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" class="post-title-link" itemprop="url">PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-13 09:48:02" itemprop="dateModified" datetime="2021-07-13T09:48:02+08:00">2021-07-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
                 </span>
             </span>
 
@@ -227,11 +407,11 @@
 <p>这样子PCL就安装完成啦！</p>
 <h4 id="完全源码安装（包括各类依赖库）"><a href="#完全源码安装（包括各类依赖库）" class="headerlink" title="完全源码安装（包括各类依赖库）"></a>完全源码安装（包括各类依赖库）</h4><p>因为没有root权限，所以apt-get是用不了了，服务器没连网，所以git/wget也用不了，所有依赖库需要从 <a target="_blank" rel="noopener" href="https://packages.ubuntu.com/">Ubuntu Package</a> 网站上下载对应源码包，用ftp传到服务器上进行源码安装。比较麻烦，就只安装了必需的四个库。</p>
 <p>需要注意的是，在编译安装前需要根据 Ubuntu Package 提供的依赖库进行检查，例如 libxt-dev 的依赖库有以下：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png" alt="1626051064861"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png" alt="1626051064861"></p>
 <p>使用 <code>dpkg -s 库名称</code> 检查服务器上是否已经安装过需要的依赖库，如果没有，就需要自己一个一个手动下载编译安装。如果嫌一个个检查麻烦的话，也可以直接安装四个依赖库，根据报错去补依赖库（没错就是我）。以openmpi为例介绍如何将依赖库安装到非root用户目录下。</p>
 <p>首先开一个新的文件夹存放下载的源码文件（例如我的：<code>~/Download</code>），再开一个文件夹仿照 <code>/usr</code> 存放安装的各种头文件、链接库等等文件（例如我的：<code>~/Software</code>）。</p>
 <p>主机下载完openmpi源码后ftp上传到服务器，会发现这一类源代码没有熟悉的CMakeLists而是直接的Makefile。</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png" alt="1626052217765"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png" alt="1626052217765"></p>
 <p>根据我们之前设置的安装路径进行config：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prerfix=/home/panweihong/Software</span><br></pre></td></tr></table></figure>
 <p>这里的prefix就是将来这个库会被安装在哪个目录底下，默认是 <code>/usr</code> ，显然我们没有操作 <code>/usr</code> 目录的权限，所以需要把它改成我们自己的安装目录，并且需要特别注意的是，这里写的必须是绝对路径，像 <code>~/Software</code> 这样子是不行的。</p>
@@ -251,7 +431,7 @@
 <p>各路径由 <code>:</code> 隔开，设置好后退出 <code>~/.bashrc</code> 并 <code>source ~/.bashrc</code> 后，在终端执行 <code>echo $某个变量名</code> 检查是否生效。</p>
 <p>另外一个小问题，因为每次 <code>source ~/.bashrc</code> 后文件中的 <code>export</code> 语句都会被执行一次，导致路径中有很多重复值，我的解决方法比较笨。就是在第一次export自己的路径前先echo一下这个变量原来的默认值，然后直接复制到原来 <code>$变量</code> 的位置，这样就不会因为重复export重复引用路径导致出现很多重复值了，这么做的原因是每次source的时候都会在第一个export给这个变量重新赋值，之后再有export就不会重复之前的值了，所以，后面再次export这个变量就和之前一样写 <code>$变量明</code> 就行了。</p>
 <h5 id="Boost"><a href="#Boost" class="headerlink" title="Boost"></a>Boost</h5><p>本来boost库服务器上已经安装好了，我之所以重新安装，是因为最后编译PCL库的时候报了这个错：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png" alt="1626054896351"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png" alt="1626054896351"></p>
 <p>这两个库其实都是有的，用 <code>locate</code> 命令都能找得到，但就是多了个后缀：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/x86_64-linux-gnu/libboost_system.so.1.65.1</span><br><span class="line">/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.65.1</span><br></pre></td></tr></table></figure>
 <p>本来是一个建立软链接就能解决的小事：</p>
@@ -264,7 +444,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=你的安装路径 ..</span><br><span class="line">make install -j8</span><br></pre></td></tr></table></figure>
 <h5 id="FLANN"><a href="#FLANN" class="headerlink" title="FLANN"></a>FLANN</h5><p>同样先下载 <a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/releases">FLANN源码</a> ，在解压文件夹下执行与Eigen3安装相同的操作。</p>
 <p>我遇到了一个非常神奇的问题，在用 3.15版本的cmake编译时，出现了这样的错误：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png" alt="1626054570126"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png" alt="1626054570126"></p>
 <p>参考<a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/issues/369">这个解决方法</a> ，我重装了一个 3.10版本的cmake（从<a target="_blank" rel="noopener" href="https://cmake.org/files">这里</a>下源码，tar.gz文件不用安装，解压后直接添加环境变量就能用），再次编译就没有这个问题了（震惊.jpg）</p>
 <h5 id="VTK"><a href="#VTK" class="headerlink" title="VTK"></a>VTK</h5><p>这是折腾了我最久的依赖库Orz</p>
 <p>首先下载需要的源码文件：<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz">VTK-8.2.0.tar.gz</a>和<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTKData-8.2.0.tar.gz">VTKData-8.2.0.tar.gz</a>，将VTKData解压到VTK文件下，执行与Eigen3安装类似的操作。</p>
@@ -294,8 +474,142 @@
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;/home/panweihong/Software/include/pcl-1.9&quot;</span>, </span><br><span class="line"><span class="string">&quot;/home/panweihong/Software/include/eigen3&quot;</span></span><br></pre></td></tr></table></figure>
 <p>执行 <code>./pcd_write_test</code> 输出：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Saved 5 data points to test_pcd.pcd</span><br><span class="line">   0.352222 -0.151883 -0.106395</span><br><span class="line">   -0.397406 -0.473106 0.292602</span><br><span class="line">   -0.731898 0.667105 0.441304</span><br><span class="line">   -0.734766 0.854581 -0.0361733</span><br><span class="line">   -0.4607 -0.277468 -0.916762</span><br></pre></td></tr></table></figure>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
 <p>成功输出就说明安装成功了！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">PCL学习(2):IO模块</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-13 09:55:59" itemprop="dateModified" datetime="2021-07-13T09:55:59+08:00">2021-07-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="OpenNI开源框架"><a href="#OpenNI开源框架" class="headerlink" title="OpenNI开源框架"></a>OpenNI开源框架</h4><p>OpenNI是一个多语言、跨平台的框架，主要目的是形成标准的、用于&lt;视音频传感器&gt;和&lt;视音频感知中间件&gt;间通信的API，兼容设备包括Primesense Reference Design、Microsoft Kinect 和 Asus XtionPro三种摄像头设备</p>
+<h4 id="I-O模块"><a href="#I-O模块" class="headerlink" title="I/O模块"></a>I/O模块</h4><p>包括有21个类和28个函数，实现对点云的获取、读入、存储等操作，既可通过点云文件进行输入输出，也可以通过封装借口直接从兼容设备获取源数据（包括RGB图像、深度图像和红外图像）。依赖 <code>pcl_common</code> 和 <code>pcl_octree</code> 及 OpenNI 外部开发包。</p>
+<h4 id="PCD（点云数据）文件格式"><a href="#PCD（点云数据）文件格式" class="headerlink" title="PCD（点云数据）文件格式"></a>PCD（点云数据）文件格式</h4><h5 id="文件头格式"><a href="#文件头格式" class="headerlink" title="文件头格式"></a>文件头格式</h5><p>每个PCD文件都有一个文件头用来声明文件中存储的点云数据的各项特性，文件头必须用ASCII码编码，从0.7版本开始文件头<strong>按顺序</strong>包含以下字段，各字段之间用换行隔开：</p>
+<ul>
+<li><p>VERSION：指定PCD文件版本</p>
+</li>
+<li><p>FIELDS：指定一个点可以有的每个维度和字段的名字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FIELDS x y z							# XYZ 坐标数据</span><br><span class="line">FIELDS x y z rgb						# XYZ + 颜色数据</span><br><span class="line">FIELDS x y z normal_x normal_y normal_z # XYZ + 表面法向量</span><br><span class="line">FIELDS j1 j2 j3							# moment invariants</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>SIZE：用字节数指定每个维度的大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">unsigned char / char -&gt; 1 byte</span><br><span class="line">unsigned short / short -&gt; 2 bytes</span><br><span class="line">unsigned int / int / float -&gt; 4 bytes</span><br><span class="line">double -&gt; 8 bytes</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>TYPE：用一个字符指定每个维度的类型</p>
+<ul>
+<li><code>I</code> ：表示有符号类型</li>
+<li><code>U</code> ：表示无符号类型</li>
+<li><code>F</code> ：表示浮点类型</li>
+</ul>
+</li>
+<li><p>COUNT：指定每个维度包含的元素数目（实际上是在给每个点引入n维直方图描述符的方法）默认情况下所有维度数目为1</p>
+</li>
+<li><p>WIDTH：用点的数量表示点云数据集的宽度</p>
+<ul>
+<li>无序数据集：表示点云中点的总数</li>
+<li>有序数据集：表示点云数据集的宽度（一行中点的个数）</li>
+</ul>
+</li>
+<li><p>HEIGHT：用点的数量表示点云数据集的高度（用来检查一个点云数据集是否有序）</p>
+<ul>
+<li>无序数据集：固定为1</li>
+<li>有序数据集：表示点云数据集的高度（行的总数）</li>
+</ul>
+</li>
+<li><p>VIEWPOINT：指定数据集中点云的获取视点，视点信息被指定为 <code>平移（tx ty tz)</code> + <code>四元数（qw qx qy qz）</code>，默认值为 <code>VIEWPOINT 0 0 0 1 0 0 0</code></p>
+</li>
+<li><p>POINTS：指定点云中点的总数</p>
+</li>
+<li><p>DATA：指定存储点云数据的数据类型，包括ASCII码和二进制两种。DATA的下一个字节开始就被视为点云的数据部分</p>
+</li>
+<li><p>举例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># .PCD v.7 - Point CLoud Data file format</span><br><span class="line">VERSION .7</span><br><span class="line">FIELDS x y z rgb</span><br><span class="line">SIZE 4 4 4 4</span><br><span class="line">TYPE F F F F</span><br><span class="line">COUNT 1 1 1 1</span><br><span class="line">WDTH 213</span><br><span class="line">HEIGHT 1</span><br><span class="line">VIEWPOINT 0 0 0 1 0 0 0</span><br><span class="line">POINTS 213</span><br><span class="line">DATA ascii</span><br><span class="line">0.93773 0.33763 0 4.2108e+06</span><br><span class="line">0.90805 0.35641 0 4.2108e+06</span><br></pre></td></tr></table></figure>
+<p>这是一个0.7版本的PCD文件，每个点都有一个三维坐标数据和一个rgb颜色数据，四个维度均以浮点4字节存储（即float类型变量）。点云数据集无序，共213个点，默认视角，数据以ASCII码格式存储。</p>
+</li>
+</ul>
+<h4 id="IO常用操作"><a href="#IO常用操作" class="headerlink" title="IO常用操作"></a>IO常用操作</h4><h5 id="PCD文件读取"><a href="#PCD文件读取" class="headerlink" title="PCD文件读取"></a>PCD文件读取</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> pcl::io::loadPCDFile&lt;PointT&gt; (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
+<p>返回-1表示读取失败</p>
+<h5 id="PCD文件写入"><a href="#PCD文件写入" class="headerlink" title="PCD文件写入"></a>PCD文件写入</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>	pcl::io::<span class="built_in">savePCDFileASCII</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br><span class="line"><span class="keyword">int</span> pcl::io::<span class="built_in">savePCDFileBinary</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
+<h5 id="连接两个点云"><a href="#连接两个点云" class="headerlink" title="连接两个点云"></a>连接两个点云</h5><ul>
+<li><p><strong>点连接</strong>：即将两个格式相同（包括字段类型和维度都要相同）的点云中的点合并。&lt;增加点数&gt;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cloud_c = cloud_a;</span><br><span class="line">cloud_c += cloud_b;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626140895249">-IO模块/1626140895249.png)</p>
+</li>
+<li><p><strong>域（字段）连接</strong>：例如点云A为N个点的XYZ点（pcl::PointXYZ），点云B为N个点的法向量（pcl::Normal），那么将两个点云进行字段连接得到的点云C则为N个点的pcl::PointNormal类型。&lt;增加维度&gt;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::concatenateFields</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn1T&gt; &amp;cloud1_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn2T&gt; &amp;cloud2_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    pcl::PointCloud&lt;PointOutT&gt; &amp;cloud_out)</span></span></span><br></pre></td></tr></table></figure>
+<p>例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pcl::<span class="built_in">concatenateFields</span>(cloud_a, n_cloud_b, p_n_cloud_c);</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626141295700">-IO模块/1626141295700.png)</p>
+</li>
+</ul>
 
       
     </div>
@@ -1580,331 +1894,10 @@ A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E6%B7%B7%E5%8F%A0%E9%97%AE%E9%A2%98-Aliasing/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Eigen/%E6%B7%B7%E5%8F%A0%E9%97%AE%E9%A2%98-Aliasing/" class="post-title-link" itemprop="url">混叠问题(Aliasing)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-05-24 08:25:49 / 修改时间：21:47:10" itemprop="dateCreated datePublished" datetime="2021-05-24T08:25:49+08:00">2021-05-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>混叠问题指的是在进行赋值操作的时候，赋值表达式的两边存在重叠的矩阵区域，例如 <code>mat = 2*mat;</code> 或 <code>mat = mat.transpose();</code> 。前一个表达式中的混叠问题不会对结果产生影响，但后一个表达式中的混叠问题会导致不可预料的结果。本节将解释什么是混叠问题，何时有害，如何处理。</p>
-<h4 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MatrixXi <span class="title">mat</span><span class="params">(<span class="number">3</span>,<span class="number">3</span>)</span></span>;</span><br><span class="line">mat &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;mat:\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">mat.<span class="built_in">bottomRightCorner</span>(<span class="number">2</span>,<span class="number">2</span>) = mat.<span class="built_in">topLeftCorner</span>(<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;After the assignment:\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mat:</span><br><span class="line">1 2 3</span><br><span class="line">4 5 6</span><br><span class="line">7 8 9</span><br><span class="line">After the assignment: </span><br><span class="line">1 2 3</span><br><span class="line">4 1 2</span><br><span class="line">7 4 1</span><br></pre></td></tr></table></figure>
-<p>可见，输出并不像我们所期望的一样将左上角的 $2\times2$ 子矩阵赋值给右下角的 $2\times2$ 子矩阵，这种情况正是由混叠问题引起的，赋值表达式的两端存在重叠的矩阵区域，即 $mat(1,1)$ 。之所以会造成这个问题，是因为Eigen中的赋值操作采用了<strong>延迟计算</strong>（也称惰性计算，Lazy Evaluation），即赋值运算并不会马上执行，而是在用到该变量时才进行计算，上述赋值运算等价于如下过程：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mat</span>(<span class="number">1</span>,<span class="number">1</span>) = <span class="built_in">mat</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line"><span class="built_in">mat</span>(<span class="number">1</span>,<span class="number">2</span>) = <span class="built_in">mat</span>(<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line"><span class="built_in">mat</span>(<span class="number">2</span>,<span class="number">1</span>) = <span class="built_in">mat</span>(<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line"><span class="built_in">mat</span>(<span class="number">2</span>,<span class="number">2</span>) = <span class="built_in">mat</span>(<span class="number">1</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-<p>所以，在为 <code>mat(2,2)</code> 赋值时，<code>mat(1,1)</code> 已经不再是旧的值，而已经被赋上了新的值。</p>
-<p>尝试进行矩阵压缩的时候很容易出现混叠问题，例如 <code>vec = vec.head(n);</code> 或 <code>mat = mat.block(i,j,row,col);</code> 等。</p>
-<p>通常情况下，混叠问题在编译过程中是不会被识别出来的，但运行时会以异常信息 (run-time assertion) 做出提示，可以使用 <code>EIGEN_NO_DEBUG</code> 退出debug模式关闭异常提示，但最好不要。</p>
-<h4 id="如何解决混叠问题"><a href="#如何解决混叠问题" class="headerlink" title="如何解决混叠问题"></a>如何解决混叠问题</h4><p>显然，最简单的解决方法就是把右侧的计算结果赋给一个临时变量，计算结束后再将这个临时变量赋值给左侧的变量，Eigen中使用 <code>eval()</code> 函数实现。用 <code>eval()</code> 纠正上例中出现的问题：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MatrixXi <span class="title">mat</span><span class="params">(<span class="number">3</span>,<span class="number">3</span>)</span></span>;</span><br><span class="line">mat &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;mat:\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">mat.<span class="built_in">bottomRightCorner</span>(<span class="number">2</span>,<span class="number">2</span>) = mat.<span class="built_in">topLeftCorner</span>(<span class="number">2</span>,<span class="number">2</span>).<span class="built_in">eval</span>();</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;After the assignment:\n&quot;</span> &lt;&lt; mat &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mat:</span><br><span class="line">1 2 3</span><br><span class="line">4 5 6</span><br><span class="line">7 8 9</span><br><span class="line">After the assignment: </span><br><span class="line">1 2 3</span><br><span class="line">4 1 2</span><br><span class="line">7 4 5</span><br></pre></td></tr></table></figure>
-<p>又例如对矩阵作转置时，直接使用 <code>a = a.transpose();</code> 会导致混叠问题：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Matrix2i a; a &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Matrix a:\n&quot;</span> &lt;&lt; a &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">a = a.<span class="built_in">transpose</span>(); <span class="comment">// !!! do NOT do this !!!</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Transposed a:\n&quot;</span> &lt;&lt; a &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Matrix a:</span><br><span class="line">1 2</span><br><span class="line">3 4</span><br><span class="line">Transposed a:</span><br><span class="line">1 2</span><br><span class="line">2 4</span><br></pre></td></tr></table></figure>
-<p>与上面相同的解决方法，即使用 <code>a = a.transpose().eval()</code> 代替。此外，Eigen提供了一种专门针对这种情况的特殊函数 <code>transposeInPlace()</code> 以实现将当前矩阵替换为其转置矩阵：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MatrixXf <span class="title">a</span><span class="params">(<span class="number">2</span>,<span class="number">3</span>)</span></span>; a &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Here is the initial matrix a:\n&quot;</span> &lt;&lt; a &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">a.<span class="built_in">transposeInPlace</span>();</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;and after being transposed:\n&quot;</span> &lt;&lt; a &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Here is the initial matrix a:</span><br><span class="line">1 2 3</span><br><span class="line">4 5 6</span><br><span class="line">and after being transposed:</span><br><span class="line">1 4</span><br><span class="line">2 5</span><br><span class="line">3 6</span><br></pre></td></tr></table></figure>
-<p>类似的原地处理函数还有：</p>
-<ul>
-<li><code>MatrixBase::adjoint()</code> &lt;-&gt; <code>MatrixBase::adjointInPlace()</code></li>
-<li><code>DenseBase::reverse()</code> &lt;-&gt; <code>DenseBase::reverseInPlace()</code></li>
-<li><code>LDLT::solve()</code> &lt;-&gt; <code>LDLT::solveInPlace()</code></li>
-<li><code>LLT::solve()</code> &lt;-&gt; <code>LLT::solveInPlace()</code></li>
-<li><code>TriangularView::solve()</code> &lt;-&gt; <code>TriangularView::solveInPlace()</code></li>
-<li><code>DenseBase::transpose()</code> &lt;-&gt; <code>DenseBase::transposeInPlace()</code></li>
-</ul>
-<p>针对矩阵/向量压缩处理（取几行几列/取前几个元素），例如 <code>vec = vec.head(n)</code> ，可以使用 <code>conservativeResize()</code> 实现原地处理。</p>
-<h4 id="混叠问题与元素级操作"><a href="#混叠问题与元素级操作" class="headerlink" title="混叠问题与元素级操作"></a>混叠问题与元素级操作</h4><p>在元素级操作中，尽管赋值表达式两边也有可能出现同一个矩阵（例如矩阵加法，数组乘法，标量乘法等），但不会对结果产生影响，即元素级操作中的混叠是安全的，因此也就不需要 <code>eval()</code> ：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MatrixXf <span class="title">mat</span><span class="params">(<span class="number">2</span>,<span class="number">2</span>)</span></span>; </span><br><span class="line">mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>,  <span class="number">4</span>, <span class="number">7</span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Here is the matrix mat:\n&quot;</span> &lt;&lt; mat &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line">mat = <span class="number">2</span> * mat;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;After &#x27;mat = 2 * mat&#x27;, mat = \n&quot;</span> &lt;&lt; mat &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">mat = mat - MatrixXf::<span class="built_in">Identity</span>(<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;After the subtraction, it becomes\n&quot;</span> &lt;&lt; mat &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">ArrayXXf arr = mat;</span><br><span class="line">arr = arr.<span class="built_in">square</span>();</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;After squaring, it becomes\n&quot;</span> &lt;&lt; arr &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Combining all operations in one statement:</span></span><br><span class="line">mat &lt;&lt; <span class="number">1</span>, <span class="number">2</span>,  <span class="number">4</span>, <span class="number">7</span>;</span><br><span class="line">mat = (<span class="number">2</span> * mat - MatrixXf::<span class="built_in">Identity</span>(<span class="number">2</span>,<span class="number">2</span>)).<span class="built_in">array</span>().<span class="built_in">square</span>();</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Doing everything at once yields\n&quot;</span> &lt;&lt; mat &lt;&lt; endl &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix mat:</span><br><span class="line">1 2</span><br><span class="line">4 7</span><br><span class="line"></span><br><span class="line">After <span class="string">&#x27;mat = 2 * mat&#x27;</span>, mat = </span><br><span class="line"> 2  4</span><br><span class="line"> 8 14</span><br><span class="line"></span><br><span class="line">After the subtraction, it becomes</span><br><span class="line"> 1  4</span><br><span class="line"> 8 13</span><br><span class="line"></span><br><span class="line">After squaring, it becomes</span><br><span class="line">  1  16</span><br><span class="line"> 64 169</span><br><span class="line"></span><br><span class="line">Doing everything at once yields</span><br><span class="line">  1  16</span><br><span class="line"> 64 169</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p><strong>总而言之，当表达式右侧的 <code>(i,j)</code> 元素仅仅依赖于表达式左侧对应的 <code>(i,j)</code> 元素时，赋值操作是安全的，也就不再需要多余的 <code>eval()</code> 操作。</strong></p>
-<h4 id="混叠问题与矩阵乘法"><a href="#混叠问题与矩阵乘法" class="headerlink" title="混叠问题与矩阵乘法"></a>混叠问题与矩阵乘法</h4><p>在目标矩阵未调整大小的情况下，矩阵乘法是Eigen中唯一默认进行混叠处理的操作。换言之，若矩阵 <code>matA</code> 为平方型矩阵（<strong>行数 = 列数</strong>），则赋值语句 <code>matA = matA*matA</code> 是安全的。</p>
-<p>除此之外的所有操作，Eigen都默认不存在由混叠导致的错误，要么是因为结果被赋值给了一个不同的矩阵，要么是因为当前进行的是元素级操作。</p>
-<p>不过Eigen对矩阵乘法进行的这种处理是需要付出一定计算资源的代价的。在进行上述乘法的过程中，Eigen首先将乘积计算入一个临时矩阵，结束计算后再将这个临时矩阵赋值给 <code>matA</code> ，在当前情况下这是合理的。但相同的操作也会对 <code>matB = matA * matA</code> 进行，这就会导致一定程度上的计算资源浪费。在这种情况下，Eigen提供了 <code>noalias()</code> 函数进行直接赋值而不用经过中间的临时矩阵：<code>matB.noalias() = matA * matA</code> 。这种操作一定要<strong>慎用！！！</strong></p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>当表达式两端同时出现相同的矩阵/数组时会出现混叠</p>
-<ul>
-<li>元素级操作时无害，包括标量/数组乘法和矩阵/数组加法</li>
-<li>两个行列相等的矩阵相乘，Eigen默认进行混叠处理；若明确不会出现混叠，使用 <code>noalias()</code> </li>
-<li>其他情况下Eigen默认不进行混叠处理，因此容易在某些情况下产生错误答案。使用 <code>eval()</code> 或 <code>xxxInPlace()</code> 函数来避免此类情况</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E5%8F%98%E5%BD%A2%E4%B8%8E%E5%88%86%E7%89%87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Eigen/%E5%8F%98%E5%BD%A2%E4%B8%8E%E5%88%86%E7%89%87/" class="post-title-link" itemprop="url">变形与切片</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-23 17:10:44" itemprop="dateCreated datePublished" datetime="2021-04-23T17:10:44+08:00">2021-04-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-11 16:00:58" itemprop="dateModified" datetime="2021-05-11T16:00:58+08:00">2021-05-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Eigen 尚未提供显式方法实现变形与切片，但可以用Map类模拟实现</p>
-<h4 id="变形"><a href="#变形" class="headerlink" title="变形"></a>变形</h4><p>变形指的是在保持原有矩阵系数不变的情况下，调整矩阵的行列大小，Map类提供了一种在原有存储的基础上创建不同矩阵视图的方法，需要注意的是，原矩阵中的数据存储顺序会影响数据在线性视图中的顺序：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MatrixXf <span class="title">Ma</span><span class="params">(<span class="number">3</span>,<span class="number">3</span>)</span></span>;</span><br><span class="line">M1 &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,</span><br><span class="line">	  <span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,</span><br><span class="line">	  <span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">Map&lt;RowVectorXf&gt; <span class="title">v1</span><span class="params">(M1.data(), M1.size())</span></span>; <span class="comment">// M1.data()将按列优先取出数据</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;v1:&quot;</span> &lt;&lt; endl &lt;&lt; v1 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line"><span class="function">Matrix&lt;<span class="keyword">float</span>, Dynamic, Dynamic, RowMajor&gt; <span class="title">M2</span><span class="params">(M1)</span></span>;</span><br><span class="line"><span class="function">Map&lt;RowVectorXf&gt; <span class="title">v2</span><span class="params">(M2.data(), M2.size())</span></span>; <span class="comment">// M2.data()将按行优先取出数据</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;v2:&quot;</span> &lt;&lt; endl &lt;&lt; v2 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v1:</span><br><span class="line">1 4 7 2 5 8 3 6 9</span><br><span class="line">v2:</span><br><span class="line">1 2 3 4 5 6 7 8 9</span><br></pre></td></tr></table></figure>
-<ul>
-<li>例：2 $\times$ 6 矩阵转置为6 $\times$ 2：</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Matrix&lt;<span class="keyword">float</span>, Dynamic, Dynamic, RowMajor&gt; <span class="title">M1</span><span class="params">(<span class="number">2</span>,<span class="number">6</span>)</span></span>;</span><br><span class="line">M1 &lt;&lt; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>,</span><br><span class="line">	  <span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>;</span><br><span class="line"><span class="function">Map&lt;MatrixXf&gt; <span class="title">M2</span><span class="params">(M1.data(), <span class="number">6</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;M2:&quot;</span> &lt;&lt; endl &lt;&lt; M2 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">M2:</span><br><span class="line">1  7</span><br><span class="line">2  8</span><br><span class="line">3  9</span><br><span class="line">4 10</span><br><span class="line">5 11</span><br><span class="line">6 12</span><br></pre></td></tr></table></figure>
-<p>注意到实现矩阵转置的时候，必须采用行优先保存，否则变形出来的矩阵就不是转置矩阵了！</p>
-<h4 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h4><p>切片指的是取出矩阵中均匀间隔的行、列或元素</p>
-<ul>
-<li>例：间隔取出向量中的某些元素</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RowVectorXf v = RowVectorXf::<span class="built_in">LinSpaced</span>(<span class="number">20</span>,<span class="number">0</span>,<span class="number">19</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Input:&quot;</span> &lt;&lt; endl &lt;&lt; v &lt;&lt; endl;</span><br><span class="line">Map&lt;RowVectorXf,<span class="number">0</span>,InnerStride&lt;<span class="number">2</span>&gt; &gt; <span class="built_in">v2</span>(v.<span class="built_in">data</span>(), v.<span class="built_in">size</span>()/<span class="number">2</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Even:&quot;</span> &lt;&lt; v2 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line"> 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19</span><br><span class="line">Even: 0  2  4  6  8 10 12 14 16 18</span><br></pre></td></tr></table></figure>
-<ul>
-<li>例：根据具体的存储顺序，使用足够的步幅 <code>stride</code> 依次从三列中取出一列</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">MatrixXf M1 = MatrixXf::<span class="built_in">Random</span>(<span class="number">3</span>, <span class="number">8</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Column Major Input:\n&quot;</span></span><br><span class="line">     &lt;&lt; M1 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">Map&lt;MatrixXf, <span class="number">0</span>, OuterStride&lt;&gt;&gt; <span class="built_in">M2</span>(</span><br><span class="line">    M1.<span class="built_in">data</span>(), M1.<span class="built_in">rows</span>(), (M1.<span class="built_in">cols</span>() + <span class="number">2</span>) / <span class="number">3</span>,</span><br><span class="line">    OuterStride&lt;&gt;(M1.<span class="built_in">outerStride</span>() * <span class="number">3</span>));</span><br><span class="line"><span class="comment">// 第二个参数 MapOptions=0 即使用默认值Unaligned</span></span><br><span class="line"><span class="comment">// 第三个参数 OuterStride&lt;&gt;说明初始化时只需声明外步幅的大小</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;对列优先矩阵取出每3列中的第1列:\n&quot;</span></span><br><span class="line">     &lt;&lt; M2 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> Matrix&lt;<span class="keyword">float</span>, Dynamic, Dynamic, RowMajor&gt; RowMajorMatrixXf;</span><br><span class="line"><span class="function">RowMajorMatrixXf <span class="title">M3</span><span class="params">(M1)</span></span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Row Major Input:\n&quot;</span></span><br><span class="line">     &lt;&lt; M3 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">Map&lt;RowMajorMatrixXf, <span class="number">0</span>, Stride&lt;Dynamic, <span class="number">3</span>&gt;&gt; <span class="built_in">M4</span>(</span><br><span class="line">    M3.<span class="built_in">data</span>(), M3.<span class="built_in">rows</span>(), (M3.<span class="built_in">cols</span>() + <span class="number">2</span>) / <span class="number">3</span>,</span><br><span class="line">    Stride&lt;Dynamic, <span class="number">3</span>&gt;(M3.<span class="built_in">outerStride</span>(), <span class="number">3</span>)); <span class="comment">// 意味着行间步幅1，列间步幅3</span></span><br><span class="line"><span class="comment">// 第三个参数 Stride&lt;OuterStride&lt;&gt;, InnerStride&lt;&gt;&gt; 指定外步幅和内步幅</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;对行优先矩阵取出每3列中的第1列:\n&quot;</span></span><br><span class="line">     &lt;&lt; M4 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Column Major Input:</span><br><span class="line">  0.680375    0.59688  -0.329554    0.10794  -0.270431    0.83239  -0.716795  -0.514226</span><br><span class="line"> -0.211234   0.823295   0.536459 -0.0452059  0.0268018   0.271423   0.213938  -0.725537</span><br><span class="line">  0.566198  -0.604897  -0.444451   0.257742   0.904459   0.434594  -0.967399   0.608353</span><br><span class="line">对列优先矩阵取出每3列中的第1列:</span><br><span class="line">  0.680375    0.10794  -0.716795</span><br><span class="line"> -0.211234 -0.0452059   0.213938</span><br><span class="line">  0.566198   0.257742  -0.967399</span><br><span class="line">Row Major Input:</span><br><span class="line">  0.680375    0.59688  -0.329554    0.10794  -0.270431    0.83239  -0.716795  -0.514226</span><br><span class="line"> -0.211234   0.823295   0.536459 -0.0452059  0.0268018   0.271423   0.213938  -0.725537</span><br><span class="line">  0.566198  -0.604897  -0.444451   0.257742   0.904459   0.434594  -0.967399   0.608353</span><br><span class="line">对行优先矩阵取出每3列中的第1列:</span><br><span class="line">  0.680375    0.10794  -0.716795</span><br><span class="line"> -0.211234 -0.0452059   0.213938</span><br><span class="line">  0.566198   0.257742  -0.967399</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/Map%E7%B1%BB%E5%AE%9E%E7%8E%B0%E4%B8%8EC-C++%E6%95%B0%E7%BB%84%E7%9A%84%E8%BD%AC%E6%8D%A2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Eigen/Map%E7%B1%BB%E5%AE%9E%E7%8E%B0%E4%B8%8EC-C++%E6%95%B0%E7%BB%84%E7%9A%84%E8%BD%AC%E6%8D%A2/" class="post-title-link" itemprop="url">Map类实现与C/C++数组的转换</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-04-23 15:24:43 / 修改时间：17:05:18" itemprop="dateCreated datePublished" datetime="2021-04-23T15:24:43+08:00">2021-04-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>本章介绍如何使用 <code>Map</code> 类通过不复制数据的方法将原始 C/C++ 数组转换成矩阵或向量</p>
-<h3 id="Map类模板参数与构造函数"><a href="#Map类模板参数与构造函数" class="headerlink" title="Map类模板参数与构造函数"></a>Map类模板参数与构造函数</h3><p>Map类模板参数如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;<span class="keyword">typename</span> MatrixType, <span class="keyword">int</span> MapOptions = Unaligned, <span class="keyword">typename</span> StrideType&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p><code>MatrixType</code> : <code>required</code> ，声明是哪种类型的矩阵或向量</p>
-</li>
-<li><p><code>MapOptions</code> : <code>optional</code> ，声明指针是对齐的还是未对齐的</p>
-</li>
-<li><p><code>StrideType</code> : <code>optional</code> ，使用<a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/classEigen_1_1Stride.html"> <code>Stride</code> 类</a>为内存中的数组自定义布局</p>
-<p><code>Stride</code> 类有两个模板参数：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Stride&lt;OuterStride, InnerStride&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>OuterStride</code> : 指的是 列优先矩阵的两个连续列 或 行优先矩阵的两个连续行 之间的指针增量</li>
-<li><code>InnerStride</code> : 指的是 列优先矩阵的某一列内两个连续行 或 行优先矩阵的某一列内两个连续列 之间的指针增量</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> array[<span class="number">8</span>];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; ++i) array[i] = i;</span><br><span class="line"><span class="comment">// 默认列优先</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Column-major:\n&quot;</span> </span><br><span class="line">     &lt;&lt; Map&lt;Matrix&lt;<span class="keyword">int</span>,<span class="number">2</span>,<span class="number">4</span>&gt; &gt;(array) &lt;&lt; endl;</span><br><span class="line"><span class="comment">// 通过定义矩阵类型实现行优先</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Row-major:\n&quot;</span> </span><br><span class="line">     &lt;&lt; Map&lt;Matrix&lt;<span class="keyword">int</span>,<span class="number">2</span>,<span class="number">4</span>,RowMajor&gt; &gt;(array) &lt;&lt; endl;</span><br><span class="line"><span class="comment">// 通过Stride参数实现行优先</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Row-major using stride:\n&quot;</span> </span><br><span class="line">     &lt;&lt; Map&lt;Matrix&lt;<span class="keyword">int</span>,<span class="number">2</span>,<span class="number">4</span>&gt;, Unaligned, Stride&lt;<span class="number">1</span>,<span class="number">4</span>&gt; &gt;(array) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Column-major:</span><br><span class="line">0 2 4 6</span><br><span class="line">1 3 5 7</span><br><span class="line">Row-major:</span><br><span class="line">0 1 2 3</span><br><span class="line">4 5 6 7</span><br><span class="line">Row-major using stride:</span><br><span class="line">0 1 2 3</span><br><span class="line">4 5 6 7</span><br></pre></td></tr></table></figure>
-<p><code>Stride</code> 类还能更灵活：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> array[<span class="number">24</span>];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">24</span>; ++i) array[i] = i;</span><br><span class="line">cout &lt;&lt; Map&lt;MatrixXi, <span class="number">0</span>, Stride&lt;Dynamic,<span class="number">2</span>&gt; &gt;</span><br><span class="line">        (array, <span class="number">3</span>, <span class="number">3</span>, Stride&lt;Dynamic,<span class="number">2</span>&gt;(<span class="number">8</span>, <span class="number">2</span>))</span><br><span class="line">     &lt;&lt; endl;</span><br><span class="line"><span class="comment">// 列间隔8，行间隔2</span></span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0  8 16</span><br><span class="line">2 10 18</span><br><span class="line">4 12 20</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>在构造一个Map类型对象的时候，还需要另外两个信息：指向数组内存空间的指针；目标矩阵/向量的大小。当矩阵/变量类型为固定大小的类型时，第二个信息可以省略。</p>
-<ul>
-<li><p>构造一个Map类型的对象用来转换动态大小的 <code>float</code> 矩阵：其中 <code>pf</code> 是一个 <code>float*</code> 类型的指针，指向数组内存空间，<code>rows</code> 和 <code>cols</code> 则定义了目标矩阵的维度</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Map&lt;MatrixXf&gt; <span class="title">mf</span><span class="params">(pf, rows, cols)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>构造一个Map类型的对象用来转换固定大小的 <code>int</code> 只读向量：其中 <code>pi</code> 是一个 <code>int*</code> 类型的指针，因为 <code>Vector4i</code> 已经说明了向量维度，所以不再需要向构造函数传入向量的维度信息</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Map&lt;<span class="keyword">const</span> Vector4i&gt; <span class="title">mi</span><span class="params">(pi)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>需要注意的是，Map类并没有默认构造函数，在构造对象的时候，必须告诉构造函数所要转化的数组的地址指针。</p>
-<h3 id="Map类型对象的使用"><a href="#Map类型对象的使用" class="headerlink" title="Map类型对象的使用"></a>Map类型对象的使用</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> Matrix&lt;<span class="keyword">float</span>, <span class="number">1</span>, Dynamic&gt; MatrixType;</span><br><span class="line"><span class="keyword">typedef</span> Map&lt;MatrixType&gt; MapType;</span><br><span class="line"><span class="keyword">typedef</span> Map&lt;<span class="keyword">const</span> MatrixType&gt; MapTypeConst; <span class="comment">// a read-only map</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> n_dims = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">MatrixType <span class="title">m1</span><span class="params">(n_dims)</span>, <span class="title">m2</span><span class="params">(n_dims)</span></span>;</span><br><span class="line">m1.<span class="built_in">setRandom</span>();</span><br><span class="line">m2.<span class="built_in">setRandom</span>();</span><br><span class="line"><span class="keyword">float</span> *p = &amp;<span class="built_in">m2</span>(<span class="number">0</span>); <span class="comment">// 拿到矩阵m2的地址</span></span><br><span class="line"><span class="function">MapType <span class="title">m2map</span><span class="params">(p,m2.size())</span></span>; <span class="comment">// 矩阵m2map和矩阵m2共享内存空间（地址相同）</span></span><br><span class="line"><span class="function">MapTypeConst <span class="title">m2mapconst</span><span class="params">(p, m2.size())</span></span>; <span class="comment">// 通过矩阵m2mapconst只能实现对m2的访问，而不能修改</span></span><br><span class="line"></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;m1: &quot;</span> &lt;&lt; m1 &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;m2: &quot;</span> &lt;&lt; m2 &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Squared euclidean distance: &quot;</span> &lt;&lt; (m1-m2).<span class="built_in">squaredNorm</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Squared euclidean distance, using map: &quot;</span> </span><br><span class="line">     &lt;&lt; (m1-m2map).<span class="built_in">squaredNorm</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line"><span class="built_in">m2map</span>(<span class="number">3</span>) = <span class="number">7</span>;   <span class="comment">// 这一步会同时改变m2和m2mapconst的值，因为这三者共享内存空间</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Updated m2: &quot;</span> &lt;&lt; m2 &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;m2 coefficient 2, constant accessor: &quot;</span> &lt;&lt; <span class="built_in">m2mapconst</span>(<span class="number">3</span>) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">m1:  0.680375 -0.211234  0.566198   0.59688  0.823295</span><br><span class="line">m2: -0.604897 -0.329554  0.536459 -0.444451   0.10794</span><br><span class="line">Squared euclidean distance: 3.26291</span><br><span class="line">Squared euclidean distance, using map: 3.26291</span><br><span class="line">Updated m2: -0.604897 -0.329554  0.536459         7   0.10794</span><br><span class="line">m2 coefficient 2, constant accessor: 7</span><br></pre></td></tr></table></figure>
-<p>虽然Eigen的所有函数都会像接受其他Eigen类型一样接受Map对象，但在实现自己的函数过程中，从Map对象到其对应的Dense类对象的转换并不会自动完成。具体见 <a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/TopicFunctionTakingEigenTypes.html">以Eigen类型为参数编写函数</a> </p>
-<h3 id="修改映射数组"><a href="#修改映射数组" class="headerlink" title="修改映射数组"></a>修改映射数组</h3><p>可以使用C++的 <code>placement new</code> 语法实现在生命Map对象后修改其数组。简而言之，<code>placement new</code> 语法实现的是从给定指针所指向的地址开始创建一个新的对象，一般来说该指针指向的是一片提前申请好的内存，所以也不会进行内存分配。例如：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> data[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;;</span><br><span class="line"><span class="function">Map&lt;RowVectorXi&gt; <span class="title">v</span><span class="params">(data,<span class="number">4</span>)</span></span>;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;The mapped vector v is: &quot;</span> &lt;&lt; v &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line"><span class="keyword">new</span> (&amp;v) Map&lt;RowVectorXi&gt;(data+<span class="number">4</span>,<span class="number">5</span>);</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Now v is: &quot;</span> &lt;&lt; v &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The mapped vector v is: 1 2 3 4</span><br><span class="line">Now v is: 5 6 7 8 9</span><br></pre></td></tr></table></figure>
-<p>用这种方法可以在不知道映射数组在内存中位置的情况下构造一个Map对象：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Map&lt;Matrix3f&gt; <span class="title">A</span><span class="params">(<span class="literal">NULL</span>)</span></span>;  <span class="comment">// don&#x27;t try to use this matrix yet!</span></span><br><span class="line"><span class="function">VectorXf <span class="title">b</span><span class="params">(n_matrices)</span></span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n_matrices; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">new</span> (&amp;A) Map&lt;Matrix3f&gt;(<span class="built_in">get_matrix_pointer</span>(i));</span><br><span class="line">    <span class="built_in">b</span>(i) = A.<span class="built_in">trace</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1972,7 +1965,7 @@ A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

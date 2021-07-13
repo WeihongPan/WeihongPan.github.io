@@ -22,24 +22,24 @@
 
   <meta name="description" content="给Ubuntu装PCL是大二时候的事情了，那时候在自己电脑的双系统上装，root权限和网络都有，apt-get安装非常快。现在开始学PCL库，在实验室服务器上重新来装一遍，不同的是，这次既没有root权限也没有网页，就会麻烦很多，折腾了一天，记录一下。 依赖库PCL需要的依赖库有点多，包括：  必须：Boost，Eigen，FLANN，VTK 选择：Qhull，OpenNI，CUDA  apt-g">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ubuntu16.04无权限断网从源码安装PCL">
-<meta property="og:url" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/index.html">
+<meta property="og:title" content="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
+<meta property="og:url" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/index.html">
 <meta property="og:site_name" content="潘薇鸿">
 <meta property="og:description" content="给Ubuntu装PCL是大二时候的事情了，那时候在自己电脑的双系统上装，root权限和网络都有，apt-get安装非常快。现在开始学PCL库，在实验室服务器上重新来装一遍，不同的是，这次既没有root权限也没有网页，就会麻烦很多，折腾了一天，记录一下。 依赖库PCL需要的依赖库有点多，包括：  必须：Boost，Eigen，FLANN，VTK 选择：Qhull，OpenNI，CUDA  apt-g">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
-<meta property="og:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png">
-<meta property="og:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png">
-<meta property="og:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png">
-<meta property="og:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png">
 <meta property="article:published_time" content="2021-07-11T16:08:00.000Z">
-<meta property="article:modified_time" content="2021-07-12T03:16:06.868Z">
+<meta property="article:modified_time" content="2021-07-13T01:48:02.172Z">
 <meta property="article:author" content="潘薇鸿">
-<meta property="article:tag" content="SLAM PCL">
+<meta property="article:tag" content="PCL">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
+<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
 
-<link rel="canonical" href="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+<link rel="canonical" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
 
 
 <script id="page-configurations">
@@ -52,7 +52,7 @@
   };
 </script>
 
-  <title>Ubuntu16.04无权限断网从源码安装PCL | 潘薇鸿</title>
+  <title>PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL | 潘薇鸿</title>
   
 
 
@@ -175,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -188,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Ubuntu16.04无权限断网从源码安装PCL
+          PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL
         </h1>
 
         <div class="post-meta">
@@ -197,17 +197,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-07-12 00:08:00 / 修改时间：11:16:06" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-13 09:48:02" itemprop="dateModified" datetime="2021-07-13T09:48:02+08:00">2021-07-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/PCL/" itemprop="url" rel="index"><span itemprop="name">PCL</span></a>
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
                 </span>
             </span>
 
@@ -236,11 +242,11 @@
 <p>这样子PCL就安装完成啦！</p>
 <h4 id="完全源码安装（包括各类依赖库）"><a href="#完全源码安装（包括各类依赖库）" class="headerlink" title="完全源码安装（包括各类依赖库）"></a>完全源码安装（包括各类依赖库）</h4><p>因为没有root权限，所以apt-get是用不了了，服务器没连网，所以git/wget也用不了，所有依赖库需要从 <a target="_blank" rel="noopener" href="https://packages.ubuntu.com/">Ubuntu Package</a> 网站上下载对应源码包，用ftp传到服务器上进行源码安装。比较麻烦，就只安装了必需的四个库。</p>
 <p>需要注意的是，在编译安装前需要根据 Ubuntu Package 提供的依赖库进行检查，例如 libxt-dev 的依赖库有以下：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png" alt="1626051064861"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png" alt="1626051064861"></p>
 <p>使用 <code>dpkg -s 库名称</code> 检查服务器上是否已经安装过需要的依赖库，如果没有，就需要自己一个一个手动下载编译安装。如果嫌一个个检查麻烦的话，也可以直接安装四个依赖库，根据报错去补依赖库（没错就是我）。以openmpi为例介绍如何将依赖库安装到非root用户目录下。</p>
 <p>首先开一个新的文件夹存放下载的源码文件（例如我的：<code>~/Download</code>），再开一个文件夹仿照 <code>/usr</code> 存放安装的各种头文件、链接库等等文件（例如我的：<code>~/Software</code>）。</p>
 <p>主机下载完openmpi源码后ftp上传到服务器，会发现这一类源代码没有熟悉的CMakeLists而是直接的Makefile。</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png" alt="1626052217765"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png" alt="1626052217765"></p>
 <p>根据我们之前设置的安装路径进行config：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prerfix=/home/panweihong/Software</span><br></pre></td></tr></table></figure>
 <p>这里的prefix就是将来这个库会被安装在哪个目录底下，默认是 <code>/usr</code> ，显然我们没有操作 <code>/usr</code> 目录的权限，所以需要把它改成我们自己的安装目录，并且需要特别注意的是，这里写的必须是绝对路径，像 <code>~/Software</code> 这样子是不行的。</p>
@@ -260,7 +266,7 @@
 <p>各路径由 <code>:</code> 隔开，设置好后退出 <code>~/.bashrc</code> 并 <code>source ~/.bashrc</code> 后，在终端执行 <code>echo $某个变量名</code> 检查是否生效。</p>
 <p>另外一个小问题，因为每次 <code>source ~/.bashrc</code> 后文件中的 <code>export</code> 语句都会被执行一次，导致路径中有很多重复值，我的解决方法比较笨。就是在第一次export自己的路径前先echo一下这个变量原来的默认值，然后直接复制到原来 <code>$变量</code> 的位置，这样就不会因为重复export重复引用路径导致出现很多重复值了，这么做的原因是每次source的时候都会在第一个export给这个变量重新赋值，之后再有export就不会重复之前的值了，所以，后面再次export这个变量就和之前一样写 <code>$变量明</code> 就行了。</p>
 <h5 id="Boost"><a href="#Boost" class="headerlink" title="Boost"></a>Boost</h5><p>本来boost库服务器上已经安装好了，我之所以重新安装，是因为最后编译PCL库的时候报了这个错：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png" alt="1626054896351"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png" alt="1626054896351"></p>
 <p>这两个库其实都是有的，用 <code>locate</code> 命令都能找得到，但就是多了个后缀：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/x86_64-linux-gnu/libboost_system.so.1.65.1</span><br><span class="line">/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.65.1</span><br></pre></td></tr></table></figure>
 <p>本来是一个建立软链接就能解决的小事：</p>
@@ -273,7 +279,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=你的安装路径 ..</span><br><span class="line">make install -j8</span><br></pre></td></tr></table></figure>
 <h5 id="FLANN"><a href="#FLANN" class="headerlink" title="FLANN"></a>FLANN</h5><p>同样先下载 <a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/releases">FLANN源码</a> ，在解压文件夹下执行与Eigen3安装相同的操作。</p>
 <p>我遇到了一个非常神奇的问题，在用 3.15版本的cmake编译时，出现了这样的错误：</p>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png" alt="1626054570126"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png" alt="1626054570126"></p>
 <p>参考<a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/issues/369">这个解决方法</a> ，我重装了一个 3.10版本的cmake（从<a target="_blank" rel="noopener" href="https://cmake.org/files">这里</a>下源码，tar.gz文件不用安装，解压后直接添加环境变量就能用），再次编译就没有这个问题了（震惊.jpg）</p>
 <h5 id="VTK"><a href="#VTK" class="headerlink" title="VTK"></a>VTK</h5><p>这是折腾了我最久的依赖库Orz</p>
 <p>首先下载需要的源码文件：<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz">VTK-8.2.0.tar.gz</a>和<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTKData-8.2.0.tar.gz">VTKData-8.2.0.tar.gz</a>，将VTKData解压到VTK文件下，执行与Eigen3安装类似的操作。</p>
@@ -303,7 +309,7 @@
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;/home/panweihong/Software/include/pcl-1.9&quot;</span>, </span><br><span class="line"><span class="string">&quot;/home/panweihong/Software/include/eigen3&quot;</span></span><br></pre></td></tr></table></figure>
 <p>执行 <code>./pcd_write_test</code> 输出：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Saved 5 data points to test_pcd.pcd</span><br><span class="line">   0.352222 -0.151883 -0.106395</span><br><span class="line">   -0.397406 -0.473106 0.292602</span><br><span class="line">   -0.731898 0.667105 0.441304</span><br><span class="line">   -0.734766 0.854581 -0.0361733</span><br><span class="line">   -0.4607 -0.277468 -0.916762</span><br></pre></td></tr></table></figure>
-<p><img src="/PCL/Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
 <p>成功输出就说明安装成功了！</p>
 
     </div>
@@ -314,7 +320,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/SLAM-PCL/" rel="tag"># SLAM PCL</a>
+              <a href="/tags/PCL/" rel="tag"># PCL</a>
           </div>
 
         
@@ -323,10 +329,13 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/slam/Multiple-View-Geometry-Lecture-1/" rel="prev" title="Multiple View Geometry - Lecture 1">
-      <i class="fa fa-chevron-left"></i> Multiple View Geometry - Lecture 1
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/" rel="prev" title="PCL学习(2):IO模块">
+      <i class="fa fa-chevron-left"></i> PCL学习(2):IO模块
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(3)-kd-tree%E6%A8%A1%E5%9D%97/" rel="next" title="PCL学习(3):kd-tree模块">
+      PCL学习(3):kd-tree模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -401,7 +410,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

@@ -165,6 +165,353 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/" class="post-title-link" itemprop="url">Logistic Regression（以二分类为例）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-24 10:02:20 / 修改时间：20:45:43" itemprop="dateCreated datePublished" datetime="2021-03-24T10:02:20+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Logistic-Regression（以二分类为例）"><a href="#Logistic-Regression（以二分类为例）" class="headerlink" title="Logistic Regression（以二分类为例）"></a>Logistic Regression（以二分类为例）</h3><p>2021/03/23</p>
+<h4 id="Step-1：Function-Set"><a href="#Step-1：Function-Set" class="headerlink" title="Step 1：Function Set"></a>Step 1：Function Set</h4><p>上节得到：</p>
+<script type="math/tex; mode=display">
+P(C_1|\boldsymbol x)=\sigma(z)=\sigma(\boldsymbol{w}\cdot\boldsymbol x+b)\\
+\sigma(z)=\frac{1}{1+\exp(-z)}</script><p>所以我们的函数集即为</p>
+<script type="math/tex; mode=display">
+f_{\boldsymbol {w},b}(\boldsymbol x) = P_{\boldsymbol {w},b}(C_1|\boldsymbol x)=\sigma\bigg(\sum_iw_ix_i+b\bigg)</script><p>此为<strong>Logistic Regression</strong> ，它与Linear Regression只相差一个 <script type="math/tex">\sigma</script> 函数；Logistic Regression的输出值在0-1之间，而Linear Regression的输出值可以是任何数</p>
+<h4 id="Step-2：Goodness-of-Function"><a href="#Step-2：Goodness-of-Function" class="headerlink" title="Step 2：Goodness of Function"></a>Step 2：Goodness of Function</h4><p>依然是最大似然估计的思想，来估计我们需要的 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> </p>
+<p>给定已知数据集的分类，上述函数 <script type="math/tex">f</script> 表示当前数据属于 <script type="math/tex">C_1</script> 的概率，$1-f$ 则表示属于 <script type="math/tex">C_2</script> 的概率（以二分类为例）那么以当前的 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> 生成该数据集的概率为：</p>
+<script type="math/tex; mode=display">
+L(\boldsymbol w,b)=f(\boldsymbol x^1)f(\boldsymbol x^2)\big(1-f(\boldsymbol x^3)\big)...f(\boldsymbol x^N)</script><p>要找 <script type="math/tex">\boldsymbol w</script> 和 <script type="math/tex">b</script> 去最大化这个概率（最大似然估计标准解法，取负对数求导）</p>
+<p>但是上面的式子形式非常的不统一，不方便后面的表述，因此对它做一下符号化，即：</p>
+<script type="math/tex; mode=display">
+x^i\rightarrow \hat{y}^i=\left\{\begin{matrix}
+1\quad x\in C_1 \\
+0\quad x\in C_2
+\end{matrix}
+\right.</script><p>那么上面的式子可以被改写为</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+-\ln L(\boldsymbol w,b)=&-\ln f(\boldsymbol x^1)-\ln f(\boldsymbol x^2)-\ln \big(1-f(\boldsymbol x^3)\big)...\\
+=&\sum_n-\Big[\hat{y}^n\ln(f(\boldsymbol x^n))+(1-\hat{y}^n)\ln(1-f(\boldsymbol x^n))\Big]
+\end{align*}</script><p>其实，大括号里的项就是两个伯努利分布的<strong>交叉熵</strong>（cross entropy)</p>
+<p>假设有两个分布 p 和 q，那么他们的交叉熵定义为：<script type="math/tex">H(p,q)=-\sum_xp(x)ln(q(x))</script> ，表示的含义是这两个分布有多接近，即用来衡量两个分布的相似性。如果两个分布完全一样，结果就会是 0。</p>
+<p>Logistic Regression: 使用交叉熵判断模型的好坏 - 先验是正态</p>
+<p>Linear Regression: 使用误差平方(square error)判断模型好坏 - 先验是二项</p>
+<h4 id="Step-3：Find-the-best-function"><a href="#Step-3：Find-the-best-function" class="headerlink" title="Step 3：Find the best function"></a>Step 3：Find the best function</h4><p>数学推导！！！</p>
+<script type="math/tex; mode=display">
+\frac{\partial\Big(-\ln L(\boldsymbol w,b)\Big)}{\partial w_i}=\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>括号内的项表示差距越大，更新越多</p>
+<p>但神奇的是</p>
+<p>Logistic Regression 的更新方式：</p>
+<script type="math/tex; mode=display">
+w_i\leftarrow w_i-\eta\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>Linear Regression 的更新方式：</p>
+<script type="math/tex; mode=display">
+w_i\leftarrow w_i-\eta\sum_n-[\hat{y}^n-f(\boldsymbol x^n)]x_i^n</script><p>其实是一模一样的，唯一不一样的是 <script type="math/tex">\hat{y}^n</script> 和 <script type="math/tex">f</script> 的取值不同</p>
+<h4 id="为什么Logistic-Regression的损失函数不用Square-Error"><a href="#为什么Logistic-Regression的损失函数不用Square-Error" class="headerlink" title="为什么Logistic Regression的损失函数不用Square Error"></a>为什么Logistic Regression的损失函数不用Square Error</h4><p>因为 <script type="math/tex">f</script> 的取值限制在了0-1之间，当估计值和目标距离很远的时候，Square Error的微分值依然很小，非常平坦，更新得很慢</p>
+<p>但Cross Entropy在距离目标较远的地方微分值很大，更新得很快</p>
+<h4 id="Discriminative-判别模型-v-s-Generative-生成模型"><a href="#Discriminative-判别模型-v-s-Generative-生成模型" class="headerlink" title="Discriminative(判别模型) v.s. Generative(生成模型)"></a>Discriminative(判别模型) v.s. Generative(生成模型)</h4><p>Discriminative: Logistic Regression =&gt; 直接找 $\boldsymbol{w}$ 和 $b$ </p>
+<p>Generative: 概率模型 =&gt; 找 $\boldsymbol{\mu}^1,\boldsymbol{\mu}^2,\boldsymbol{\Sigma}^{-1}$  =&gt; 计算 $\boldsymbol{w}$ 和 $b$ （<strong>假设</strong>了数据分布，这里是高斯分布）</p>
+<p>两种方法找出来的w和b会一样么？（不会）=&gt; 同样的模型，不同的方法得到了不同的方程。</p>
+<p>生成模型的优势：</p>
+<ul>
+<li><p>判别模型的准确率受训练数据量影响大，生成模型的准确率(一般来说)受训练数据量影响小。在训练数据少的情况下，通过假设数据分布提高准确率(但有时候也会适得其反)。</p>
+</li>
+<li><p>假设数据分布的做法，使生成模型对噪声数据更鲁棒</p>
+</li>
+<li><p>生成模型把参数分为 Priors probabilities 和 class-dependent probabilities，可以分别从不同的来源进行估计</p>
+<p>例如语音识别，现在一般使用神经网络实现（Discriminative），但事实上它是个Generative System，DNN只是其中的一部分。对语音识别来说，Priors probability指的是一句话被说出来的概率，这是不需要语音数据的，直接从网上爬文字数据就能计算出某句话出现的概率；class-dependent probability才同时需要语音和文字数据</p>
+</li>
+</ul>
+<h4 id="Logistic-Regression的限制"><a href="#Logistic-Regression的限制" class="headerlink" title="Logistic Regression的限制"></a>Logistic Regression的限制</h4><p>数据必须<strong>线性可分</strong>才能做。如果不能线性可分，解决方法：<strong>Feature Transformation</strong> 把原本线性不可分的特征向量转化为线性可分。但并不是所有时候都能知道如何找到一个好的Transformation方法，人找不到，那机器呢？</p>
+<h5 id="Cascading-Logistic-regression-models"><a href="#Cascading-Logistic-regression-models" class="headerlink" title="Cascading Logistic regression models"></a>Cascading Logistic regression models</h5><p><img src="/Machine-Learning/Logistic-Regression%EF%BC%88%E4%BB%A5%E4%BA%8C%E5%88%86%E7%B1%BB%E4%B8%BA%E4%BE%8B%EF%BC%89/1616553063518.png" alt="Cascading Logistic regression models"></p>
+<p>前两个logistic regression自动完成feature transformation，最后一个logistic regression完成分类</p>
+<p>把诸多logistic regression叠加在一起，作进一步推广：</p>
+<ul>
+<li>某个logistic regression的输入可以是其他logistic regression的输出</li>
+<li>某个logistic regression的输出可以是其他logistic regression的输入</li>
+</ul>
+<p>把每个logistic regression模块叫做一个<strong>Neuron</strong>，把由logistic regression组成的整体叫做<strong>Neural Network</strong> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Classification/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/Classification/" class="post-title-link" itemprop="url">Classification</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-23 17:44:23 / 修改时间：22:16:40" itemprop="dateCreated datePublished" datetime="2021-03-23T17:44:23+08:00">2021-03-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Classification"><a href="#Classification" class="headerlink" title="Classification"></a>Classification</h3><p>2021/03/23</p>
+<h5 id="为什么不能用regression的方法来处理classification问题："><a href="#为什么不能用regression的方法来处理classification问题：" class="headerlink" title="为什么不能用regression的方法来处理classification问题："></a>为什么不能用regression的方法来处理classification问题：</h5><ol>
+<li>因为regression模型更在乎整体的Loss是否足够小，这会受到极端error点(“过于正确的点”)的影响</li>
+<li>涉及多分类问题，如果把Class i看作输出为i，那么就默认了各个Class之间其实是有联系的（比较接近等），但如果实际上这种关系并不存在的话，就无法得到好的结果</li>
+</ol>
+<h5 id="理想的选择"><a href="#理想的选择" class="headerlink" title="理想的选择"></a>理想的选择</h5><ul>
+<li><p>Function f(x)</p>
+<p>内建函数g(x)，当g(x)&gt;0时，输出class 1；否则输出class 2</p>
+</li>
+<li><p>Loss Function L(f)</p>
+<p>训练集上预测错误的次数</p>
+<script type="math/tex; mode=display">
+L(f)=\sum_n\delta((f(x^n)\neq\hat{y}^n)</script><p>但是这个函数是不可微的，所以不能用Gradient Descent解决，而是一般用Perception（感知机），SVM（支持向量机）解决</p>
+</li>
+</ul>
+<h5 id="从概率角度看问题"><a href="#从概率角度看问题" class="headerlink" title="从概率角度看问题"></a>从概率角度看问题</h5><ul>
+<li><p>贝叶斯公式</p>
+<script type="math/tex; mode=display">
+P(C_i|x) = \frac{P(x|C_i)P(C_i)}{\sum_{j=1}^nP(x|C_j)P(C_j)}</script></li>
+<li><p>Generative Model（生成模型）</p>
+<script type="math/tex; mode=display">
+P(x)=\sum_{i=1}^nP(x|C_i)P(C_i)</script></li>
+<li><p>Feature：用一个向量 <script type="math/tex">\boldsymbol{x}</script> 描述个体的特征</p>
+</li>
+<li><p>可以将样本数据（训练集）看作是从一个高斯分布中随机采样得到的，根据样本数据估计高斯分布的均值 <script type="math/tex">\boldsymbol{\mu}</script> 和协方差矩阵 <script type="math/tex">\boldsymbol{\Sigma}</script> ，从而得到该分布的概率密度。找到那个高斯分布，从中选出所有样本数据的概率是最大的，所用的方法就是极大似然估计（Maximum Likelihood）</p>
+</li>
+<li><p>极大似然估计</p>
+<script type="math/tex; mode=display">
+L(\boldsymbol\mu,\boldsymbol\Sigma)=\prod_{i=1}^nf_{\boldsymbol\mu,\boldsymbol\Sigma}(\boldsymbol x^i) \\\\
+\boldsymbol\mu^*,\boldsymbol\Sigma^*=arg\max\limits_{\boldsymbol\mu,\boldsymbol\Sigma}L(\boldsymbol\mu,\boldsymbol\Sigma)</script><p>其中的 L 表示极大似然函数，f 表示该分布的概率密度函数。取对数求导求零点：</p>
+<script type="math/tex; mode=display">
+\boldsymbol\mu^*= \frac{1}{n}\sum_{i=1}^{n}\boldsymbol x^i \\\\
+\boldsymbol\Sigma^*=\frac{1}{n}\sum_{i=1}^n(\boldsymbol x^i-\boldsymbol\mu^*)(\boldsymbol x^i-\boldsymbol\mu^*)^T</script></li>
+<li><p>存在的问题和解决方法</p>
+<p>因为协方差矩阵的参数很多，当特征函数维度增加时，参数个数会显著增长，从而容易导致过拟合。因此采用共享协方差矩阵的策略，也就是不同分类使用相同的协方差矩阵</p>
+<p>协方差矩阵表示的是特征向量与输出分类之间的线性相关关系，所以可以假设相同。</p>
+<p>又因为可将各分类视为相互独立，所以极大似然函数可改写为（<script type="math/tex">N</script> 个分类，第 <script type="math/tex">i</script> 分类数据个数为 <script type="math/tex">n_i</script> ）：</p>
+<script type="math/tex; mode=display">
+L(\boldsymbol\mu^1,...,\boldsymbol\mu^N,\boldsymbol\Sigma)=\prod_{i=1}^{n_1}f_{\boldsymbol\mu^1,\boldsymbol\Sigma}(x^i)\prod_{i=1}^{n_2}f_{\boldsymbol\mu^2,\boldsymbol\Sigma}(x^i)...\prod_{i=1}^{n_N}f_{\boldsymbol\mu^N,\boldsymbol\Sigma}(x^i)\\\\
+\boldsymbol\mu^{i*}= \frac{1}{n_i}\sum_{i=1}^{n_i}\boldsymbol x^i \\\\
+\boldsymbol\Sigma=\sum_{i=1}^N\frac{n_i}{\sum_{j=1}^Nn_j}\boldsymbol\Sigma^i</script><p>因为共享协方差矩阵，最后分类的边界会呈线性，把这种模型也叫做线性模型</p>
+</li>
+</ul>
+<h5 id="概率模型的三个步骤"><a href="#概率模型的三个步骤" class="headerlink" title="概率模型的三个步骤"></a>概率模型的三个步骤</h5><ul>
+<li>Function Set (Model)  ：基于贝叶斯公式的概率分布</li>
+<li>Goodness of Function：对均值和协方差矩阵的极大似然估计</li>
+</ul>
+<p>具体选择哪种概率模型是人为决定的</p>
+<h5 id="朴素贝叶斯分类（Naive-Bayes-Classifier）"><a href="#朴素贝叶斯分类（Naive-Bayes-Classifier）" class="headerlink" title="朴素贝叶斯分类（Naive Bayes Classifier）"></a>朴素贝叶斯分类（Naive Bayes Classifier）</h5><p>前提假设：特征向量的各个维度相互独立（有较强的局限性）</p>
+<script type="math/tex; mode=display">
+P(\boldsymbol x|C_i) = \prod_{i=1}^kP(x_k|C_i)</script><p>每一项都是一个一维高斯</p>
+<h5 id="后验概率-P-C-1-x-与-sigmoid函数的关系-假设当前二分类，共用协方差矩阵"><a href="#后验概率-P-C-1-x-与-sigmoid函数的关系-假设当前二分类，共用协方差矩阵" class="headerlink" title="后验概率 $P(C_1|x)$ 与 sigmoid函数的关系 (假设当前二分类，共用协方差矩阵)"></a>后验概率 $P(C_1|x)$ 与 sigmoid函数的关系 (假设当前二分类，共用协方差矩阵)</h5><script type="math/tex; mode=display">
+\begin{align}
+P(C_1|\boldsymbol x) &= \frac{P(\boldsymbol x|C_1)P(C_1)}{P(\boldsymbol x|C_1)P(C_1)+P(\boldsymbol x|C_2)P(C_2)}\\
+&=\frac{1}{1+\frac{P(\boldsymbol x|C_2)P(C_2)}{P(\boldsymbol x|C_1)P(C_1)}}\\
+&=\frac{1}{1+\exp(-z)}\\
+&=\sigma(z)
+\end{align}\\\\
+其中，z=\ln\frac{P(\boldsymbol x|C_1)P(C_1)}{P(\boldsymbol x|C_2)P(C_2)}=...=\boldsymbol{w}\cdot\boldsymbol x+b （省略了一系列推导过程）</script><p>所以最后得到：</p>
+<script type="math/tex; mode=display">
+P(C_1|\boldsymbol x)=\sigma(\boldsymbol{w}\cdot\boldsymbol x+b)</script><p>所以，何不直接找我们需要的 <script type="math/tex">\boldsymbol{w}</script> 和 <script type="math/tex">b</script> 呢？</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/New-Optimizers-for-Deep-Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Machine-Learning/New-Optimizers-for-Deep-Learning/" class="post-title-link" itemprop="url">New Optimizers for Deep Learning</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-23 17:44:10 / 修改时间：23:04:19" itemprop="dateCreated datePublished" datetime="2021-03-23T17:44:10+08:00">2021-03-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="New-Optimizer-for-Deep-Learning"><a href="#New-Optimizer-for-Deep-Learning" class="headerlink" title="New Optimizer for Deep Learning"></a>New Optimizer for Deep Learning</h3><ul>
+<li>参数更新 $\theta_t = \theta_{t-1} - \eta_{t-1}$</li>
+</ul>
+<h4 id="SGD"><a href="#SGD" class="headerlink" title="SGD"></a>SGD</h4><script type="math/tex; mode=display">
+m_t = g_t ,\quad v_t = 1 ,\quad  \eta_t=\eta\cdot m_t=\eta \cdot g_t</script><p>存在问题：</p>
+<ol>
+<li><p>选择恰当的初始学习率困难 </p>
+</li>
+<li><p>所有参数使用相同的学习率</p>
+</li>
+<li>容易陷入局部极值（导数值为0的局部点）</li>
+</ol>
+<h4 id="SGD-with-Momentum-SGDM"><a href="#SGD-with-Momentum-SGDM" class="headerlink" title="SGD with Momentum(SGDM)"></a>SGD with Momentum(SGDM)</h4><p>引入一阶动量 <script type="math/tex">m_t=\beta \cdot m_{t-1} + (1-\beta)\cdot g_t</script> ，<script type="math/tex">\eta_t=\eta\cdot m_t=\lambda m_{t-1} + \mu g_{t}</script>   </p>
+<p>不仅依赖于当前梯度，还依赖于过去的移动（惯性）。坡度陡，惯性大，下降多；坡度缓，惯性小，下降慢</p>
+<p>某些时候可以解决陷入局部最小值的情况</p>
+<h4 id="Adagrad"><a href="#Adagrad" class="headerlink" title="Adagrad"></a>Adagrad</h4><script type="math/tex; mode=display">\theta_t =\theta_{t-1}-\frac{\eta}{\sqrt{\sum_{i=0}^{t-1}(g_i)^2}}g_{t-1}</script><p>分母：陡峭走慢，平缓走快</p>
+<p>问题：分母越来越大，最终会导致学习率太小而无法有效更新</p>
+<h4 id="RMSProp"><a href="#RMSProp" class="headerlink" title="RMSProp"></a>RMSProp</h4><script type="math/tex; mode=display">\theta_t=\theta_{t-1}-\frac{\eta}{\sqrt{v_t}}g_{t-1}</script><script type="math/tex; mode=display">v_1=g_0^2</script><script type="math/tex; mode=display">v_t=\alpha v_{t-1}+(1-\alpha) g_{t-1}^2</script><p>主要解决的是Adagrad中，分母太大导致无法有效更新的问题</p>
+<p>但依然无法彻底解决</p>
+<h4 id="Adam-SGDM-RMSProp"><a href="#Adam-SGDM-RMSProp" class="headerlink" title="Adam = SGDM + RMSProp"></a>Adam = SGDM + RMSProp</h4><p>$\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t$    ($\epsilon=10^{-8}$ ，避免刚开始分母为0) </p>
+<p>$\hat{m}_t=\frac{m_t}{1-\beta_1^t}$  （$\beta_1=0.9$）(均值的无偏估计。de-biasing：确保t较小的时候，一阶动量不会因为系数小于1而太小)</p>
+<p>$\hat{v}_t=\frac{v_t}{1-\beta_2^t}$    （$\beta_2=0.999$）（方差的无偏估计）</p>
+<p>问题：</p>
+<p>$\underset{t\rightarrow\infty}{\lim}\frac{\hat{m}_t}{\sqrt{\hat{v}_t}}=1$</p>
+<p>这会导致训练很久后，的movement$\rightarrow\eta$​ ，并且不能提供有效的方向信息；而当真正有效的gradient出现时，又会因为前面大量的无效gradient而只产生微不足道的影响</p>
+<p>一次更新最多移动的距离不超过$\sqrt{\frac{1}{1-\beta_2}}\eta$ </p>
+<h4 id="Adam-Warm-up"><a href="#Adam-Warm-up" class="headerlink" title="Adam Warm-up"></a>Adam Warm-up</h4>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Machine-Learning/Gradient-Descent/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1077,374 +1424,10 @@ A^{[1]}=ReLU(W^{[1]}*A^{[0]}+B^{[1]})</script><h4 id="CNN的组成结构"><a hre
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/%E9%9A%8F%E8%AE%B0/2019-10-25%E9%9A%8F%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E9%9A%8F%E8%AE%B0/2019-10-25%E9%9A%8F%E8%AE%B0/" class="post-title-link" itemprop="url">2019-10-25随记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-27 18:03:52" itemprop="dateCreated datePublished" datetime="2019-10-27T18:03:52+08:00">2019-10-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-23 15:53:05" itemprop="dateModified" datetime="2021-03-23T15:53:05+08:00">2021-03-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">随记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="图像文件序列按序重命名编号-std-glob-amp-amp-std-imwrite"><a href="#图像文件序列按序重命名编号-std-glob-amp-amp-std-imwrite" class="headerlink" title="图像文件序列按序重命名编号 - std::glob &amp;&amp; std::imwrite"></a>图像文件序列按序重命名编号 - <strong>std::glob &amp;&amp; std::imwrite</strong></h4>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">extractId</span><span class="params">(String a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	string a_ = a;	</span><br><span class="line">	string src_ = <span class="string">&quot;D:\\theThirdYear\\RM\\task1\\imageDataset\\&quot;</span>;</span><br><span class="line">	<span class="keyword">int</span> pos_a = a_.<span class="built_in">find</span>(src_);	</span><br><span class="line">	<span class="keyword">int</span> n = src_.<span class="built_in">size</span>();</span><br><span class="line">	a_ = a_.<span class="built_in">erase</span>(pos_a, n);	</span><br><span class="line"></span><br><span class="line">	string tail = <span class="string">&quot;.jpg&quot;</span>;</span><br><span class="line">	pos_a = a_.<span class="built_in">find</span>(tail);	</span><br><span class="line">	n = src_.<span class="built_in">size</span>();</span><br><span class="line">	a_ = a_.<span class="built_in">erase</span>(pos_a, n);	</span><br><span class="line"></span><br><span class="line">	stringstream ss;</span><br><span class="line">	<span class="keyword">int</span> A;</span><br><span class="line">	ss &lt;&lt; a_;</span><br><span class="line">	ss &gt;&gt; A;	</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> A;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat image;</span><br><span class="line">	String src = <span class="string">&quot;D:\\theThirdYear\\RM\\task1\\imageDataset\\&quot;</span>;</span><br><span class="line">	String dst = <span class="string">&quot;D:/theThirdYear/RM/task1/image/&quot;</span>;</span><br><span class="line"></span><br><span class="line">	vector&lt;String&gt; names;</span><br><span class="line">	<span class="keyword">char</span> name[<span class="number">10</span>];</span><br><span class="line">	<span class="built_in">glob</span>(src, names, <span class="literal">false</span>);</span><br><span class="line">	<span class="built_in">sort</span>(names.<span class="built_in">begin</span>(), names.<span class="built_in">end</span>(),cmp);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; names.<span class="built_in">size</span>(); i++)</span><br><span class="line">	&#123;</span><br><span class="line">		image = <span class="built_in">imread</span>(names[i]);</span><br><span class="line">		<span class="keyword">if</span> (image.data != <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">sprintf_s</span>(name, <span class="string">&quot;%04d.jpg&quot;</span>, i);</span><br><span class="line">			<span class="built_in">imwrite</span>(dst + name, image);</span><br><span class="line">			cout &lt;&lt; name &lt;&lt; endl;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			cout &lt;&lt; <span class="string">&quot;end of reading&quot;</span> &lt;&lt; endl;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<hr>
-<h4 id="从string字符串中删去指定字符-字符串-string-find-amp-amp-string-erase"><a href="#从string字符串中删去指定字符-字符串-string-find-amp-amp-string-erase" class="headerlink" title="从string字符串中删去指定字符/字符串 - string::find &amp;&amp; string::erase"></a>从<code>string</code>字符串中删去指定字符/字符串 - <strong>string::find &amp;&amp; string::erase</strong></h4><h2 id><a href="#" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">string str;</span><br><span class="line">string target;</span><br><span class="line"><span class="keyword">int</span> pos = str.<span class="built_in">find</span>(target);</span><br><span class="line">n = target.<span class="built_in">size</span>();</span><br><span class="line">str = str.<span class="built_in">erase</span>(pos,n);</span><br></pre></td></tr></table></figure></h2><h4 id="字符串和数字的相互转化-stringstream"><a href="#字符串和数字的相互转化-stringstream" class="headerlink" title="字符串和数字的相互转化 - stringstream"></a>字符串和数字的相互转化 - <strong>stringstream</strong></h4><h2 id="-1"><a href="#-1" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sstream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 字符串-&gt;数字</span></span><br><span class="line">string str = <span class="string">&quot;123&quot;</span>;</span><br><span class="line"><span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">stringstream ss;</span><br><span class="line">ss &lt;&lt; str;</span><br><span class="line">ss &gt;&gt; id;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数字-&gt;字符串</span></span><br><span class="line"><span class="keyword">int</span> id = <span class="number">123</span>;</span><br><span class="line">string str;</span><br><span class="line"></span><br><span class="line">stringstream ss;</span><br><span class="line">ss &lt;&lt; id;</span><br><span class="line">ss &gt;&gt; str;</span><br><span class="line"></span><br></pre></td></tr></table></figure></h2><h4 id="在图片上打印帧数-cv-putText"><a href="#在图片上打印帧数-cv-putText" class="headerlink" title="在图片上打印帧数 - cv::putText"></a>在图片上打印帧数 - <strong>cv::putText</strong></h4><h2 id="-2"><a href="#-2" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">putFrame</span><span class="params">(Mat &amp;image, <span class="keyword">int</span> frame)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat img = image;</span><br><span class="line">	<span class="comment">// 输出文本字符串</span></span><br><span class="line">	<span class="keyword">char</span> id[<span class="number">10</span>];</span><br><span class="line">	<span class="built_in">sprintf_s</span>(id, <span class="string">&quot;%04d&quot;</span>, frame++);</span><br><span class="line">	string text = <span class="string">&quot;Frame: &quot;</span>;</span><br><span class="line">	text = text + id;</span><br><span class="line">	<span class="comment">// 设置文本参数</span></span><br><span class="line">	<span class="keyword">int</span> font_face = FONT_HERSHEY_COMPLEX;</span><br><span class="line">	<span class="keyword">double</span> font_scale = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">int</span> thickness = <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">int</span> baseline;</span><br><span class="line">	<span class="comment">// 获取文本框长宽</span></span><br><span class="line">	Size text_size = <span class="built_in">getTextSize</span>(text, font_face, font_scale, thickness, &amp;baseline);</span><br><span class="line">	Point origin;</span><br><span class="line">	origin.x = <span class="number">0</span>;</span><br><span class="line">	origin.y = text_size.height;</span><br><span class="line">	<span class="built_in">putText</span>(img, text, origin, font_face, font_scale, <span class="built_in">Scalar</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), thickness, <span class="number">8</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">return</span> img;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></h2><h4 id="读入视频-图像序列-cv-VideoCapture"><a href="#读入视频-图像序列-cv-VideoCapture" class="headerlink" title="读入视频/图像序列 - cv::VideoCapture"></a>读入视频/图像序列 - <strong>cv::VideoCapture</strong></h4><h2 id="-3"><a href="#-3" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">std::string frame_file = <span class="string">&quot;your/frame_file/path/%d.jpg&quot;</span>;</span><br><span class="line"><span class="function">cv::VideoCapture <span class="title">Sequence</span><span class="params">(frame_file)</span></span>;</span><br><span class="line"><span class="keyword">if</span> (!Sequence.<span class="built_in">isOpened</span>())</span><br><span class="line">	std::cerr &lt;&lt; <span class="string">&quot;Failed to open image dataset&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	Sequence &gt;&gt; img;</span><br><span class="line">	<span class="keyword">if</span> (img.<span class="built_in">empty</span>())</span><br><span class="line">	&#123;</span><br><span class="line">		std::cout &lt;&lt; <span class="string">&quot;End of Sequence&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;	</span><br><span class="line">	<span class="comment">// 图片处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></h2><h4 id="给定范围内图像二值化-cv-inRange"><a href="#给定范围内图像二值化-cv-inRange" class="headerlink" title="给定范围内图像二值化 - cv::inRange"></a>给定范围内图像二值化 - <strong>cv::inRange</strong></h4><h2 id="-4"><a href="#-4" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">inRange</span>(hsv_img, cv::<span class="built_in">Scalar</span>(hmin, smin, vmin), cv::<span class="built_in">Scalar</span>(hmax, smax, vmax), bin_img);</span><br></pre></td></tr></table></figure></h2><h4 id="生成滚动条控制参数变化-cv-createTrackbar"><a href="#生成滚动条控制参数变化-cv-createTrackbar" class="headerlink" title="生成滚动条控制参数变化 - cv::createTrackbar"></a>生成滚动条控制参数变化 - <strong>cv::createTrackbar</strong></h4><h2 id="-5"><a href="#-5" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 滚动条参数，初始值为0/360，反馈滚动条上的数值</span></span><br><span class="line"><span class="keyword">int</span> hmin = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> hmax = <span class="number">360</span>;</span><br><span class="line"><span class="keyword">int</span> smin = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> smax = <span class="number">255</span>;</span><br><span class="line"><span class="keyword">int</span> vmin = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> vmax = <span class="number">255</span>;</span><br><span class="line"><span class="comment">// 滚动条参数最大值，最小值默认为0</span></span><br><span class="line"><span class="keyword">int</span> hmin_max = <span class="number">360</span>;</span><br><span class="line"><span class="keyword">int</span> hmax_max = <span class="number">360</span>;</span><br><span class="line"><span class="keyword">int</span> smin_max = <span class="number">255</span>;</span><br><span class="line"><span class="keyword">int</span> smax_max = <span class="number">255</span>;</span><br><span class="line"><span class="keyword">int</span> vmin_max = <span class="number">255</span>;</span><br><span class="line"><span class="keyword">int</span> vmax_max = <span class="number">255</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置为全局变量一边在子函数中的使用</span></span><br><span class="line">Mat hsv_img;</span><br><span class="line">Mat bin_img;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">on_Trackbar</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">void</span>*)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cv::<span class="built_in">inRange</span>(hsv_img, cv::<span class="built_in">Scalar</span>(hmin, smin, vmin), cv::<span class="built_in">Scalar</span>(hmax, smax, vmax), bin_img);</span><br><span class="line">	cv::<span class="built_in">imshow</span>(<span class="string">&quot;bin_img&quot;</span>, bin_img);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cv::<span class="built_in">namedWindow</span>(<span class="string">&quot;Trackbar&quot;</span>, <span class="number">1</span>);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;hmin&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;hmin, hmin_max, on_Trackbar);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;hmax&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;hmax, hmax_max, on_Trackbar);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;smin&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;smin, smin_max, on_Trackbar);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;smax&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;smax, smax_max, on_Trackbar);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;vmin&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;vmin, vmin_max, on_Trackbar);</span><br><span class="line">	cv::<span class="built_in">createTrackbar</span>(<span class="string">&quot;vmax&quot;</span>, <span class="string">&quot;Trackbar&quot;</span>, &amp;vmax, vmax_max, on_Trackbar);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		Sequence &gt;&gt; img;</span><br><span class="line">		<span class="keyword">if</span> (img.<span class="built_in">empty</span>())</span><br><span class="line">		&#123;</span><br><span class="line">			std::cout &lt;&lt; <span class="string">&quot;End of Sequence&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;		</span><br><span class="line">		hsv_img = cv::<span class="built_in">Mat</span>(img.<span class="built_in">size</span>(), img.<span class="built_in">type</span>());</span><br><span class="line">		cv::<span class="built_in">cvtColor</span>(img, hsv_img, CV_BGR2HSV);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//结果在回调函数中显示</span></span><br><span class="line">		<span class="built_in">on_Trackbar</span>(hmin, <span class="number">0</span>);</span><br><span class="line">		<span class="built_in">on_Trackbar</span>(hmax, <span class="number">0</span>);</span><br><span class="line">		<span class="built_in">on_Trackbar</span>(smin, <span class="number">0</span>);</span><br><span class="line">		<span class="built_in">on_Trackbar</span>(smax, <span class="number">0</span>);</span><br><span class="line">		<span class="built_in">on_Trackbar</span>(vmin, <span class="number">0</span>);</span><br><span class="line">		<span class="built_in">on_Trackbar</span>(vmax, <span class="number">0</span>);		</span><br><span class="line">		</span><br><span class="line">		cv::<span class="built_in">waitKey</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></h2><h4 id="寻找列表中的最小值和最大值-std-minmax"><a href="#寻找列表中的最小值和最大值-std-minmax" class="headerlink" title="寻找列表中的最小值和最大值 - std::minmax()"></a>寻找列表中的最小值和最大值 - <strong>std::minmax()</strong></h4><p>&emsp;&emsp;该函数返回一个<code>pair</code>，该<code>pair</code>的<code>first</code>元素值为最小值（第一次出现的），<code>second</code>元素的值为最大值（第一次出现的）。</p>
-<h2 id="-6"><a href="#-6" class="headerlink" title></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> it = <span class="built_in">minmax</span>([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]);</span><br></pre></td></tr></table></figure></h2><h4 id="旋转矩形类-cv-RotatedRect-const-Point2f-amp-center-const-Size2f-amp-size-float-angle"><a href="#旋转矩形类-cv-RotatedRect-const-Point2f-amp-center-const-Size2f-amp-size-float-angle" class="headerlink" title="旋转矩形类 - cv::RotatedRect(const Point2f&amp; center, const Size2f&amp; size, float angle)"></a>旋转矩形类 - <strong>cv::RotatedRect(const Point2f&amp; center, const Size2f&amp; size, float angle)</strong></h4><ul>
-<li>center : 矩形中心坐标</li>
-<li>size： 矩形长宽</li>
-<li>angle：从水平轴开始的顺时针旋转角度</li>
-</ul>
-<hr>
-<h4 id="轮廓提取函数-void-cv-findContours"><a href="#轮廓提取函数-void-cv-findContours" class="headerlink" title="轮廓提取函数 - void cv::findContours"></a>轮廓提取函数 - <strong>void cv::findContours</strong></h4><h5 id="函数原型："><a href="#函数原型：" class="headerlink" title="函数原型："></a><strong>函数原型</strong>：</h5>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">findContours</span>( InputOutputArray image, OutputArrayOfArrays contours,</span><br><span class="line">              OutputArray hierarchy, <span class="keyword">int</span> mode,  </span><br><span class="line">              <span class="keyword">int</span> method, Point offset=<span class="built_in">Point</span>()</span><br><span class="line">);  </span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>image</strong>: 单通道图像矩阵，可以是灰度图，但更常用的是二值图像，一般是经过Canny、拉普拉斯等边缘检测算子处理过的二值图像；</li>
-<li><strong>contours</strong>: 定义为<strong><code>vector&lt;vector&lt;Point&gt;&gt; contours</code></strong>，是一个向量，并且是一个双重向量，向量内每个元素保存了一组由连续的Point点构成的点的集合的向量，每一组Point点集就是一个轮廓。有多少轮廓，向量contours就有多少元素。</li>
-<li><strong>hierarchy</strong>: 定义为 <strong><code>vector&lt;Vec4i&gt; hierarchy</code></strong>，也是一个向量，向量内每个元素保存了一个包含4个int整型的数组。向量hiararchy内的元素和轮廓向量contours内的元素是一一对应的，向量的容量相同。<br>&emsp;&emsp;hierarchy向量内每一个元素的4个int型变量——<code>hierarchy[i][0] ~ hierarchy[i][3]</code>，分别表示第i个轮廓的后一个轮廓、前一个轮廓、父轮廓、内嵌轮廓的索引编号。如果当前轮廓没有对应的后一个轮廓、前一个轮廓、父轮廓或内嵌轮廓的话，则<code>hierarchy[i][0] ~ hierarchy[i][3]</code>的相应位被设置为默认值-1。</li>
-<li><strong>mode</strong>: 定义轮廓的检索模式：<ul>
-<li><strong>CV_RETR_EXTERNAL</strong>: 只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略。</li>
-<li><strong>CV_RETR_LIST</strong>: 检测所有的轮廓，包括内围、外围轮廓，但是检测到的轮廓不建立等级关系，彼此之间独立，没有等级关系，这就意味着<strong>这个检索模式下不存在父轮廓或内嵌轮廓</strong>，所以hierarchy向量内所有元素的第3、第4个分量都会被置为-1。</li>
-<li><strong>CV_RETR_CCOMP</strong>: 检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层。两个等级关系：顶层为连通域的外围边界，次层为孔的内层边界。</li>
-<li><strong>CV_RETR_TREE</strong>: 检测所有轮廓，所有轮廓建立一个等级树结构。外层轮廓包含内层轮廓，内层轮廓还可以继续包含内嵌轮廓。</li>
-</ul>
-</li>
-<li><strong>method</strong>: 定义轮廓的近似方法：<ul>
-<li><strong>CV_CHAIN_APPROX_NONE</strong>: 保存物体边界上所有连续的轮廓点到contours向量内</li>
-<li><strong>CV_CHAIN_APPROX_SIMPLE</strong>: 仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留</li>
-<li><strong>CV_CHAIN_APPROX_TC89_L1</strong>，<strong>CV_CHAIN_APPROX_TC89_KCOS</strong>使用teh-Chinl chain 近似算法</li>
-</ul>
-</li>
-<li><strong>Point</strong>: 偏移量，所有的轮廓信息相对于原始图像对应点的偏移量，<strong>相当于在每一个检测出的轮廓点上加</strong>上该偏移量，并且Point还可以是负值</li>
-</ul>
-<hr>
-<h4 id="轮廓绘制函数-void-cv-drawContours"><a href="#轮廓绘制函数-void-cv-drawContours" class="headerlink" title="轮廓绘制函数 - void cv::drawContours"></a>轮廓绘制函数 - <strong>void cv::drawContours</strong></h4><h5 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h5>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drawContours</span></span></span><br><span class="line"><span class="function"><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    InputOutputArray image,</span></span></span><br><span class="line"><span class="params"><span class="function">    InputArrayOfArrays contours,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">int</span> contourIdx,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> Scalar&amp; color,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">int</span> thickness = <span class="number">1</span>, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">int</span> lineType = <span class="number">8</span>, </span></span></span><br><span class="line"><span class="params"><span class="function">    InputArray hierarchy = noArray(),</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">int</span> maxLevel = INT_MAX,                                       </span></span></span><br><span class="line"><span class="params"><span class="function">    Point offset = Point()</span></span></span><br><span class="line"><span class="params"><span class="function">)</span>  </span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>image</strong>: 要绘制轮廓的图像</li>
-<li><strong>contours</strong>: 所有输入的轮廓，每个轮廓被保存成一个point向量</li>
-<li><strong>contourIdx</strong>: 指定要绘制轮廓的编号，如果是负数，则绘制所有的轮廓</li>
-<li><strong>color</strong>: 绘制轮廓所用的颜色</li>
-<li><strong>thickness</strong>: 绘制轮廓的线的粗细，如果是负数，则轮廓内部被填充</li>
-<li><strong>lineType</strong>: 绘制轮廓的线的连通性</li>
-<li><strong>hierarchy</strong>: 关于层级的可选参数，只有绘制部分轮廓时才会用到</li>
-<li><strong>maxLevel</strong>: 绘制轮廓的最高级别，这个参数只有hierarchy有效的时候才有效<ul>
-<li><strong>maxLevel=0</strong>，绘制与输入轮廓属于同一等级的所有轮廓即输入轮廓和与其相邻的轮廓</li>
-<li><strong>maxLevel=1</strong>, 绘制与输入轮廓同一等级的所有轮廓与其子节点</li>
-<li><strong>maxLevel=2</strong>，绘制与输入轮廓同一等级的所有轮廓与其子节点以及子节点的子节点</li>
-</ul>
-</li>
-<li><strong>offset</strong>: 偏移量</li>
-</ul>
-<hr>
-<h4 id="轮廓的最小外接矩形函数-Rect-cv-boundingRect-InputArray-array"><a href="#轮廓的最小外接矩形函数-Rect-cv-boundingRect-InputArray-array" class="headerlink" title="轮廓的最小外接矩形函数 - Rect cv::boundingRect( InputArray array )"></a>轮廓的最小外接矩形函数 - <strong>Rect cv::boundingRect( InputArray array )</strong></h4><ul>
-<li><strong>InputArray array</strong>: 一般为findContours函数查找的轮廓，包含轮廓的点集或者Mat；</li>
-<li>返回值为最小外接矩形的Rect，即左上点与矩形的宽度和高度；</li>
-</ul>
-<hr>
-<h4 id="返回指定形状和尺寸的结构元素-Mat-cv-getStructuringElement"><a href="#返回指定形状和尺寸的结构元素-Mat-cv-getStructuringElement" class="headerlink" title="返回指定形状和尺寸的结构元素 - Mat cv::getStructuringElement"></a>返回指定形状和尺寸的结构元素 - <strong>Mat cv::getStructuringElement</strong></h4><h5 id="函数原型：-1"><a href="#函数原型：-1" class="headerlink" title="函数原型："></a>函数原型：</h5>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">getStructuringElement</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">int</span> shape, Size esize, Point anchor = Point(<span class="number">-1</span>, <span class="number">-1</span>)</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>shape</strong>: 表示内核的形状<ul>
-<li><strong>MORPH_RECT</strong>: 矩形</li>
-<li><strong>MORPH_CROSS</strong>: 交叉形</li>
-<li><strong>MORPH_ELLIPSE</strong>: 椭圆形</li>
-</ul>
-</li>
-<li><strong>esize &amp; anchor</strong>: 内核的尺寸以及锚点的位置，默认值<code>Point(-1,-1)</code>表示位于中心。</li>
-<li>一般在调用膨胀/腐蚀函数<code>dilate</code>和<code>erode</code>之前，先定义一个<code>Mat</code>类型的变量来获得该函数的返回值，作为膨胀/腐蚀函数的膨胀操作内核输入。</li>
-</ul>
-<hr>
-<h4 id="膨胀函数-cv-dilate"><a href="#膨胀函数-cv-dilate" class="headerlink" title="膨胀函数 - cv::dilate()"></a>膨胀函数 - <strong>cv::dilate()</strong></h4><p>  使用像素邻域内的局部极大运算符来膨胀一张图片，从<code>src</code>输入， 由<code>dst</code>输出。</p>
-<h5 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h5>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dilate</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">	InputArray src,</span></span></span><br><span class="line"><span class="params"><span class="function">	OutputArray dst,</span></span></span><br><span class="line"><span class="params"><span class="function">	InputArray kernel,</span></span></span><br><span class="line"><span class="params"><span class="function">	Point anchor=Point(<span class="number">-1</span>,<span class="number">-1</span>),</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">int</span> iterations=<span class="number">1</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">int</span> borderType=BORDER_CONSTANT,</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">const</span> Scalar&amp; borderValue=morphologyDefaultBorderValue()</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>src</strong>: 输入源图像，<code>Mat</code>类即可</li>
-<li><strong>dst</strong>: 和源图像有相同尺寸和类型的目标图像</li>
-<li><strong>kernel</strong>: 膨胀操作的内核，当为<code>NULL</code>时，表示的是使用参考点位于中心$3\times 3$的核。一般使用函数<strong><code>Mat getStructuringElement</code></strong>配合这个参数使用。</li>
-<li><strong>anchor</strong>: 锚点位置，默认值表示位于中心</li>
-<li><strong>iterations</strong>: 迭代使用<code>dilate()</code>函数的次数，默认为1次</li>
-<li><strong>borderType</strong>: 用于推断图像外部像素的某种边界模式，有默认值，可以不考虑</li>
-<li><strong>borderValue</strong>: 当边界为常数时的边界值，有默认值，一般不去考虑</li>
-<li>使用膨胀函数，一般只需要填前面三个参数，后面四个都有默认值。</li>
-</ul>
-<hr>
-<h4 id="腐蚀函数-cv-erode"><a href="#腐蚀函数-cv-erode" class="headerlink" title="腐蚀函数 - cv::erode()"></a>腐蚀函数 - <strong>cv::erode()</strong></h4><p>  使用像素邻域内的局部极小运算符来腐蚀一张图片，从<code>src</code>输入， 由<code>dst</code>输出。</p>
-<h5 id="函数原型-2"><a href="#函数原型-2" class="headerlink" title="函数原型"></a>函数原型</h5>  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">erode</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">	InputArray src,</span></span></span><br><span class="line"><span class="params"><span class="function">	OutputArray dst,</span></span></span><br><span class="line"><span class="params"><span class="function">	InputArray kernel,</span></span></span><br><span class="line"><span class="params"><span class="function">	Point anchor=Point(<span class="number">-1</span>,<span class="number">-1</span>),</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">int</span> iterations=<span class="number">1</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">int</span> borderType=BORDER_CONSTANT,</span></span></span><br><span class="line"><span class="params"><span class="function">	<span class="keyword">const</span> Scalar&amp; borderValue=morphologyDefaultBorderValue()</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/%E9%9A%8F%E8%AE%B0/2019-10-23%E9%9A%8F%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E9%9A%8F%E8%AE%B0/2019-10-23%E9%9A%8F%E8%AE%B0/" class="post-title-link" itemprop="url">2019-10-23随记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-27 18:03:44" itemprop="dateCreated datePublished" datetime="2019-10-27T18:03:44+08:00">2019-10-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-23 15:53:05" itemprop="dateModified" datetime="2021-03-23T15:53:05+08:00">2021-03-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">随记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>latex</p>
-</blockquote>
-<ul>
-<li>摄氏度：<code>^&#123;\circ&#125;C</code></li>
-<li><code>equation</code>环境中斜体变直体：<code>&#123;\rm T&#125;</code></li>
-<li>空行：<code>~\\</code></li>
-<li>在<code>equation</code>环境中输入中文：<code>mbox&#123;中文&#125;</code></li>
-<li>并排图片（子图片）</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;figure&#125;[!htbp]</span><br><span class="line">	\centering</span><br><span class="line">	\subfigure[name]&#123;</span><br><span class="line">		\includegraphics[width=]&#123;path/to/your/image&#125;</span><br><span class="line">		\title&#123;&#125;</span><br><span class="line">		\label&#123;&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	\subfigure[name]&#123;</span><br><span class="line">		\includegraphics[width=]&#123;path/to/your/image&#125;</span><br><span class="line">		\title&#123;&#125;</span><br><span class="line">		\label&#123;&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	\caption</span><br><span class="line">	\label&#123;&#125;</span><br><span class="line">\end&#123;figure&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>电脑装了Visual Studio如果直接在vscode中”cmake …”会生成VS的工程文件，所以这里需要指定下。</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -G <span class="string">&quot;Unix Makefiles&quot;</span> ../</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/%E9%9A%8F%E8%AE%B0/2019-10-9%E9%9A%8F%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E9%9A%8F%E8%AE%B0/2019-10-9%E9%9A%8F%E8%AE%B0/" class="post-title-link" itemprop="url">2019-10-9随记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-27 17:59:19" itemprop="dateCreated datePublished" datetime="2019-10-27T17:59:19+08:00">2019-10-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-23 15:53:05" itemprop="dateModified" datetime="2021-03-23T15:53:05+08:00">2021-03-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">随记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="python异常机制"><a href="#python异常机制" class="headerlink" title="python异常机制"></a>python异常机制</h5><h5 id="numpy中的ndim-shape-dtype-astype方法"><a href="#numpy中的ndim-shape-dtype-astype方法" class="headerlink" title="numpy中的ndim / shape/ dtype/ astype方法"></a>numpy中的<strong>ndim / shape/ dtype/ astype</strong>方法</h5><ul>
-<li><strong>ndim</strong> 返回数组维度（int）</li>
-<li><strong>shape</strong> 返回各维度大小的元组（元组）</li>
-<li><strong>dtype</strong> 返回该数组的数据类型（整型返回int32，有小数点返回float64）</li>
-<li><strong>astype</strong> 转换数组的数据类型<ul>
-<li>int32 —&gt; float64 </li>
-<li>float64 —&gt; int32   小数部分被截断</li>
-<li>string —&gt; float64   如果字符串数组表示的全是数字，也可以用astype转化为数值类型</li>
-</ul>
-</li>
-</ul>
-<h5 id="numpy-transpose-a-axes-None"><a href="#numpy-transpose-a-axes-None" class="headerlink" title="numpy.transpose(a, axes=None)"></a><strong>numpy.transpose(a, axes=None)</strong></h5><ul>
-<li>重置数组的维度</li>
-<li>参数：a&lt;输入数组&gt;；axes&lt;整数列表&gt;默认情况下，反转维度，否则根据给定的值对维度进行排列。</li>
-<li>返回值：修改维度后的a</li>
-</ul>
-<h5 id="PIL-Image与numpy-array之间的相互转换"><a href="#PIL-Image与numpy-array之间的相互转换" class="headerlink" title="PIL.Image与numpy.array之间的相互转换"></a><strong>PIL.Image</strong>与<strong>numpy.array</strong>之间的相互转换</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line">image = Image.<span class="built_in">open</span>(<span class="string">&#x27;path/to/image&#x27;</span>)</span><br><span class="line">img = numpy.array(image)</span><br><span class="line"><span class="comment"># 图像处理</span></span><br><span class="line">image = Image.fromarray(img.astype(<span class="string">&#x27;uint8&#x27;</span>)).convert(<span class="string">&#x27;RGB&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<h5 id="array-1-逆序"><a href="#array-1-逆序" class="headerlink" title="array[::-1,:,:] 逆序"></a><strong>array[::-1,:,:]</strong> 逆序</h5><h5 id="numpy-flatten-多维数组变成一维数组"><a href="#numpy-flatten-多维数组变成一维数组" class="headerlink" title="numpy.flatten(): 多维数组变成一维数组"></a><strong>numpy.flatten()</strong>: 多维数组变成一维数组</h5><h5 id="numpy-mean-array-axes"><a href="#numpy-mean-array-axes" class="headerlink" title="numpy.mean(array, axes)"></a><strong>numpy.mean(array, axes)</strong></h5><h5 id="中心化与标准化"><a href="#中心化与标准化" class="headerlink" title="中心化与标准化"></a>中心化与标准化</h5><ul>
-<li><strong>中心化</strong>（又叫零均值化）zero-centered 或者 Mean-subtraction</li>
-<li><strong>标准化</strong>（又叫归一化）Standardization 或者 Normalization<ul>
-<li><strong>意义</strong>：数据中心化和标准化在回归分析中是取消由于量纲不同、自身变异或者数值相差较大所引起的误差。</li>
-<li><strong>原理</strong>：<ul>
-<li>数据标准化是指变量减去均值，再除以标准差</li>
-<li>数据中心化是指变量减去均值</li>
-</ul>
-</li>
-<li><strong>目的</strong>：通过中心化和标准化处理，得到均值为0，标准差为1的服从标准正态分布的数据。在训练神经网络的过程中，通过将数据标准化，能够加速权重参数的收敛；对数据进行中心化预处理，能够增加基向量的正交性</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mean = np.array([np.mean(image[<span class="number">0</span>]),np.mean(image[<span class="number">1</span>]),np.mean(image[<span class="number">2</span>])])</span><br><span class="line">  </span><br><span class="line">std = np.array([np.std(image[<span class="number">0</span>],ddof=<span class="number">1</span>),np.std(image[<span class="number">1</span>],ddof=<span class="number">1</span>),np.std(image[<span class="number">2</span>],ddof=<span class="number">1</span>)])</span><br><span class="line"></span><br><span class="line">np.std(array, ddof=<span class="number">1</span>) <span class="comment"># 最后的参数一定要加!!!</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>caffe与PyTorch的图像预处理不同。caffe2中图像的通道与OpenCV相同，是BGR格式，标准化到0-255，PyTorch中图像是RGB格式，标准化到0-1。</li>
-</ul>
-<h5 id="numpy-random-get-state-amp-numpy-random-set-state"><a href="#numpy-random-get-state-amp-numpy-random-set-state" class="headerlink" title="numpy.random.get_state() &amp; numpy.random.set_state()"></a><strong>numpy.random.get_state() &amp; numpy.random.set_state()</strong></h5><ul>
-<li>功能：获取/设置随机生成器np.random的状态</li>
-<li>作用：具有相同state的随机生成器(random)的随机效果相同。随机生成器random，每执行一次，random的状态（state）就会变化一次，所以每次产生的随机数都不同，或随机操作的效果都不同。而当random的状态（state）不变时，多次执行random的同一操作具有相同的效果。</li>
-<li>用途：<ul>
-<li>通过设置相同的state，使得两次生成的随机数相同</li>
-<li>通过设置相同的state,使得random.shuffle以相同的规律打乱两个列表，进而使得两个列表被打乱后，仍旧能维持两个列表间元素的一一对应关系。这一点在深度学习的标注数据集的打乱的过程中很有用。一一对应的image_list 与label_list，在分别打乱后，仍能维持一一对应的关系。</li>
-</ul>
-</li>
-</ul>
-  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"> </span><br><span class="line">images_list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>]</span><br><span class="line">labels_list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>]</span><br><span class="line"> </span><br><span class="line">state = np.random.get_state()</span><br><span class="line">np.random.shuffle(images_list)</span><br><span class="line">np.random.set_state(state)</span><br><span class="line">np.random.shuffle(labels_list)</span><br><span class="line"> </span><br><span class="line"><span class="built_in">print</span>(images_list）</span><br><span class="line"><span class="built_in">print</span>(labels_list)</span><br></pre></td></tr></table></figure>
-<h5 id="cv-RotatedRect"><a href="#cv-RotatedRect" class="headerlink" title="cv::RotatedRect"></a><strong>cv::RotatedRect</strong></h5><p>  这是一个存储旋转矩形的类，通常用来存储最小外接矩形函数<code>minAreaRect()</code>和椭圆拟合函数<code>fitEllipse()</code>返回的结果。它具有三个属性：</p>
-<ul>
-<li>矩形中心（质心）：<code>const Point2f &amp;center</code></li>
-<li>边长（长和宽）：<code>const Size2f &amp;size</code></li>
-<li>旋转角度：<code>float angle</code></li>
-</ul>
-<p>  <img src="/%E9%9A%8F%E8%AE%B0/2019-10-9%E9%9A%8F%E8%AE%B0/RotatedRect.png" width="60%" height="60%"></p>
-<p>  参数<code>angle</code>从平行于x轴射线出发，逆时针为负，顺时针为正。逆时针旋转碰到的第一条边的边长即为<code>width</code></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1512,7 +1495,7 @@ A^{[1]}=ReLU(W^{[1]}*A^{[0]}+B^{[1]})</script><h4 id="CNN的组成结构"><a hre
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

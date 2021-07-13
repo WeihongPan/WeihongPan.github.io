@@ -23,20 +23,20 @@
   <meta name="description" content="OpenNI开源框架OpenNI是一个多语言、跨平台的框架，主要目的是形成标准的、用于&lt;视音频传感器&gt;和&lt;视音频感知中间件&gt;间通信的API，兼容设备包括Primesense Reference Design、Microsoft Kinect 和 Asus XtionPro三种摄像头设备 I&#x2F;O模块包括有21个类和28个函数，实现对点云的获取、读入、存储等操作，既可通过点云文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PCL学习(2):IO模块">
-<meta property="og:url" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:url" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/index.html">
 <meta property="og:site_name" content="潘薇鸿">
 <meta property="og:description" content="OpenNI开源框架OpenNI是一个多语言、跨平台的框架，主要目的是形成标准的、用于&lt;视音频传感器&gt;和&lt;视音频感知中间件&gt;间通信的API，兼容设备包括Primesense Reference Design、Microsoft Kinect 和 Asus XtionPro三种摄像头设备 I&#x2F;O模块包括有21个类和28个函数，实现对点云的获取、读入、存储等操作，既可通过点云文">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2">
-<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/PCL学习(2">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/1626141295700.png">
 <meta property="article:published_time" content="2021-07-11T16:08:00.000Z">
-<meta property="article:modified_time" content="2021-07-13T01:55:59.832Z">
+<meta property="article:modified_time" content="2021-07-13T08:42:26.752Z">
 <meta property="article:author" content="潘薇鸿">
 <meta property="article:tag" content="PCL">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2">
+<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/PCL学习(2">
 
-<link rel="canonical" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/">
+<link rel="canonical" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/">
 
 
 <script id="page-configurations">
@@ -172,7 +172,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -202,7 +202,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-13 09:55:59" itemprop="dateModified" datetime="2021-07-13T09:55:59+08:00">2021-07-13</time>
+                <time title="修改时间：2021-07-13 16:42:26" itemprop="dateModified" datetime="2021-07-13T16:42:26+08:00">2021-07-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -276,14 +276,14 @@
 <li><p><strong>点连接</strong>：即将两个格式相同（包括字段类型和维度都要相同）的点云中的点合并。&lt;增加点数&gt;</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cloud_c = cloud_a;</span><br><span class="line">cloud_c += cloud_b;</span><br></pre></td></tr></table></figure>
 <p>输出：</p>
-<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626140895249">-IO模块/1626140895249.png)</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626140895249">-IO模块/1626140895249.png)</p>
 </li>
 <li><p><strong>域（字段）连接</strong>：例如点云A为N个点的XYZ点（pcl::PointXYZ），点云B为N个点的法向量（pcl::Normal），那么将两个点云进行字段连接得到的点云C则为N个点的pcl::PointNormal类型。&lt;增加维度&gt;</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::concatenateFields</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn1T&gt; &amp;cloud1_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn2T&gt; &amp;cloud2_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    pcl::PointCloud&lt;PointOutT&gt; &amp;cloud_out)</span></span></span><br></pre></td></tr></table></figure>
 <p>例：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pcl::<span class="built_in">concatenateFields</span>(cloud_a, n_cloud_b, p_n_cloud_c);</span><br></pre></td></tr></table></figure>
 <p>输出：</p>
-<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(2)-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626141295700">-IO模块/1626141295700.png)</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/1626141295700.png" alt="1626141295700"></p>
 </li>
 </ul>
 
@@ -308,7 +308,7 @@
       <i class="fa fa-chevron-left"></i> Multiple View Geometry - Lecture 1
     </a></div>
       <div class="post-nav-item">
-    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" rel="next" title="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-1-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" rel="next" title="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
       PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -385,7 +385,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

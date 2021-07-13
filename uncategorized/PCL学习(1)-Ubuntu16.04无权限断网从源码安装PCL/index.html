@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="给Ubuntu装PCL是大二时候的事情了，那时候在自己电脑的双系统上装，root权限和网络都有，apt-get安装非常快。现在开始学PCL库，在实验室服务器上重新来装一遍，不同的是，这次既没有root权限也没有网页，就会麻烦很多，折腾了一天，记录一下。 依赖库PCL需要的依赖库有点多，包括：  必须：Boost，Eigen，FLANN，VTK 选择：Qhull，OpenNI，CUDA  apt-g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
+<meta property="og:url" content="https://weihongpan.github.io/uncategorized/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/index.html">
+<meta property="og:site_name" content="潘薇鸿">
+<meta property="og:description" content="给Ubuntu装PCL是大二时候的事情了，那时候在自己电脑的双系统上装，root权限和网络都有，apt-get安装非常快。现在开始学PCL库，在实验室服务器上重新来装一遍，不同的是，这次既没有root权限也没有网页，就会麻烦很多，折腾了一天，记录一下。 依赖库PCL需要的依赖库有点多，包括：  必须：Boost，Eigen，FLANN，VTK 选择：Qhull，OpenNI，CUDA  apt-g">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png">
+<meta property="article:published_time" content="2021-07-11T16:08:00.000Z">
+<meta property="article:modified_time" content="2021-07-13T01:48:02.172Z">
+<meta property="article:author" content="潘薇鸿">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png">
+
+<link rel="canonical" href="https://weihongpan.github.io/uncategorized/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL | 潘薇鸿</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">潘薇鸿</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">keep on fighting</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/WeihongPan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/uncategorized/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-13 09:48:02" itemprop="dateModified" datetime="2021-07-13T09:48:02+08:00">2021-07-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>给Ubuntu装PCL是大二时候的事情了，那时候在自己电脑的双系统上装，root权限和网络都有，apt-get安装非常快。现在开始学PCL库，在实验室服务器上重新来装一遍，不同的是，这次既没有root权限也没有网页，就会麻烦很多，折腾了一天，记录一下。</p>
+<h4 id="依赖库"><a href="#依赖库" class="headerlink" title="依赖库"></a>依赖库</h4><p>PCL需要的依赖库有点多，包括：</p>
+<ul>
+<li>必须：Boost，Eigen，FLANN，VTK</li>
+<li>选择：Qhull，OpenNI，CUDA</li>
+</ul>
+<h4 id="apt-get安装"><a href="#apt-get安装" class="headerlink" title="apt-get安装"></a>apt-get安装</h4><p>如果有root权限不妨选择全部都装一遍：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update  </span><br><span class="line">sudo apt-get install git build-essential linux-libc-dev  </span><br><span class="line">sudo apt-get install cmake cmake-gui   </span><br><span class="line">sudo apt-get install libusb-1.0-0-dev libusb-dev libudev-dev  </span><br><span class="line">sudo apt-get install mpi-default-dev openmpi-bin openmpi-common    </span><br><span class="line">sudo apt-get install libflann1.8 libflann-dev  </span><br><span class="line">sudo apt-get install libeigen3-dev  </span><br><span class="line">sudo apt-get install libboost-all-dev    </span><br><span class="line">sudo apt-get install libqhull* libgtest-dev  </span><br><span class="line">sudo apt-get install freeglut3-dev pkg-config  </span><br><span class="line">sudo apt-get install libxmu-dev libxi-dev   </span><br><span class="line">sudo apt-get install mono-complete  </span><br><span class="line">sudo apt-get install qt-sdk openjdk-8-jdk openjdk-8-jre</span><br></pre></td></tr></table></figure>
+<p>关于Boost库的版本问题，由于我的系统是Ubuntu16.04，只支持到1.58，所以只能apt安装1.7版本的PCL；如果从源码安装更高版本的PCL则需要另外安装更高版本的Boost库。</p>
+<p>接着：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libpcl-dev</span><br></pre></td></tr></table></figure>
+<p>这样子PCL就安装完成啦！</p>
+<h4 id="完全源码安装（包括各类依赖库）"><a href="#完全源码安装（包括各类依赖库）" class="headerlink" title="完全源码安装（包括各类依赖库）"></a>完全源码安装（包括各类依赖库）</h4><p>因为没有root权限，所以apt-get是用不了了，服务器没连网，所以git/wget也用不了，所有依赖库需要从 <a target="_blank" rel="noopener" href="https://packages.ubuntu.com/">Ubuntu Package</a> 网站上下载对应源码包，用ftp传到服务器上进行源码安装。比较麻烦，就只安装了必需的四个库。</p>
+<p>需要注意的是，在编译安装前需要根据 Ubuntu Package 提供的依赖库进行检查，例如 libxt-dev 的依赖库有以下：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626051064861.png" alt="1626051064861"></p>
+<p>使用 <code>dpkg -s 库名称</code> 检查服务器上是否已经安装过需要的依赖库，如果没有，就需要自己一个一个手动下载编译安装。如果嫌一个个检查麻烦的话，也可以直接安装四个依赖库，根据报错去补依赖库（没错就是我）。以openmpi为例介绍如何将依赖库安装到非root用户目录下。</p>
+<p>首先开一个新的文件夹存放下载的源码文件（例如我的：<code>~/Download</code>），再开一个文件夹仿照 <code>/usr</code> 存放安装的各种头文件、链接库等等文件（例如我的：<code>~/Software</code>）。</p>
+<p>主机下载完openmpi源码后ftp上传到服务器，会发现这一类源代码没有熟悉的CMakeLists而是直接的Makefile。</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626052217765.png" alt="1626052217765"></p>
+<p>根据我们之前设置的安装路径进行config：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prerfix=/home/panweihong/Software</span><br></pre></td></tr></table></figure>
+<p>这里的prefix就是将来这个库会被安装在哪个目录底下，默认是 <code>/usr</code> ，显然我们没有操作 <code>/usr</code> 目录的权限，所以需要把它改成我们自己的安装目录，并且需要特别注意的是，这里写的必须是绝对路径，像 <code>~/Software</code> 这样子是不行的。</p>
+<p>config没有问题后就可以开始编译安装了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j8 &amp;&amp; make install -j8</span><br></pre></td></tr></table></figure>
+<p>能开多核就开多核，速度能提快不止一点点。没有报错就okk；有报错大概率就是依赖库的问题，检查一下缺了什么库，再针对性地安装即可，安装过程和这个一模一样。</p>
+<p>不过这样还没有完全结束，因为是手动安装，所以也需要手动配置路径。打开 <code>~/.bashrc</code> 文件，添加：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=/你的安装目录/lib:<span class="variable">$LD_LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=/你的安装目录/lib:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> INCLUDE=/你的安装目录/include:<span class="variable">$INCLUDE</span></span><br><span class="line"><span class="built_in">export</span> PATH=/你的安装目录/bin:<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">export</span> PKG_CONFIG_PATH=/你的安装目录/lib/pkgconfig:<span class="variable">$PKG_CONFIG_PATH</span></span><br><span class="line"><span class="built_in">export</span> MANPATH=/你的安装目录/man:<span class="variable">$MANPATH</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>LD_LIBRARY_PATH：加载运行期间查找<strong>动态链接库</strong>的路径</li>
+<li>LIBRARY_PATH：编译期间查找<strong>动态链接库</strong>的路径</li>
+<li>INCLUDE：<strong>头文件</strong>路径</li>
+<li>PATH：<strong>可执行文件</strong>路径</li>
+<li>PKG_CONFIG_PATH：让安装库能找到依赖库的<strong>安装目录</strong></li>
+<li><code>$VAR</code> ：表示引用 <code>VAR</code> 这个变量的值</li>
+</ul>
+<p>各路径由 <code>:</code> 隔开，设置好后退出 <code>~/.bashrc</code> 并 <code>source ~/.bashrc</code> 后，在终端执行 <code>echo $某个变量名</code> 检查是否生效。</p>
+<p>另外一个小问题，因为每次 <code>source ~/.bashrc</code> 后文件中的 <code>export</code> 语句都会被执行一次，导致路径中有很多重复值，我的解决方法比较笨。就是在第一次export自己的路径前先echo一下这个变量原来的默认值，然后直接复制到原来 <code>$变量</code> 的位置，这样就不会因为重复export重复引用路径导致出现很多重复值了，这么做的原因是每次source的时候都会在第一个export给这个变量重新赋值，之后再有export就不会重复之前的值了，所以，后面再次export这个变量就和之前一样写 <code>$变量明</code> 就行了。</p>
+<h5 id="Boost"><a href="#Boost" class="headerlink" title="Boost"></a>Boost</h5><p>本来boost库服务器上已经安装好了，我之所以重新安装，是因为最后编译PCL库的时候报了这个错：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054896351.png" alt="1626054896351"></p>
+<p>这两个库其实都是有的，用 <code>locate</code> 命令都能找得到，但就是多了个后缀：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/x86_64-linux-gnu/libboost_system.so.1.65.1</span><br><span class="line">/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.65.1</span><br></pre></td></tr></table></figure>
+<p>本来是一个建立软链接就能解决的小事：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/lib/x86_64-linux-gnu/</span><br><span class="line">sudo ln -s libboost_system.so.1.58.0  libboost_system.so</span><br><span class="line">sudo ln -s libboost_iostreams.so.1.58.0  libboost_iostreams.so </span><br></pre></td></tr></table></figure>
+<p>但尴尬的是，没有权限啊！！！所以只能自己重新安装了Orz</p>
+<p>先去 <a target="_blank" rel="noopener" href="http://sourceforge.net/projects/boost/files/boost">sourceforge</a> 下载自己需要版本的boost源码，在解压文件夹下执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./bootstrap.sh --prefix=/home/panweihong/Software</span><br><span class="line">./b2 install --with=all</span><br></pre></td></tr></table></figure>
+<p>如果系统中已经有了预装的boost，为了让自己的boost库能被找到，在cmake的时候加上编译条件 <code>-DBOOST_ROOT=/你的安装目录</code> ，例如我就是 <code>-DBOOST_ROOT=/home/panweihong/Software</code> </p>
+<h5 id="Eigen3"><a href="#Eigen3" class="headerlink" title="Eigen3"></a>Eigen3</h5><p>先去 <a target="_blank" rel="noopener" href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen官网</a> 下载自己需要版本的Eigen源码，在解压文件夹下执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=你的安装路径 ..</span><br><span class="line">make install -j8</span><br></pre></td></tr></table></figure>
+<h5 id="FLANN"><a href="#FLANN" class="headerlink" title="FLANN"></a>FLANN</h5><p>同样先下载 <a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/releases">FLANN源码</a> ，在解压文件夹下执行与Eigen3安装相同的操作。</p>
+<p>我遇到了一个非常神奇的问题，在用 3.15版本的cmake编译时，出现了这样的错误：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626054570126.png" alt="1626054570126"></p>
+<p>参考<a target="_blank" rel="noopener" href="https://github.com/flann-lib/flann/issues/369">这个解决方法</a> ，我重装了一个 3.10版本的cmake（从<a target="_blank" rel="noopener" href="https://cmake.org/files">这里</a>下源码，tar.gz文件不用安装，解压后直接添加环境变量就能用），再次编译就没有这个问题了（震惊.jpg）</p>
+<h5 id="VTK"><a href="#VTK" class="headerlink" title="VTK"></a>VTK</h5><p>这是折腾了我最久的依赖库Orz</p>
+<p>首先下载需要的源码文件：<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz">VTK-8.2.0.tar.gz</a>和<a target="_blank" rel="noopener" href="https://www.vtk.org/files/release/8.2/VTKData-8.2.0.tar.gz">VTKData-8.2.0.tar.gz</a>，将VTKData解压到VTK文件下，执行与Eigen3安装类似的操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=/home/panweihong/Software -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DVTK_WRAP_PYTHON=ON ..</span><br><span class="line">make -j8</span><br><span class="line">make install -j8</span><br></pre></td></tr></table></figure>
+<ul>
+<li>缺少 <code>libxt-dev</code> </li>
+</ul>
+<p>cmake的时候报错：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X11_Xt_LIB could not be found. Required <span class="keyword">for</span> VTK X lib.</span><br></pre></td></tr></table></figure>
+<p>这是缺少 <code>libxt_dev</code> ，去 Ubuntu Package 上下载源码包，又缺依赖 <code>libsm-dev</code> ，<code>libsm-dev</code> 又缺 <code>libice-dev</code> （禁止套娃）。都下载编译安装，方法和上面讲的openmpi一样。不过在make的时候报了这样一个错误：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cc: error: ./sepces: Is a directory</span><br></pre></td></tr></table></figure>
+<p>参考<a target="_blank" rel="noopener" href="https://github.com/raphlinus/pulldown-cmark/issues/122">这个解决方法</a>，<code>LD_LIBRARY</code>、<code>LPATH</code> 和 <code>GCC_EXEC_PREFIX</code> 不能以 <code>:</code> 开头或结尾，并且泵你在中间的任何地方包含 <code>::</code> ，而像这种方法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> VAR=some/new/path:<span class="variable">$VAR</span></span><br></pre></td></tr></table></figure>
+<p>就很容易导致上述问题（当变量初始值为空时）。所以需要在 <code>~/.bashrc</code> 末尾添加一行用来删除路径中的空值：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LD_LIBRARY_PATH=$(<span class="built_in">echo</span> <span class="variable">$LD_LIBRARY_PATH</span> | sed -E -e <span class="string">&#x27;s/^:*//&#x27;</span> -e <span class="string">&#x27;s/:*$//&#x27;</span> -e <span class="string">&#x27;s/:+/:/g&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>断网下载不了测试数据</li>
+</ul>
+<p>VTK在进行make的时候会下载一些测试数据到build的ExternalData文件夹下，但由于服务器断网，所以会出现 <code>(Couldn&#39;t connect to server)</code> 的问题。因为我在自己的双系统上安装过，所以还保留了下载完成的ExternalData文件夹，将该文件夹复制到build文件夹下，再执行make操作就不会报错了。这个数据文件我上传到<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1B46nLFuTDpMf9104N6SGQg">百度云</a>，提取码为64gw，我的VTK是8.2.0版本。</p>
+<h5 id="PCL"><a href="#PCL" class="headerlink" title="PCL"></a>PCL</h5><p>下载<a target="_blank" rel="noopener" href="https://github.com/PointCloudLibrary/pcl/releases">源码文件</a> ，在解压文件夹下执行类似操作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=/home/panweihong/Software -DCMAKE_BUILD_TYPE=Release ..</span><br><span class="line">make -j8</span><br><span class="line">make install -j8</span><br></pre></td></tr></table></figure>
+<h4 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h4><p>从官网上拷贝了一份代码下来</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;pcl-1.7/pcl/point_cloud.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;pcl-1.7/pcl/io/pcd_io.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;pcl-1.7/pcl/point_types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    pcl::PointCloud&lt;pcl::PointXYZ&gt; cloud;    </span><br><span class="line"></span><br><span class="line">    cloud.width = <span class="number">5</span>;</span><br><span class="line">    cloud.height = <span class="number">1</span>;</span><br><span class="line">    cloud.is_dense = <span class="literal">false</span>;</span><br><span class="line">    cloud.points.<span class="built_in">resize</span>(cloud.width*cloud.height);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; point: cloud)</span><br><span class="line">    &#123;</span><br><span class="line">        point.x = <span class="number">1024</span> * <span class="built_in">rand</span>() / (RAND_MAX+<span class="number">1.0f</span>);</span><br><span class="line">        point.y = <span class="number">1024</span> * <span class="built_in">rand</span>() / (RAND_MAX+<span class="number">1.0f</span>);</span><br><span class="line">        point.z = <span class="number">1024</span> * <span class="built_in">rand</span>() / (RAND_MAX+<span class="number">1.0f</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pcl::io::<span class="built_in">savePCDFileASCII</span>(<span class="string">&quot;test_pcd.pcd&quot;</span>,cloud);</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Saved &quot;</span> &lt;&lt; cloud.<span class="built_in">size</span>() &lt;&lt; <span class="string">&quot; data points to test_pcd.pcd&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; point: cloud)</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;   &quot;</span> &lt;&lt; point.x &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; point.y &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; point.z &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CMakeLists.txt如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span> FATAL_ERROR)</span><br><span class="line"><span class="keyword">project</span>(PCL_LEARNING)</span><br><span class="line"><span class="keyword">add_definitions</span>(-std=c++<span class="number">11</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(Eigen3 REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;EIGEN3_INCLUDE_DIR&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;EIGEN3_DEFINITIONS&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(PCL REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;PCL_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;PCL_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;PCL_DEFINITIONS&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(pcd_write_test</span><br><span class="line">    pcd_write.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(</span><br><span class="line">    pcd_write_test </span><br><span class="line">    <span class="variable">$&#123;PCL_LIBRARIES&#125;</span></span><br><span class="line">    <span class="variable">$&#123;EIGEN3_LIBS&#125;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>如果和我一样在vscode里跑的话，在c_cpp_properties.json文件中的<code>includePath</code>加入PCL和Eigen3（如果需要）的头文件路径后就不会报头文件找不到的错误了</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;/home/panweihong/Software/include/pcl-1.9&quot;</span>, </span><br><span class="line"><span class="string">&quot;/home/panweihong/Software/include/eigen3&quot;</span></span><br></pre></td></tr></table></figure>
+<p>执行 <code>./pcd_write_test</code> 输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Saved 5 data points to test_pcd.pcd</span><br><span class="line">   0.352222 -0.151883 -0.106395</span><br><span class="line">   -0.397406 -0.473106 0.292602</span><br><span class="line">   -0.731898 0.667105 0.441304</span><br><span class="line">   -0.734766 0.854581 -0.0361733</span><br><span class="line">   -0.4607 -0.277468 -0.916762</span><br></pre></td></tr></table></figure>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0(1)-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
+<p>成功输出就说明安装成功了！</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-1-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/" rel="prev" title="PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL">
+      <i class="fa fa-chevron-left"></i> PCL学习(1):Ubuntu16.04无权限断网从源码安装PCL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-3-kd-tree%E6%A8%A1%E5%9D%97/" rel="next" title="PCL学习(3):kd-tree模块">
+      PCL学习(3):kd-tree模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">依赖库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#apt-get%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">apt-get安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E5%85%A8%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85%EF%BC%88%E5%8C%85%E6%8B%AC%E5%90%84%E7%B1%BB%E4%BE%9D%E8%B5%96%E5%BA%93%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">完全源码安装（包括各类依赖库）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Boost"><span class="nav-number">3.1.</span> <span class="nav-text">Boost</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Eigen3"><span class="nav-number">3.2.</span> <span class="nav-text">Eigen3</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FLANN"><span class="nav-number">3.3.</span> <span class="nav-text">FLANN</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#VTK"><span class="nav-number">3.4.</span> <span class="nav-text">VTK</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PCL"><span class="nav-number">3.5.</span> <span class="nav-text">PCL</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">4.</span> <span class="nav-text">测试程序</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="潘薇鸿"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">潘薇鸿</p>
+  <div class="site-description" itemprop="description">跬步千里</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WeihongPan" title="GitHub → https://github.com/WeihongPan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">潘薇鸿</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

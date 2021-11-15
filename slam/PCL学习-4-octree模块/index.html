@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"weihongpan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="跬步千里">
+  <meta name="description" content="八叉树 Octree八叉树是一种树形数据结构，每个节点有0个或8个子节点，常用于分割三维空间，因为一个正方体最少可以等分为八个小正方体。在3D物体建模中是一种非常有效的存储数据的方法，尤其对于流形物体、点云图、体素这类稀疏化（sparse）数据而言，八叉树可以更好地展现数据的结构特性。 八叉树数据存储原理 将一个物体用最小的立方体包裹起来，然后对这个立方体使用八叉树的方式进行分割。因为是立体空间，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PCL学习(4)-octree模块">
 <meta property="og:url" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/index.html">
 <meta property="og:site_name" content="潘薇鸿">
-<meta property="og:description" content="跬步千里">
+<meta property="og:description" content="八叉树 Octree八叉树是一种树形数据结构，每个节点有0个或8个子节点，常用于分割三维空间，因为一个正方体最少可以等分为八个小正方体。在3D物体建模中是一种非常有效的存储数据的方法，尤其对于流形物体、点云图、体素这类稀疏化（sparse）数据而言，八叉树可以更好地展现数据的结构特性。 八叉树数据存储原理 将一个物体用最小的立方体包裹起来，然后对这个立方体使用八叉树的方式进行分割。因为是立体空间，">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/1626237833567.png">
 <meta property="article:published_time" content="2021-07-13T08:35:55.000Z">
-<meta property="article:modified_time" content="2021-07-13T08:43:05.748Z">
+<meta property="article:modified_time" content="2021-07-15T07:23:27.228Z">
 <meta property="article:author" content="潘薇鸿">
 <meta property="article:tag" content="PCL">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/1626237833567.png">
 
 <link rel="canonical" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/">
 
@@ -191,10 +193,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-07-13 16:35:55 / 修改时间：16:43:05" itemprop="dateCreated datePublished" datetime="2021-07-13T16:35:55+08:00">2021-07-13</time>
+              <time title="创建时间：2021-07-13 16:35:55" itemprop="dateCreated datePublished" datetime="2021-07-13T16:35:55+08:00">2021-07-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-15 15:23:27" itemprop="dateModified" datetime="2021-07-15T15:23:27+08:00">2021-07-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -216,7 +224,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h4 id="八叉树-Octree"><a href="#八叉树-Octree" class="headerlink" title="八叉树 Octree"></a>八叉树 Octree</h4><p>八叉树是一种树形数据结构，每个节点有0个或8个子节点，常用于分割三维空间，因为一个正方体最少可以等分为八个小正方体。在3D物体建模中是一种非常有效的存储数据的方法，尤其对于流形物体、点云图、体素这类稀疏化（sparse）数据而言，八叉树可以更好地展现数据的结构特性。</p>
+<h5 id="八叉树数据存储原理"><a href="#八叉树数据存储原理" class="headerlink" title="八叉树数据存储原理"></a>八叉树数据存储原理</h5><p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/1626237833567.png" alt="1626237833567"></p>
+<p>将一个物体用最小的立方体包裹起来，然后对这个立方体使用八叉树的方式进行分割。因为是立体空间，所以每次划分都会把一个方块分为8个等分的子方块，若某个子方块中没有包含这个物体，那么就把这个小方块储存的数据置为0，表示这是一个空的区域；反之置为1，并继续分割下去，直到不存在部分被物体占据的子方块后停止分割（要么不包含该物体，要么被该物体占满）。</p>
+<p>第一次分割完后只有两个方块非空，于是这两个位置的数据被置为1，其他全为0；然后继续分割值为1的子方块，直到达到最大深度后停止分割。如图所示，最终需要用1+8+64=73位（bit）来存储这种八叉树结构：1 01010000 00000000 01010000 00000000 01010000… 第一位的数字1表示根节点，第二位到第九位数字01010000表示了八叉树分割深度达到2时的子节点的分割情况，以此类推，深度为3时一共需要8*8=64位来储存相应的子节点的分割情况。</p>
+<p>因此，为了看清楚物体的形状，只需要找到这73个位置对应的数值就行了。而对于同样的分辨率的体素来说，因为是3维空间，每一点都有3个坐标，所以建立同样的空间我们需要多达8*8*8=512个点的坐标索引，因此也就需要记录512个位置的数据。这种思想叫做位表示（Bit-representation），它能帮助我们更加高效地存储稀疏化数据。</p>
+<p>八叉树数据结构可以更高效地储存数据，减少计算机内存和磁盘空间的占用，这一特点使得其在3D模型等稀疏化数据处理中逐渐受到学者的青睐。同时八叉树也是一种对数据的特征提取，因为八叉树一层一层不断划分子空间的过程也包含了物体的空间信息，这也给我们后续的数据进一步处理（比如说计算机视觉领域的物体分类等）提供了便利。</p>
+<h4 id="PCL中-octree-模块的类"><a href="#PCL中-octree-模块的类" class="headerlink" title="PCL中 octree 模块的类"></a>PCL中 octree 模块的类</h4><p>octree模块提供了对 octree 数据结构的实现，利用FLANN进行快速<strong>邻域检索</strong>，邻域检索在匹配、特征描述子计算、邻域特征提取中是非常基础的核心操作。octree 模块包含 17 个类，实现对点云的高效管理和检索以及相应的一些空间处理算法，例如压缩、空间变化检测等，依赖于 <code>pcl_common</code> 模块。</p>
+<ul>
+<li><code>pcl::octree::Octree2BufBase&lt;LeafContainerT, BranchContainerT&gt;</code></li>
+</ul>
+
     </div>
 
     
@@ -237,7 +255,10 @@
     <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-3-kd-tree%E6%A8%A1%E5%9D%97/" rel="prev" title="PCL学习(3):kd-tree模块">
       <i class="fa fa-chevron-left"></i> PCL学习(3):kd-tree模块
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/SLAM/SLAM%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A301/" rel="next" title="SLAM源码详解01">
+      SLAM源码详解01 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -296,6 +317,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AB%E5%8F%89%E6%A0%91-Octree"><span class="nav-number">1.</span> <span class="nav-text">八叉树 Octree</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%AB%E5%8F%89%E6%A0%91%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">八叉树数据存储原理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PCL%E4%B8%AD-octree-%E6%A8%A1%E5%9D%97%E7%9A%84%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">PCL中 octree 模块的类</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -311,7 +333,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -324,7 +346,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

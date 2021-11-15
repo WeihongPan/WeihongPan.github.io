@@ -165,6 +165,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/SLAM%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A301/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/SLAM/SLAM%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A301/" class="post-title-link" itemprop="url">SLAM源码详解01</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-08-11 09:24:56 / 修改时间：10:09:14" itemprop="dateCreated datePublished" datetime="2021-08-11T09:24:56+08:00">2021-08-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>首先简单说明一下ORB-SLAM的变量名前缀设计：</p>
+<ul>
+<li>m：类中的成员变量（member）</li>
+<li>p：指针数据类型（point）</li>
+<li>n：int数据类型</li>
+<li>b：bool数据类型</li>
+<li>s：set数据类型</li>
+<li>v：vector数据类型</li>
+<li>l：list数据类型</li>
+<li>KF：KeyFrame数据类型</li>
+</ul>
+<h3 id="系统构造函数、特征点金字塔、构造灰度质心圆"><a href="#系统构造函数、特征点金字塔、构造灰度质心圆" class="headerlink" title="系统构造函数、特征点金字塔、构造灰度质心圆"></a>系统构造函数、特征点金字塔、构造灰度质心圆</h3><p>以单目情况 <code>mono_tum.cc</code> 为例，调用 <code>LoadImages</code> 函数加载图片和时间戳后开始创建SLAM系统，用于初始化所有系统线程（Local Mapping、Loop Closing、Viewer）并为下一步处理帧做准备。</p>
+<h4 id="系统构造函数类-ORB-SLAM2-System"><a href="#系统构造函数类-ORB-SLAM2-System" class="headerlink" title="系统构造函数类 ORB_SLAM2::System"></a>系统构造函数类 ORB_SLAM2::System</h4><p>本类定义在 <code>System.h</code> 中，实现在 <code>System.cc</code> 中。构造函数定义如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">System</span>(<span class="keyword">const</span> string &amp;strVocFile,            <span class="comment">//指定ORB字典文件的路径</span></span><br><span class="line">       <span class="keyword">const</span> string &amp;strSettingsFile,       <span class="comment">//指定配置文件的路径</span></span><br><span class="line">       <span class="keyword">const</span> eSensor sensor,                <span class="comment">//指定所使用的传感器类型</span></span><br><span class="line">       <span class="keyword">const</span> <span class="keyword">bool</span> bUseViewer = <span class="literal">true</span>);       <span class="comment">//指定是否使用可视化界面 TODO </span></span><br></pre></td></tr></table></figure>
+<p>其中，<code>eSensor</code> 是一个枚举类型，用于表示本系统所使用的所有传感器类型</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -188,10 +270,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-07-13 16:35:55 / 修改时间：16:43:05" itemprop="dateCreated datePublished" datetime="2021-07-13T16:35:55+08:00">2021-07-13</time>
+              <time title="创建时间：2021-07-13 16:35:55" itemprop="dateCreated datePublished" datetime="2021-07-13T16:35:55+08:00">2021-07-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-15 15:23:27" itemprop="dateModified" datetime="2021-07-15T15:23:27+08:00">2021-07-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -213,7 +301,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <h4 id="八叉树-Octree"><a href="#八叉树-Octree" class="headerlink" title="八叉树 Octree"></a>八叉树 Octree</h4><p>八叉树是一种树形数据结构，每个节点有0个或8个子节点，常用于分割三维空间，因为一个正方体最少可以等分为八个小正方体。在3D物体建模中是一种非常有效的存储数据的方法，尤其对于流形物体、点云图、体素这类稀疏化（sparse）数据而言，八叉树可以更好地展现数据的结构特性。</p>
+<h5 id="八叉树数据存储原理"><a href="#八叉树数据存储原理" class="headerlink" title="八叉树数据存储原理"></a>八叉树数据存储原理</h5><p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-4-octree%E6%A8%A1%E5%9D%97/1626237833567.png" alt="1626237833567"></p>
+<p>将一个物体用最小的立方体包裹起来，然后对这个立方体使用八叉树的方式进行分割。因为是立体空间，所以每次划分都会把一个方块分为8个等分的子方块，若某个子方块中没有包含这个物体，那么就把这个小方块储存的数据置为0，表示这是一个空的区域；反之置为1，并继续分割下去，直到不存在部分被物体占据的子方块后停止分割（要么不包含该物体，要么被该物体占满）。</p>
+<p>第一次分割完后只有两个方块非空，于是这两个位置的数据被置为1，其他全为0；然后继续分割值为1的子方块，直到达到最大深度后停止分割。如图所示，最终需要用1+8+64=73位（bit）来存储这种八叉树结构：1 01010000 00000000 01010000 00000000 01010000… 第一位的数字1表示根节点，第二位到第九位数字01010000表示了八叉树分割深度达到2时的子节点的分割情况，以此类推，深度为3时一共需要8*8=64位来储存相应的子节点的分割情况。</p>
+<p>因此，为了看清楚物体的形状，只需要找到这73个位置对应的数值就行了。而对于同样的分辨率的体素来说，因为是3维空间，每一点都有3个坐标，所以建立同样的空间我们需要多达8*8*8=512个点的坐标索引，因此也就需要记录512个位置的数据。这种思想叫做位表示（Bit-representation），它能帮助我们更加高效地存储稀疏化数据。</p>
+<p>八叉树数据结构可以更高效地储存数据，减少计算机内存和磁盘空间的占用，这一特点使得其在3D模型等稀疏化数据处理中逐渐受到学者的青睐。同时八叉树也是一种对数据的特征提取，因为八叉树一层一层不断划分子空间的过程也包含了物体的空间信息，这也给我们后续的数据进一步处理（比如说计算机视觉领域的物体分类等）提供了便利。</p>
+<h4 id="PCL中-octree-模块的类"><a href="#PCL中-octree-模块的类" class="headerlink" title="PCL中 octree 模块的类"></a>PCL中 octree 模块的类</h4><p>octree模块提供了对 octree 数据结构的实现，利用FLANN进行快速<strong>邻域检索</strong>，邻域检索在匹配、特征描述子计算、邻域特征提取中是非常基础的核心操作。octree 模块包含 17 个类，实现对点云的高效管理和检索以及相应的一些空间处理算法，例如压缩、空间变化检测等，依赖于 <code>pcl_common</code> 模块。</p>
+<ul>
+<li><code>pcl::octree::Octree2BufBase&lt;LeafContainerT, BranchContainerT&gt;</code></li>
+</ul>
+
       
     </div>
 
@@ -330,6 +428,140 @@
 <p><a target="_blank" rel="noopener" href="https://pcl.readthedocs.io/projects/tutorials/en/latest/kdtree_search.html#kdtree-search">代码示例</a> </p>
 <p>运行输出：</p>
 <p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-3-kd-tree%E6%A8%A1%E5%9D%97/1626165206589.png" alt="1626165206589"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="潘薇鸿">
+      <meta itemprop="description" content="跬步千里">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="潘薇鸿">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">PCL学习(2):IO模块</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-13 16:42:26" itemprop="dateModified" datetime="2021-07-13T16:42:26+08:00">2021-07-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="OpenNI开源框架"><a href="#OpenNI开源框架" class="headerlink" title="OpenNI开源框架"></a>OpenNI开源框架</h4><p>OpenNI是一个多语言、跨平台的框架，主要目的是形成标准的、用于&lt;视音频传感器&gt;和&lt;视音频感知中间件&gt;间通信的API，兼容设备包括Primesense Reference Design、Microsoft Kinect 和 Asus XtionPro三种摄像头设备</p>
+<h4 id="I-O模块"><a href="#I-O模块" class="headerlink" title="I/O模块"></a>I/O模块</h4><p>包括有21个类和28个函数，实现对点云的获取、读入、存储等操作，既可通过点云文件进行输入输出，也可以通过封装借口直接从兼容设备获取源数据（包括RGB图像、深度图像和红外图像）。依赖 <code>pcl_common</code> 和 <code>pcl_octree</code> 及 OpenNI 外部开发包。</p>
+<h4 id="PCD（点云数据）文件格式"><a href="#PCD（点云数据）文件格式" class="headerlink" title="PCD（点云数据）文件格式"></a>PCD（点云数据）文件格式</h4><h5 id="文件头格式"><a href="#文件头格式" class="headerlink" title="文件头格式"></a>文件头格式</h5><p>每个PCD文件都有一个文件头用来声明文件中存储的点云数据的各项特性，文件头必须用ASCII码编码，从0.7版本开始文件头<strong>按顺序</strong>包含以下字段，各字段之间用换行隔开：</p>
+<ul>
+<li><p>VERSION：指定PCD文件版本</p>
+</li>
+<li><p>FIELDS：指定一个点可以有的每个维度和字段的名字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FIELDS x y z							# XYZ 坐标数据</span><br><span class="line">FIELDS x y z rgb						# XYZ + 颜色数据</span><br><span class="line">FIELDS x y z normal_x normal_y normal_z # XYZ + 表面法向量</span><br><span class="line">FIELDS j1 j2 j3							# moment invariants</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>SIZE：用字节数指定每个维度的大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">unsigned char / char -&gt; 1 byte</span><br><span class="line">unsigned short / short -&gt; 2 bytes</span><br><span class="line">unsigned int / int / float -&gt; 4 bytes</span><br><span class="line">double -&gt; 8 bytes</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>TYPE：用一个字符指定每个维度的类型</p>
+<ul>
+<li><code>I</code> ：表示有符号类型</li>
+<li><code>U</code> ：表示无符号类型</li>
+<li><code>F</code> ：表示浮点类型</li>
+</ul>
+</li>
+<li><p>COUNT：指定每个维度包含的元素数目（实际上是在给每个点引入n维直方图描述符的方法）默认情况下所有维度数目为1</p>
+</li>
+<li><p>WIDTH：用点的数量表示点云数据集的宽度</p>
+<ul>
+<li>无序数据集：表示点云中点的总数</li>
+<li>有序数据集：表示点云数据集的宽度（一行中点的个数）</li>
+</ul>
+</li>
+<li><p>HEIGHT：用点的数量表示点云数据集的高度（用来检查一个点云数据集是否有序）</p>
+<ul>
+<li>无序数据集：固定为1</li>
+<li>有序数据集：表示点云数据集的高度（行的总数）</li>
+</ul>
+</li>
+<li><p>VIEWPOINT：指定数据集中点云的获取视点，视点信息被指定为 <code>平移（tx ty tz)</code> + <code>四元数（qw qx qy qz）</code>，默认值为 <code>VIEWPOINT 0 0 0 1 0 0 0</code></p>
+</li>
+<li><p>POINTS：指定点云中点的总数</p>
+</li>
+<li><p>DATA：指定存储点云数据的数据类型，包括ASCII码和二进制两种。DATA的下一个字节开始就被视为点云的数据部分</p>
+</li>
+<li><p>举例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># .PCD v.7 - Point CLoud Data file format</span><br><span class="line">VERSION .7</span><br><span class="line">FIELDS x y z rgb</span><br><span class="line">SIZE 4 4 4 4</span><br><span class="line">TYPE F F F F</span><br><span class="line">COUNT 1 1 1 1</span><br><span class="line">WDTH 213</span><br><span class="line">HEIGHT 1</span><br><span class="line">VIEWPOINT 0 0 0 1 0 0 0</span><br><span class="line">POINTS 213</span><br><span class="line">DATA ascii</span><br><span class="line">0.93773 0.33763 0 4.2108e+06</span><br><span class="line">0.90805 0.35641 0 4.2108e+06</span><br></pre></td></tr></table></figure>
+<p>这是一个0.7版本的PCD文件，每个点都有一个三维坐标数据和一个rgb颜色数据，四个维度均以浮点4字节存储（即float类型变量）。点云数据集无序，共213个点，默认视角，数据以ASCII码格式存储。</p>
+</li>
+</ul>
+<h4 id="IO常用操作"><a href="#IO常用操作" class="headerlink" title="IO常用操作"></a>IO常用操作</h4><h5 id="PCD文件读取"><a href="#PCD文件读取" class="headerlink" title="PCD文件读取"></a>PCD文件读取</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> pcl::io::loadPCDFile&lt;PointT&gt; (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
+<p>返回-1表示读取失败</p>
+<h5 id="PCD文件写入"><a href="#PCD文件写入" class="headerlink" title="PCD文件写入"></a>PCD文件写入</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>	pcl::io::<span class="built_in">savePCDFileASCII</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br><span class="line"><span class="keyword">int</span> pcl::io::<span class="built_in">savePCDFileBinary</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
+<h5 id="连接两个点云"><a href="#连接两个点云" class="headerlink" title="连接两个点云"></a>连接两个点云</h5><ul>
+<li><p><strong>点连接</strong>：即将两个格式相同（包括字段类型和维度都要相同）的点云中的点合并。&lt;增加点数&gt;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cloud_c = cloud_a;</span><br><span class="line">cloud_c += cloud_b;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626140895249">-IO模块/1626140895249.png)</p>
+</li>
+<li><p><strong>域（字段）连接</strong>：例如点云A为N个点的XYZ点（pcl::PointXYZ），点云B为N个点的法向量（pcl::Normal），那么将两个点云进行字段连接得到的点云C则为N个点的pcl::PointNormal类型。&lt;增加维度&gt;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::concatenateFields</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn1T&gt; &amp;cloud1_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn2T&gt; &amp;cloud2_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    pcl::PointCloud&lt;PointOutT&gt; &amp;cloud_out)</span></span></span><br></pre></td></tr></table></figure>
+<p>例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pcl::<span class="built_in">concatenateFields</span>(cloud_a, n_cloud_b, p_n_cloud_c);</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/1626141295700.png" alt="1626141295700"></p>
+</li>
+</ul>
 
       
     </div>
@@ -486,140 +718,6 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Saved 5 data points to test_pcd.pcd</span><br><span class="line">   0.352222 -0.151883 -0.106395</span><br><span class="line">   -0.397406 -0.473106 0.292602</span><br><span class="line">   -0.731898 0.667105 0.441304</span><br><span class="line">   -0.734766 0.854581 -0.0361733</span><br><span class="line">   -0.4607 -0.277468 -0.916762</span><br></pre></td></tr></table></figure>
 <p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-1-Ubuntu16.04%E6%97%A0%E6%9D%83%E9%99%90%E6%96%AD%E7%BD%91%E4%BB%8E%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85PCL/1626058927783.png" alt="1626058927783"></p>
 <p>成功输出就说明安装成功了！</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">PCL学习(2):IO模块</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-12 00:08:00" itemprop="dateCreated datePublished" datetime="2021-07-12T00:08:00+08:00">2021-07-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-13 16:42:26" itemprop="dateModified" datetime="2021-07-13T16:42:26+08:00">2021-07-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SLAM/" itemprop="url" rel="index"><span itemprop="name">SLAM</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="OpenNI开源框架"><a href="#OpenNI开源框架" class="headerlink" title="OpenNI开源框架"></a>OpenNI开源框架</h4><p>OpenNI是一个多语言、跨平台的框架，主要目的是形成标准的、用于&lt;视音频传感器&gt;和&lt;视音频感知中间件&gt;间通信的API，兼容设备包括Primesense Reference Design、Microsoft Kinect 和 Asus XtionPro三种摄像头设备</p>
-<h4 id="I-O模块"><a href="#I-O模块" class="headerlink" title="I/O模块"></a>I/O模块</h4><p>包括有21个类和28个函数，实现对点云的获取、读入、存储等操作，既可通过点云文件进行输入输出，也可以通过封装借口直接从兼容设备获取源数据（包括RGB图像、深度图像和红外图像）。依赖 <code>pcl_common</code> 和 <code>pcl_octree</code> 及 OpenNI 外部开发包。</p>
-<h4 id="PCD（点云数据）文件格式"><a href="#PCD（点云数据）文件格式" class="headerlink" title="PCD（点云数据）文件格式"></a>PCD（点云数据）文件格式</h4><h5 id="文件头格式"><a href="#文件头格式" class="headerlink" title="文件头格式"></a>文件头格式</h5><p>每个PCD文件都有一个文件头用来声明文件中存储的点云数据的各项特性，文件头必须用ASCII码编码，从0.7版本开始文件头<strong>按顺序</strong>包含以下字段，各字段之间用换行隔开：</p>
-<ul>
-<li><p>VERSION：指定PCD文件版本</p>
-</li>
-<li><p>FIELDS：指定一个点可以有的每个维度和字段的名字</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FIELDS x y z							# XYZ 坐标数据</span><br><span class="line">FIELDS x y z rgb						# XYZ + 颜色数据</span><br><span class="line">FIELDS x y z normal_x normal_y normal_z # XYZ + 表面法向量</span><br><span class="line">FIELDS j1 j2 j3							# moment invariants</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>SIZE：用字节数指定每个维度的大小</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">unsigned char / char -&gt; 1 byte</span><br><span class="line">unsigned short / short -&gt; 2 bytes</span><br><span class="line">unsigned int / int / float -&gt; 4 bytes</span><br><span class="line">double -&gt; 8 bytes</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>TYPE：用一个字符指定每个维度的类型</p>
-<ul>
-<li><code>I</code> ：表示有符号类型</li>
-<li><code>U</code> ：表示无符号类型</li>
-<li><code>F</code> ：表示浮点类型</li>
-</ul>
-</li>
-<li><p>COUNT：指定每个维度包含的元素数目（实际上是在给每个点引入n维直方图描述符的方法）默认情况下所有维度数目为1</p>
-</li>
-<li><p>WIDTH：用点的数量表示点云数据集的宽度</p>
-<ul>
-<li>无序数据集：表示点云中点的总数</li>
-<li>有序数据集：表示点云数据集的宽度（一行中点的个数）</li>
-</ul>
-</li>
-<li><p>HEIGHT：用点的数量表示点云数据集的高度（用来检查一个点云数据集是否有序）</p>
-<ul>
-<li>无序数据集：固定为1</li>
-<li>有序数据集：表示点云数据集的高度（行的总数）</li>
-</ul>
-</li>
-<li><p>VIEWPOINT：指定数据集中点云的获取视点，视点信息被指定为 <code>平移（tx ty tz)</code> + <code>四元数（qw qx qy qz）</code>，默认值为 <code>VIEWPOINT 0 0 0 1 0 0 0</code></p>
-</li>
-<li><p>POINTS：指定点云中点的总数</p>
-</li>
-<li><p>DATA：指定存储点云数据的数据类型，包括ASCII码和二进制两种。DATA的下一个字节开始就被视为点云的数据部分</p>
-</li>
-<li><p>举例</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># .PCD v.7 - Point CLoud Data file format</span><br><span class="line">VERSION .7</span><br><span class="line">FIELDS x y z rgb</span><br><span class="line">SIZE 4 4 4 4</span><br><span class="line">TYPE F F F F</span><br><span class="line">COUNT 1 1 1 1</span><br><span class="line">WDTH 213</span><br><span class="line">HEIGHT 1</span><br><span class="line">VIEWPOINT 0 0 0 1 0 0 0</span><br><span class="line">POINTS 213</span><br><span class="line">DATA ascii</span><br><span class="line">0.93773 0.33763 0 4.2108e+06</span><br><span class="line">0.90805 0.35641 0 4.2108e+06</span><br></pre></td></tr></table></figure>
-<p>这是一个0.7版本的PCD文件，每个点都有一个三维坐标数据和一个rgb颜色数据，四个维度均以浮点4字节存储（即float类型变量）。点云数据集无序，共213个点，默认视角，数据以ASCII码格式存储。</p>
-</li>
-</ul>
-<h4 id="IO常用操作"><a href="#IO常用操作" class="headerlink" title="IO常用操作"></a>IO常用操作</h4><h5 id="PCD文件读取"><a href="#PCD文件读取" class="headerlink" title="PCD文件读取"></a>PCD文件读取</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> pcl::io::loadPCDFile&lt;PointT&gt; (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
-<p>返回-1表示读取失败</p>
-<h5 id="PCD文件写入"><a href="#PCD文件写入" class="headerlink" title="PCD文件写入"></a>PCD文件写入</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>	pcl::io::<span class="built_in">savePCDFileASCII</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br><span class="line"><span class="keyword">int</span> pcl::io::<span class="built_in">savePCDFileBinary</span> (</span><br><span class="line">    <span class="keyword">const</span> std::string &amp;file_name, </span><br><span class="line">    <span class="keyword">const</span> pcl::PointCloud&lt;PointT&gt; &amp;cloud)</span><br></pre></td></tr></table></figure>
-<h5 id="连接两个点云"><a href="#连接两个点云" class="headerlink" title="连接两个点云"></a>连接两个点云</h5><ul>
-<li><p><strong>点连接</strong>：即将两个格式相同（包括字段类型和维度都要相同）的点云中的点合并。&lt;增加点数&gt;</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cloud_c = cloud_a;</span><br><span class="line">cloud_c += cloud_b;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/PCL学习(2" alt="1626140895249">-IO模块/1626140895249.png)</p>
-</li>
-<li><p><strong>域（字段）连接</strong>：例如点云A为N个点的XYZ点（pcl::PointXYZ），点云B为N个点的法向量（pcl::Normal），那么将两个点云进行字段连接得到的点云C则为N个点的pcl::PointNormal类型。&lt;增加维度&gt;</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcl::concatenateFields</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn1T&gt; &amp;cloud1_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">const</span> pcl::PointCloud&lt;PointIn2T&gt; &amp;cloud2_in, </span></span></span><br><span class="line"><span class="params"><span class="function">    pcl::PointCloud&lt;PointOutT&gt; &amp;cloud_out)</span></span></span><br></pre></td></tr></table></figure>
-<p>例：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pcl::<span class="built_in">concatenateFields</span>(cloud_a, n_cloud_b, p_n_cloud_c);</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<p><img src="/SLAM/PCL%E5%AD%A6%E4%B9%A0-2-IO%E6%A8%A1%E5%9D%97/1626141295700.png" alt="1626141295700"></p>
-</li>
-</ul>
 
       
     </div>
@@ -1745,165 +1843,6 @@ J_1 &  \cdots & 0 \\
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://weihongpan.github.io/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="潘薇鸿">
-      <meta itemprop="description" content="跬步千里">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="潘薇鸿">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/" class="post-title-link" itemprop="url">线性代数与稠密矩阵分解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-24 21:57:47" itemprop="dateCreated datePublished" datetime="2021-05-24T21:57:47+08:00">2021-05-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-27 01:20:54" itemprop="dateModified" datetime="2021-05-27T01:20:54+08:00">2021-05-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Eigen/" itemprop="url" rel="index"><span itemprop="name">Eigen</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>本章介绍如何利用不同的矩阵分解方法（LU，QR，SVD，特征分解等）求解线性系统</p>
-<h4 id="矩阵分解"><a href="#矩阵分解" class="headerlink" title="矩阵分解"></a>矩阵分解</h4><p>矩阵分解（decomposition/factorization）是指将矩阵拆分为若干矩阵的乘积，包括三角分解（LU）、满秩分解、QR分解、Jordan分解和奇异值分解（SVD）等。Eigen提供了常用的三种矩阵分解：LU、QR、SVD</p>
-<h5 id="三角分解-LU"><a href="#三角分解-LU" class="headerlink" title="三角分解 LU"></a>三角分解 LU</h5><script type="math/tex; mode=display">
-A=LU</script><p>将原方阵（square matrix）分解成一个上三角矩阵和一个下三角形矩阵。主要用于简化一个大矩阵的行列式的计算、求逆矩阵、求解方程组。这种分解法所得到的上下三角形矩阵并非唯一。</p>
-<h5 id="LLT分解（Cholesky分解）"><a href="#LLT分解（Cholesky分解）" class="headerlink" title="LLT分解（Cholesky分解）"></a>LLT分解（Cholesky分解）</h5><p>若A为<strong>正定矩阵</strong>，则A有如下唯一的分解形式：</p>
-<script type="math/tex; mode=display">
-A=LL^*</script><p>其中 $L$ 为下三角矩阵，$L^<em>$ 为其共轭转置矩阵，当A为实矩阵时，$L^</em>=L^T$ </p>
-<h5 id="LDLT分解"><a href="#LDLT分解" class="headerlink" title="LDLT分解"></a>LDLT分解</h5><p>若A为一<strong>对称矩阵</strong>且其任意<strong>k阶主子阵均不为零</strong>，即半正定或半负定，则A有如下惟一的分解形式：</p>
-<script type="math/tex; mode=display">
-A=LDL^T</script><p>其中 $L$ 为下三角形单位矩阵（即主对角线元素皆为1），$D$ 为对角矩阵，$L^T$ 为 $L$ 的转置矩阵。LDLT分解法是Cholesky分解法的改进，Cholesky分解法虽然不需要选主元，但其运算过程中涉及到开方问题，而LDLT分解法则避免了这一问题，可用于求解线性方程组。</p>
-<h5 id="QR分解"><a href="#QR分解" class="headerlink" title="QR分解"></a>QR分解</h5><p>对列向量线性无关的矩阵 A ：</p>
-<script type="math/tex; mode=display">
-A=QR</script><p>其中，$Q$ 为 $m\times m$ 的酉矩阵（实数域内称为正交矩阵），$R$ 为上三角矩阵</p>
-<h5 id="奇异值分解-SVD"><a href="#奇异值分解-SVD" class="headerlink" title="奇异值分解 SVD"></a>奇异值分解 SVD</h5><p>对任意矩阵 A：</p>
-<script type="math/tex; mode=display">
-A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为正交矩阵，$V^*=V^T$）且不唯一， $\Sigma$ 为对角矩阵，对角线上的元素称为A的奇异值。用于解最小二乘和数据压缩。</p>
-<h4 id="用矩阵分解求解线性方程组"><a href="#用矩阵分解求解线性方程组" class="headerlink" title="用矩阵分解求解线性方程组"></a>用<a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__TopicLinearAlgebraDecompositions.html">矩阵分解</a>求解线性方程组</h4><p>Eigen为矩阵提供了如图所示的分解方法，调用第二列的方法后会返回一个第一列对应的类对象，再通过调用该对象的 <code>solve()</code> 方法实现对方程的求解，具体见后文代码示例。</p>
-<p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224931096.png" alt="矩阵分解函数"></p>
-<h5 id="LU-分解"><a href="#LU-分解" class="headerlink" title="LU 分解"></a>LU 分解</h5><ul>
-<li><p><strong>partialPivLu()</strong></p>
-<p>基于部分消元的LU分解（必须是可逆方阵）。$A=PLU$ ，其中 $L$ 为单位下三角矩阵，$U$ 为上三角矩阵，$P$ 为置换矩阵，即只进行行变换</p>
-</li>
-<li><p><strong>fullPivLu()</strong></p>
-<p>基于全消元的LU分解（对任意矩阵）。$A=P^{-1}LUQ^{-1}$ ，$L,U,P$ 同上，$Q$ 为置换矩阵，即同时进行行变换和列变换。速度比部分消元慢</p>
-</li>
-<li><p><strong>llt()</strong></p>
-<p>标准Cholesky分解（必须是对称正定矩阵）。$A=LL^*$</p>
-</li>
-<li><p><strong>ldlt()</strong> </p>
-<p>有主元的鲁棒Cholesky分解（必须是半正定或半负定矩阵）。$A=P^TLDL^*P$ </p>
-</li>
-</ul>
-<h5 id="QR-分解"><a href="#QR-分解" class="headerlink" title="QR 分解"></a>QR 分解</h5><ul>
-<li><p><strong>householderQr()</strong> </p>
-<p>使用 <code>Househoder</code> 变换实现 $A=QR$ 的分解，其中 $Q$ 为酉矩阵，$R$ 为上三角矩阵。无主元，快，但不稳定</p>
-</li>
-<li><p><strong>colPivHouseholderQr()</strong> </p>
-<p>基于行变换（列主元消元法）的 <code>Householder</code> 变换，$AP=QR$ 。较慢，但更精确</p>
-</li>
-<li><p><strong>fullPivHouseholderQr()</strong> </p>
-<p>同时进行行变换和列变换的 <code>Householder</code> 变换，$PAP’=QR$ 。最慢，但最稳定</p>
-</li>
-<li><p><strong>completeOrthogonalDecomposition()</strong> </p>
-<p>完全正交分解。可以看作是QR分解的推广</p>
-</li>
-</ul>
-<h5 id="SVD-分解"><a href="#SVD-分解" class="headerlink" title="SVD 分解"></a>SVD 分解</h5><ul>
-<li><p><strong>bdcSvd()</strong> </p>
-<p>最快的SVD算法（推荐使用）</p>
-</li>
-<li><p><strong>jacobiSvd()</strong> </p>
-<p>对小矩阵速度快，大矩阵慢</p>
-</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html">表格</a>给出了上述所有分解方法的效率对比 </p>
-<p>代码示例：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Eigen&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ctime&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MATRIX_SIZE 10</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">     <span class="comment">/* 假设矩阵A为方阵，待求解方程为 Ax=b */</span></span><br><span class="line">     <span class="comment">// 首先定义一个随机矩阵A，随机列向量b和待求解向量x</span></span><br><span class="line">     MatrixXd A;</span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; b;</span><br><span class="line">     A = MatrixXd::<span class="built_in">Random</span>(MATRIX_SIZE, MATRIX_SIZE);</span><br><span class="line">     b = MatrixXd::<span class="built_in">Random</span>(MATRIX_SIZE, <span class="number">1</span>);</span><br><span class="line">     <span class="comment">// 定义时间变量，方便比较效率</span></span><br><span class="line">     <span class="keyword">clock_t</span> <span class="keyword">start_t</span>;</span><br><span class="line">     <span class="keyword">double</span> time;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法一：直接右乘A的逆矩阵 x = A^&#123;-1&#125;*b */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_inv;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_inv = A.<span class="built_in">inverse</span>()*b;</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_inv time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_inv = &quot;</span> &lt;&lt; x_inv.<span class="built_in">transpose</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法二：普通LU分解 </span></span><br><span class="line"><span class="comment">      * Eigen 提供了四种LU分解的方法</span></span><br><span class="line"><span class="comment">      * - partialPivLu(): A = PLU -&gt; 要求A必须可逆</span></span><br><span class="line"><span class="comment">      * - fullPivLu(): A = P^&#123;-1&#125;LUQ^&#123;-1&#125;</span></span><br><span class="line"><span class="comment">      * - llt(): A = LL^T -&gt; 要求A必须对称正定</span></span><br><span class="line"><span class="comment">      * - ldlt(): A = LDL^T -&gt; 要求A必须半正定或半负定</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 2.1 partialPivLu()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_plu;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_plu = A.<span class="built_in">partialPivLu</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_plu time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_plu = &quot;</span> &lt;&lt; x_plu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 2.2 fullPivLu()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_flu;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_flu = A.<span class="built_in">fullPivLu</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_flu time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_flu = &quot;</span> &lt;&lt; x_flu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法三：LLT分解 */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_llt;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     <span class="comment">// 因为llt分解要求 A 必须为正定矩阵，所以构造新的方程：(A^T*A)*x = A^T*b 来求解x</span></span><br><span class="line">     x_llt = (A.<span class="built_in">transpose</span>()*A).<span class="built_in">llt</span>().<span class="built_in">solve</span>(A.<span class="built_in">transpose</span>()*b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_llt time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_llt = &quot;</span> &lt;&lt; x_llt.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法四：LDLT分解 */</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_ldlt;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_ldlt = (A.<span class="built_in">transpose</span>()*A).<span class="built_in">llt</span>().<span class="built_in">solve</span>(A.<span class="built_in">transpose</span>()*b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_ldlt time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_ldlt = &quot;</span> &lt;&lt; x_ldlt.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法五：QR分解</span></span><br><span class="line"><span class="comment">      * Eigen 提供了四种QR分解的方法</span></span><br><span class="line"><span class="comment">      * - householderQr()</span></span><br><span class="line"><span class="comment">      * - colPivHouseholderQr()</span></span><br><span class="line"><span class="comment">      * - fullPivHouseholderQr()</span></span><br><span class="line"><span class="comment">      * - completeOrthogonalDecomposition()</span></span><br><span class="line"><span class="comment">      * 常用2和3</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 5.1 colPivHhouseholderQr()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_cqr;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_cqr = A.<span class="built_in">colPivHouseholderQr</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_cqr time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_cqr = &quot;</span> &lt;&lt; x_cqr.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 5.2 fullPivHhouseholderQr()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_fqr;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_fqr = A.<span class="built_in">fullPivHouseholderQr</span>().<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_fqr time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_fqr = &quot;</span> &lt;&lt; x_plu.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line"></span><br><span class="line">     <span class="comment">/* 方法六：SVD分解</span></span><br><span class="line"><span class="comment">      * Eigen 提供了两种SVD分解方法</span></span><br><span class="line"><span class="comment">      * - bdcSvd()</span></span><br><span class="line"><span class="comment">      * - jacobiSvd()</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="comment">// 6.1 bdcSvd()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_bsvd;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_bsvd = A.<span class="built_in">bdcSvd</span>(ComputeThinU|ComputeThinV).<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_bsvd time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_bsvd = &quot;</span> &lt;&lt; x_bsvd.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">     <span class="comment">// 6.2 jacobiSvd()</span></span><br><span class="line">     Matrix&lt;<span class="keyword">double</span>, MATRIX_SIZE, <span class="number">1</span>&gt; x_jsvd;</span><br><span class="line">     <span class="keyword">start_t</span> = <span class="built_in">clock</span>();</span><br><span class="line">     x_jsvd = A.<span class="built_in">jacobiSvd</span>(ComputeThinU|ComputeThinV).<span class="built_in">solve</span>(b);</span><br><span class="line">     time = <span class="number">1000</span> * (<span class="built_in">clock</span>() - <span class="keyword">start_t</span>) / (<span class="keyword">double</span>)CLOCKS_PER_SEC;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_jsvd time = &quot;</span> &lt;&lt; time &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; endl;</span><br><span class="line">     cout &lt;&lt; <span class="string">&quot;x_jsvd = &quot;</span> &lt;&lt; x_jsvd.<span class="built_in">transpose</span>() &lt;&lt; endl; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>计算结果：</p>
-<p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210526224615007.png" alt="计算结果"></p>
-<h4 id="计算特征值与特征向量"><a href="#计算特征值与特征向量" class="headerlink" title="计算特征值与特征向量"></a>计算特征值与特征向量</h4><p><img src="/Eigen/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%8E%E5%88%86%E8%A7%A3/image-20210527002238291.png" alt="image-20210527002238291"></p>
-<p>如图，Eigen为矩阵提供了四种<strong>特征分解</strong>的方法，第二列表示适用矩阵的条件，第三四列分别表示运算速度和精度</p>
-<p>以 <code>SelfAdjointEigenSolver</code> 为例，代码如下，其中 <code>info()</code> 函数用来检查特征值/特征向量是否收敛：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2f A;</span><br><span class="line">   A &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   <span class="function">SelfAdjointEigenSolver&lt;Matrix2f&gt; <span class="title">eigensolver</span><span class="params">(A)</span></span>;</span><br><span class="line">   <span class="keyword">if</span> (eigensolver.<span class="built_in">info</span>() != Success) <span class="built_in">abort</span>();</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The eigenvalues of A are:\n&quot;</span> &lt;&lt; eigensolver.<span class="built_in">eigenvalues</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here&#x27;s a matrix whose columns are eigenvectors of A \n&quot;</span></span><br><span class="line">        &lt;&lt; <span class="string">&quot;corresponding to these eigenvalues:\n&quot;</span></span><br><span class="line">        &lt;&lt; eigensolver.<span class="built_in">eigenvectors</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运算结果如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line">1 2</span><br><span class="line">2 3</span><br><span class="line">The eigenvalues of A are:</span><br><span class="line">-0.236</span><br><span class="line">  4.24</span><br><span class="line">Here<span class="string">&#x27;s a matrix whose columns are eigenvectors of A </span></span><br><span class="line"><span class="string">corresponding to these eigenvalues:</span></span><br><span class="line"><span class="string">-0.851 -0.526</span></span><br><span class="line"><span class="string"> 0.526 -0.851</span></span><br></pre></td></tr></table></figure>
-<h4 id="计算逆矩阵与行列式"><a href="#计算逆矩阵与行列式" class="headerlink" title="计算逆矩阵与行列式"></a>计算逆矩阵与行列式</h4><p>尽管逆和行列式是基本的数学概念，但它们在数值线性代数中不像在纯数学中那么常用。求逆通常由 <code>solve()</code> 代替，而行列式一般并不是检测矩阵是否可逆的好方法。不过对于比较小的矩阵，逆和行列式还是比较有用的。</p>
-<p>尽管Eigen提供了上述矩阵分解的方法，我们仍然可以直接调用 <code>inverse()</code> 方法和 <code>determinant()</code> 方法。若矩阵尺寸较小（不超过4x4），那么Eigen可以避免使用LU分解，而是使用数学公式，这样更高效。</p>
-<h4 id="求解最小二乘"><a href="#求解最小二乘" class="headerlink" title="求解最小二乘"></a><a target="_blank" rel="noopener" href="http://eigen.tuxfamily.org/dox/group__LeastSquares.html">求解最小二乘</a></h4><p>求解最小二乘最精确的方法是使用SVD分解。Eigen提供了两种方法（见上文），推荐使用 <code>bdcSvd()</code> ，对大规模问题友好，同时对小规模问题能自动降级到 <code>jacobiSvd()</code> 方法；</p>
-<p>另一种方法是使用 <code>Cholesky</code> 分解或 <code>QR</code> 分解，速度可能会快点，但准确率会下降；</p>
-<p>第三种方法是将方程转化为 $A^TAx=A^Tb$ 并使用 <code>ldlt()</code> 方法求解。不过，如果 A 是一个病态矩阵的话，这种方法就不会太好，因为 $A^TA$ 的条件数是 $A$ 的平方，这意味着这种方法会比其他方法损失两倍数值。</p>
-<h4 id="将求解和构造分开"><a href="#将求解和构造分开" class="headerlink" title="将求解和构造分开"></a>将求解和构造分开</h4><p>上面的例子将矩阵分解对象的构造和计算写在同一句中，当然也有方法将它们分开写，每种矩阵分解类都有一个默认的构造函数和一个 <code>compute(matrix)</code> 方法，该方法可以对不同的 <code>matrix</code> 重复调用：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2f A, b;</span><br><span class="line">   LLT&lt;Matrix2f&gt; llt;</span><br><span class="line">   A &lt;&lt; <span class="number">2</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">3</span>;</span><br><span class="line">   b &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the right hand side b:\n&quot;</span> &lt;&lt; b &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Computing LLT decomposition...&quot;</span> &lt;&lt; endl;</span><br><span class="line">   llt.<span class="built_in">compute</span>(A);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The solution is:\n&quot;</span> &lt;&lt; llt.<span class="built_in">solve</span>(b) &lt;&lt; endl;</span><br><span class="line">   <span class="built_in">A</span>(<span class="number">1</span>,<span class="number">1</span>)++;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The matrix A is now:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Computing LLT decomposition...&quot;</span> &lt;&lt; endl;</span><br><span class="line">   llt.<span class="built_in">compute</span>(A);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The solution is now:\n&quot;</span> &lt;&lt; llt.<span class="built_in">solve</span>(b) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line"> 2 -1</span><br><span class="line">-1  3</span><br><span class="line">Here is the right hand side b:</span><br><span class="line">1 2</span><br><span class="line">3 1</span><br><span class="line">Computing LLT decomposition...</span><br><span class="line">The solution is:</span><br><span class="line">1.2 1.4</span><br><span class="line">1.4 0.8</span><br><span class="line">The matrix A is now:</span><br><span class="line"> 2 -1</span><br><span class="line">-1  4</span><br><span class="line">Computing LLT decomposition...</span><br><span class="line">The solution is now:</span><br><span class="line">    1  1.29</span><br><span class="line">    1 0.571</span><br></pre></td></tr></table></figure>
-<p>也可以通过向构造函数中传入矩阵大小来预分配分解矩阵所需要的内存空间大小：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HouseholderQR&lt;MatrixXf&gt; <span class="title">qr</span><span class="params">(<span class="number">50</span>,<span class="number">50</span>)</span></span>;</span><br><span class="line">MatrixXf A = MatrixXf::<span class="built_in">Random</span>(<span class="number">50</span>,<span class="number">50</span>);</span><br><span class="line">qr.<span class="built_in">compute</span>(A); <span class="comment">// no dynamic memory allocation</span></span><br></pre></td></tr></table></figure>
-<h4 id="秩显式分解"><a href="#秩显式分解" class="headerlink" title="秩显式分解"></a>秩显式分解</h4><p>某些分解方法可以同时计算出矩阵的秩，这些通常也是在面对非满秩矩阵（方阵时称为奇异矩阵）时表现最好的方法。包括 <code>FullPivLU</code> 、<code>ColPivHouseholderQR</code> 、<code>FullPivHouseholderQR</code> 、<code>BDCSVD</code> 、<code>JacobiSVD</code> 、<code>SelfAdjointEigenSolver</code> 、<code>ComplexEigenSolver</code> 和 <code>EigenSolver</code> </p>
-<p>这些分解类至少提供了一个 <code>rank()</code> 方法用来求矩阵的秩。此外，还提供了一些方便的方法，例如 <code>isInvertible()</code> ；有些还提供了计算矩阵的内核(零空间)和图像(列空间)方法，例如 <code>FullPivLU</code> ：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix3f A;</span><br><span class="line">   A &lt;&lt; <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>,</span><br><span class="line">        <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>,</span><br><span class="line">        <span class="number">3</span>, <span class="number">0</span>, <span class="number">3</span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is the matrix A:\n&quot;</span> &lt;&lt; A &lt;&lt; endl;</span><br><span class="line">   <span class="function">FullPivLU&lt;Matrix3f&gt; <span class="title">lu_decomp</span><span class="params">(A)</span></span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;The rank of A is &quot;</span> &lt;&lt; lu_decomp.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is a matrix whose columns form a basis of the null-space of A:\n&quot;</span></span><br><span class="line">        &lt;&lt; lu_decomp.<span class="built_in">kernel</span>() &lt;&lt; endl;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;Here is a matrix whose columns form a basis of the column-space of A:\n&quot;</span></span><br><span class="line">        &lt;&lt; lu_decomp.<span class="built_in">image</span>(A) &lt;&lt; endl; <span class="comment">// yes, have to pass the original A</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Here is the matrix A:</span><br><span class="line">1 2 5</span><br><span class="line">2 1 4</span><br><span class="line">3 0 3</span><br><span class="line">The rank of A is 2</span><br><span class="line">Here is a matrix whose columns form a basis of the null-space of A:</span><br><span class="line"> 0.5</span><br><span class="line">   1</span><br><span class="line">-0.5</span><br><span class="line">Here is a matrix whose columns form a basis of the column-space of A:</span><br><span class="line">5 1</span><br><span class="line">4 2</span><br><span class="line">3 3</span><br></pre></td></tr></table></figure>
-<p>当然，任何秩计算都取决于对随机阈值的选择，因为实际上没有哪个浮点矩阵是完全秩亏的。Eigen会选择一个合理的默认阈值。我们也可以自己设定想要的正确阈值：在调用 <code>rank()</code> 或任何其他需要使用这个阈值的方法之前，调用 <code>setThreshold()</code> 来设置阈值。分解计算本身，即 <code>compute()</code> 方法，与阈值选取无关，所以在改变阈值之后，不需要重新计算矩阵分解。</p>
-<p>例：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Eigen/Dense&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> Eigen;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   Matrix2d A;</span><br><span class="line">   A &lt;&lt; <span class="number">2</span>, <span class="number">1</span>,</span><br><span class="line">        <span class="number">2</span>, <span class="number">0.9999999999</span>;</span><br><span class="line">   <span class="function">FullPivLU&lt;Matrix2d&gt; <span class="title">lu</span><span class="params">(A)</span></span>;</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;By default, the rank of A is found to be &quot;</span> &lt;&lt; lu.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">   lu.<span class="built_in">setThreshold</span>(<span class="number">1e-5</span>);</span><br><span class="line">   cout &lt;&lt; <span class="string">&quot;With threshold 1e-5, the rank of A is found to be &quot;</span> &lt;&lt; lu.<span class="built_in">rank</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">By default, the rank of A is found to be 2</span><br><span class="line">With threshold 1e-5, the rank of A is found to be 1</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1975,7 +1914,7 @@ A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1988,7 +1927,7 @@ A=U\Sigma V^*</script><p>其中 $U$ 和 $V$ 均为酉矩阵（实数域内称为
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
